@@ -4137,35 +4137,248 @@ video {
   border-color: rgba(var(--primary-rgb), 0.35);
 }
 
+.admin-remedy-mobile {
+  display: none;
+}
+
+.admin-remedy-cards {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.admin-remedy-card {
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 1rem;
+  background: var(--surface-muted);
+}
+
+.admin-remedy-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.admin-remedy-card-top h3 {
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: none;
+  -webkit-text-fill-color: var(--text-primary);
+}
+
+.admin-remedy-card-top p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.admin-remedy-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin: 0 0 0.75rem;
+}
+
+.admin-remedy-meta dt {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  font-weight: 750;
+  margin-bottom: 0.15rem;
+}
+
+.admin-remedy-meta dd {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
+.admin-remedy-card-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
 @media (max-width: 900px) {
   .admin-shell {
     grid-template-columns: 1fr;
   }
 
   .admin-nav {
+    position: sticky;
+    top: 57px;
+    z-index: 15;
     flex-direction: row;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     border-right: none;
     border-bottom: 1px solid var(--card-border);
-    padding: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    gap: 0.45rem;
+  }
+
+  .admin-nav::-webkit-scrollbar {
+    display: none;
   }
 
   .admin-nav-btn {
     flex: 0 0 auto;
     white-space: nowrap;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  .admin-main {
+    padding: 1rem 0.85rem 1.5rem;
+  }
+
+  .admin-panel {
+    border-radius: 16px;
+    padding: 1rem;
+  }
+
+  .admin-remedy-desktop {
+    display: none;
+  }
+
+  .admin-remedy-mobile {
+    display: grid;
   }
 }
 
 @media (max-width: 600px) {
+  .admin-login-wrap {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: max(1.5rem, env(safe-area-inset-top));
+  }
+
+  .admin-login-card {
+    padding: 1.35rem 1.15rem;
+    border-radius: 16px;
+  }
+
+  .admin-login-card h1 {
+    font-size: 1.3rem;
+  }
+
+  .admin-topbar {
+    padding: 0.7rem 0.85rem;
+    gap: 0.65rem;
+  }
+
+  .admin-brand strong {
+    font-size: 0.85rem;
+  }
+
+  .admin-brand span {
+    display: none;
+  }
+
+  .admin-link-btn {
+    font-size: 0.78rem;
+  }
+
+  .admin-logout {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .admin-logout-label {
+    display: none;
+  }
+
+  .admin-nav {
+    top: 52px;
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+
+  .admin-nav-btn {
+    gap: 0.4rem;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .admin-count {
+    font-size: 0.65rem;
+    padding: 0.12rem 0.38rem;
+  }
+
+  .admin-main {
+    padding: 0.85rem 0.7rem 1.25rem;
+  }
+
+  .admin-panel-head h2 {
+    font-size: 1.1rem;
+  }
+
+  .admin-panel-head p {
+    font-size: 0.8rem;
+  }
+
   .admin-form-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .admin-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .admin-form-actions .btn,
+  .admin-form-actions .btn-primary {
+    width: 100%;
+    min-width: 0;
   }
 
   .admin-contact-top {
     flex-direction: column;
+    align-items: flex-start;
   }
 
-  .admin-topbar {
+  .admin-contact-top span {
+    white-space: normal;
+  }
+
+  .admin-contact-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .admin-consult-pay {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-remedy-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-remedy-card-top {
     flex-wrap: wrap;
+  }
+
+  .admin-input {
+    font-size: 16px; /* prevents iOS zoom */
+  }
+}
+
+@media (max-width: 380px) {
+  .admin-nav-btn span.admin-count {
+    display: none;
+  }
+
+  .admin-remedy-meta {
+    grid-template-columns: 1fr;
   }
 }

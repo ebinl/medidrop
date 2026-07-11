@@ -292,7 +292,7 @@ export default function AdminPage({ addToast }) {
           </Link>
           <button type="button" className="btn btn-outline admin-logout" onClick={handleLogout}>
             <LogOut size={16} />
-            Logout
+            <span className="admin-logout-label">Logout</span>
           </button>
         </div>
       </header>
@@ -480,46 +480,91 @@ export default function AdminPage({ addToast }) {
                   </button>
                 </div>
               ) : (
-                <div className="admin-remedy-table-wrap">
-                  <table className="admin-remedy-table">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Min qty</th>
-                        <th>Source</th>
-                        <th>Added</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {remedies.map((r) => (
-                        <tr key={r.id}>
-                          <td>
-                            <strong>{r.name}</strong>
-                            <span>{r.scientificName}</span>
-                          </td>
-                          <td>{r.category || '—'}</td>
-                          <td>₹{r.price}</td>
-                          <td>{r.minQuantity}</td>
-                          <td>{r.isDefault ? 'Catalog' : 'Added'}</td>
-                          <td>{formatDate(r.createdAt)}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="admin-edit-btn"
-                              onClick={() => startEditRemedy(r)}
-                            >
-                              <Pencil size={14} />
-                              Edit
-                            </button>
-                          </td>
+                <>
+                  <div className="admin-remedy-table-wrap admin-remedy-desktop">
+                    <table className="admin-remedy-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Category</th>
+                          <th>Price</th>
+                          <th>Min qty</th>
+                          <th>Source</th>
+                          <th>Added</th>
+                          <th>Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {remedies.map((r) => (
+                          <tr key={r.id}>
+                            <td>
+                              <strong>{r.name}</strong>
+                              <span>{r.scientificName}</span>
+                            </td>
+                            <td>{r.category || '—'}</td>
+                            <td>₹{r.price}</td>
+                            <td>{r.minQuantity}</td>
+                            <td>{r.isDefault ? 'Catalog' : 'Added'}</td>
+                            <td>{formatDate(r.createdAt)}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="admin-edit-btn"
+                                onClick={() => startEditRemedy(r)}
+                              >
+                                <Pencil size={14} />
+                                Edit
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="admin-remedy-cards admin-remedy-mobile">
+                    {remedies.map((r) => (
+                      <article key={r.id} className="admin-remedy-card">
+                        <div className="admin-remedy-card-top">
+                          <div>
+                            <h3>{r.name}</h3>
+                            {r.scientificName && <p>{r.scientificName}</p>}
+                          </div>
+                          <button
+                            type="button"
+                            className="admin-edit-btn"
+                            onClick={() => startEditRemedy(r)}
+                          >
+                            <Pencil size={14} />
+                            Edit
+                          </button>
+                        </div>
+                        <dl className="admin-remedy-meta">
+                          <div>
+                            <dt>Category</dt>
+                            <dd>{r.category || '—'}</dd>
+                          </div>
+                          <div>
+                            <dt>Price</dt>
+                            <dd>₹{r.price}</dd>
+                          </div>
+                          <div>
+                            <dt>Min qty</dt>
+                            <dd>{r.minQuantity}</dd>
+                          </div>
+                          <div>
+                            <dt>Source</dt>
+                            <dd>{r.isDefault ? 'Catalog' : 'Added'}</dd>
+                          </div>
+                        </dl>
+                        <span className="admin-remedy-card-date">
+                          <Clock size={12} />
+                          {formatDate(r.createdAt)}
+                        </span>
+                      </article>
+                    ))}
+                  </div>
+                </>
               )}
             </section>
           )}
