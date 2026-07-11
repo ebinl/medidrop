@@ -8,13 +8,16 @@ export default function RemediesPage({ onAddToCart }) {
     <div className="remedies-page">
       <section className="remedies-hero">
         <div className="remedies-hero-inner">
-          <Link to="/" className="remedies-back">
-            <ArrowLeft size={16} />
-            Back to Home
-          </Link>
-          <div className="remedies-hero-badge">
-            <Leaf size={14} />
-            Pure Homeopathic Catalog
+          <div className="remedies-hero-meta">
+            <Link to="/" className="remedies-back">
+              <ArrowLeft size={15} strokeWidth={2.25} />
+              <span>Back to Home</span>
+            </Link>
+            <span className="remedies-meta-dot" aria-hidden="true" />
+            <div className="remedies-hero-badge">
+              <Leaf size={13} strokeWidth={2.25} />
+              <span>Pure Homeopathic Catalog</span>
+            </div>
           </div>
           <h1>Homeopathic Remedies</h1>
           <p>

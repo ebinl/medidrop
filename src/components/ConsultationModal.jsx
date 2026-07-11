@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Video, ShieldCheck, CreditCard, Check, Copy, RefreshCw, Smartphone, Calendar, Clock, User, Mail, Phone, Stethoscope } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { submitConsultation } from '../services/consultations';
 
 const STEPS = [
   { id: 1, label: 'Details' },
@@ -96,7 +97,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
     setStep(2);
   };
 
-  const handlePaymentSubmit = (e) => {
+  const handlePaymentSubmit = async (e) => {
     e.preventDefault();
 
     if (paymentMethod === 'upi') {
@@ -138,7 +139,16 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
 
     setIsProcessing(true);
 
-    setTimeout(() => {
+    try {
+      const digits = cardData.number.replace(/\s/g, '');
+      await submitConsultation({
+        ...formData,
+        paymentMethod,
+        upiRefNo: paymentMethod === 'upi' ? upiRefNo : '',
+        cardHolder: paymentMethod === 'card' ? cardData.holder.trim() : '',
+        cardLast4: paymentMethod === 'card' ? digits.slice(-4) : '',
+      });
+
       setIsProcessing(false);
       setStep(3);
       confetti({
@@ -151,7 +161,15 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
         message: "Your ₹200 payment was confirmed and video session is scheduled.",
         type: "success"
       });
-    }, 2500);
+    } catch (err) {
+      console.error(err);
+      setIsProcessing(false);
+      addToast({
+        title: "Booking Failed",
+        message: "Could not save your consultation. Please try again.",
+        type: "error"
+      });
+    }
   };
 
   const resetModal = () => {

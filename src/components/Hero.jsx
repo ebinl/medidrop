@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Video, Calendar, ShieldCheck, Heart, Users } from 'lucide-react';
+import { Video, Calendar, ShieldCheck, Stethoscope, Users } from 'lucide-react';
 
 export default function Hero({ onConsultationClick }) {
   return (
@@ -48,9 +48,9 @@ export default function Hero({ onConsultationClick }) {
           <span className="hero-stat-label">Instant Video Support</span>
         </div>
         <div className="glass-interactive hero-stat-card">
-          <Heart size={28} className="hero-stat-icon primary" />
-          <span className="hero-stat-value">10 Set</span>
-          <span className="hero-stat-label">Curated Organic Packages</span>
+          <Stethoscope size={28} className="hero-stat-icon primary" />
+          <span className="hero-stat-value">₹200</span>
+          <span className="hero-stat-label">Online Doctor Consultation</span>
         </div>
       </div>
     </section>

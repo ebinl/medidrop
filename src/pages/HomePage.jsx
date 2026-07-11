@@ -1,11 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
-import { Activity, HeartPulse, Clock } from 'lucide-react';
+import DoctorCard from '../components/DoctorCard';
+import MedicineGrid from '../components/MedicineGrid';
+import { Activity, HeartPulse, Clock, ArrowRight } from 'lucide-react';
 
-export default function HomePage({ onConsultationClick }) {
+export default function HomePage({ onConsultationClick, onAddToCart }) {
   return (
     <>
       <Hero onConsultationClick={onConsultationClick} />
+
+      <DoctorCard onConsultationClick={onConsultationClick} />
 
       <section id="features" className="features-section">
         <div className="section-header">
@@ -39,6 +44,15 @@ export default function HomePage({ onConsultationClick }) {
           </div>
         </div>
       </section>
+
+      <MedicineGrid onAddToCart={onAddToCart} />
+
+      <div className="home-remedies-more">
+        <Link to="/remedies" className="btn btn-outline">
+          View All Remedies
+          <ArrowRight size={16} />
+        </Link>
+      </div>
 
       <section className="consult-cta-section">
         <div className="glass consult-cta-panel">

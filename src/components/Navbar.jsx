@@ -64,6 +64,9 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
         Remedies
       </NavLink>
       <a href={whyUsHref} className="nav-link" onClick={closeMenu}>Why Us</a>
+      <NavLink to="/contact" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+        Contact
+      </NavLink>
       <button type="button" onClick={handleConsult} className="btn btn-outline nav-consult-btn">
         <Video size={16} />
         <span>Consult Doctor</span>
@@ -77,6 +80,9 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
         Remedies
       </NavLink>
       <a href={whyUsHref} className="nav-link" onClick={closeMenu}>Why Us</a>
+      <NavLink to="/contact" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+        Contact
+      </NavLink>
       <button type="button" onClick={handleConsult} className="btn btn-outline nav-consult-btn nav-consult-mobile">
         <Video size={16} />
         <span>Consult Doctor</span>
@@ -87,18 +93,12 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
   return (
     <>
       <nav className={`site-nav glass ${menuOpen ? 'menu-open' : ''}`}>
-        <Link to="/" className="brand-logo-link" onClick={closeMenu}>
-          <div className="brand-logo-icon">
-            <div className="bottle-neck" />
-            <div className="bottle-body">
-              <div className="bottle-fluid" />
-              <div className="bottle-drop" />
-            </div>
-            <span className="brand-logo-ring" />
-          </div>
-          <div className="brand-logo-copy">
-            <span className="brand-title">MEDI DROP<span className="brand-extension">.net</span></span>
-          </div>
+        <Link to="/" className="brand-logo-link" onClick={closeMenu} aria-label="MEDI DROP home">
+          <img
+            src="/medi-drop-logo-full.png"
+            alt="medi drop"
+            className="brand-logo-img"
+          />
         </Link>
 
         <div className="nav-links nav-links-desktop">
