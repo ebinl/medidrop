@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Pill, Shield, Award, Layers } from 'lucide-react';
+import { ShoppingCart, Pill } from 'lucide-react';
 
 export const MEDICINES = [
   {
@@ -104,7 +104,7 @@ export const MEDICINES = [
   }
 ];
 
-export default function MedicineGrid({ onAddToCart }) {
+export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
   // Store quantities for each card individually
   const [quantities, setQuantities] = useState(
     MEDICINES.reduce((acc, med) => ({ ...acc, [med.id]: med.minQuantity }), {})
@@ -122,285 +122,103 @@ export default function MedicineGrid({ onAddToCart }) {
   };
 
   return (
-    <div id="medicines" style={{
-      padding: '5rem 2rem',
-      maxWidth: '1200px',
-      margin: '0 auto'
-    }}>
-      {/* Grid Header */}
-      <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-        <h2 style={{ fontSize: '2.25rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-          Select Homeopathic Remedies
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto' }}>
-          Explore our doctor-recommended pure homeopathic organic dilutions. Check the minimum purchase quantities listed under each remedy before adding them to your cart.
-        </p>
-      </div>
+    <section id="medicines" className={`medicines-section ${compactHeader ? 'medicines-section-compact' : ''}`}>
+      {!compactHeader && (
+        <div className="section-header medicines-header">
+          <h2 className="section-title medicines-title">Select Homeopathic Remedies</h2>
+          <p className="section-desc">
+            Explore our doctor-recommended pure homeopathic organic dilutions. Check the minimum purchase quantities listed under each remedy before adding them to your cart.
+          </p>
+        </div>
+      )}
 
-      {/* Grid Layout */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-        gap: '2rem'
-      }}>
+      <div className="medicines-grid">
         {MEDICINES.map((med) => {
           const selectedQty = quantities[med.id] || med.minQuantity;
 
           return (
-            <div key={med.id} className="glass-interactive" style={{
-              borderRadius: '20px',
-              padding: '1.75rem',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              {/* Category tag */}
-              <div style={{
-                position: 'absolute',
-                top: '1.25rem',
-                right: '1.25rem',
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                color: 'var(--primary)',
-                background: 'var(--primary-tint)',
-                padding: '0.25rem 0.65rem',
-                borderRadius: '8px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em'
-              }}>
-                {med.category}
-              </div>
+            <article key={med.id} className="glass-interactive med-card">
+              <span className="med-category">{med.category}</span>
 
-              {/* Medicine visual and Name */}
               <div>
-                <div style={{ display: 'flex', gap: '1.25rem', marginBottom: '1.25rem', marginTop: '0.5rem' }}>
-                  {/* Premium CSS Homeopathy Bottle Illustration */}
-                  <div style={{
-                    position: 'relative',
-                    width: '60px',
-                    height: '80px',
-                    background: 'linear-gradient(to bottom, #d97706 0%, #78350f 100%)', // Amber glass bottle gradient
-                    borderRadius: '8px 8px 12px 12px',
-                    border: '1px solid rgba(251, 191, 36, 0.2)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    boxShadow: '0 8px 16px rgba(0,0,0,0.3)',
-                    paddingBottom: '8px'
-                  }}>
-                    {/* Bottle Neck */}
-                    <div style={{
-                      position: 'absolute',
-                      top: '-10px',
-                      width: '20px',
-                      height: '10px',
-                      background: '#78350f',
-                      borderRadius: '3px 3px 0 0'
-                    }} />
-                    {/* Bottle Cap (White Dropper Cap) */}
-                    <div style={{
-                      position: 'absolute',
-                      top: '-20px',
-                      width: '24px',
-                      height: '10px',
-                      background: '#f8fafc',
-                      borderRadius: '5px 5px 2px 2px',
-                      boxShadow: '0 -2px 5px rgba(255,255,255,0.2)'
-                    }} />
-                    {/* Bottle Label (White/Green Clinic label) */}
-                    <div style={{
-                      width: '46px',
-                      height: '38px',
-                      background: '#f8fafc',
-                      borderRadius: '3px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '2px',
-                      zIndex: 2,
-                      marginBottom: '6px'
-                    }}>
+                <div className="med-card-top">
+                  <div className="med-bottle" aria-hidden="true">
+                    <div className="med-bottle-neck" />
+                    <div className="med-bottle-cap" />
+                    <div className="med-bottle-label">
                       <Pill size={12} color="var(--primary)" strokeWidth={3} />
-                      <div style={{
-                        width: '32px',
-                        height: '2px',
-                        background: 'var(--primary)',
-                        marginTop: '2px'
-                      }} />
-                      <span style={{ fontSize: '0.45rem', fontWeight: 800, color: '#1e293b', marginTop: '2px' }}>
-                        HOMEOPATHY
-                      </span>
+                      <div className="med-bottle-line" />
+                      <span>HOMEOPATHY</span>
                     </div>
-                    {/* Fluid level shine */}
-                    <div style={{
-                      position: 'absolute',
-                      top: '12px',
-                      left: '4px',
-                      width: '4px',
-                      height: '56px',
-                      background: 'rgba(255,255,255,0.15)',
-                      borderRadius: '2px',
-                      pointerEvents: 'none'
-                    }} />
+                    <div className="med-bottle-shine" />
                   </div>
 
-                  {/* Title details */}
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <h3 style={{ fontSize: '1.2rem', color: 'var(--text-primary)', marginBottom: '0.15rem' }}>
-                      {med.name}
-                    </h3>
-                    <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontStyle: 'italic' }}>
-                      {med.scientificName}
-                    </span>
+                  <div className="med-card-titles">
+                    <h3>{med.name}</h3>
+                    <span>{med.scientificName}</span>
                   </div>
                 </div>
 
-                <p style={{
-                  fontSize: '0.85rem',
-                  color: 'var(--text-secondary)',
-                  marginBottom: '1.25rem',
-                  height: '60px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical'
-                }}>
-                  {med.description}
-                </p>
+                <p className="med-desc">{med.description}</p>
 
-                {/* Benefits Bullet points */}
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.45rem',
-                  marginBottom: '1.5rem',
-                  background: 'rgba(0,0,0,0.15)',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255,255,255,0.02)'
-                }}>
+                <div className="med-benefits">
                   {med.benefits.map((benefit, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem' }}>
-                      <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>✓</span>
-                      <span style={{ color: 'var(--text-secondary)' }}>{benefit}</span>
+                    <div key={i} className="med-benefit">
+                      <span>✓</span>
+                      <span>{benefit}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Price & Action row */}
               <div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '1rem',
-                  borderTop: '1px solid var(--card-border)',
-                  paddingTop: '1rem'
-                }}>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Unit Price</span>
-                    <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)' }}>₹{med.price}</span>
+                <div className="med-price-row">
+                  <div>
+                    <span className="med-price-label">Unit Price</span>
+                    <span className="med-price">₹{med.price}</span>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <span className="badge badge-secondary" style={{
-                      fontSize: '0.7rem',
-                      padding: '0.2rem 0.5rem',
-                      fontWeight: 700,
-                      boxShadow: '0 0 10px rgba(251,191,36,0.15)',
-                      marginBottom: '0.25rem'
-                    }}>
+                  <div className="med-min-wrap">
+                    <span className="badge badge-secondary med-min-badge">
                       Min Qty: {med.minQuantity}
                     </span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Required limit</span>
+                    <span className="med-min-hint">Required limit</span>
                   </div>
                 </div>
 
-                <div style={{
-                  display: 'flex',
-                  gap: '0.75rem',
-                  alignItems: 'center'
-                }}>
-                  {/* Selector */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    border: '1px solid var(--card-border)',
-                    borderRadius: '12px',
-                    padding: '0.35rem 0.5rem',
-                    background: 'rgba(0,0,0,0.2)'
-                  }}>
+                <div className="med-actions">
+                  <div className="med-qty">
                     <button
+                      type="button"
                       onClick={() => handleDecrement(med.id, med.minQuantity)}
                       disabled={selectedQty <= med.minQuantity}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: selectedQty <= med.minQuantity ? 'var(--text-muted)' : 'var(--text-primary)',
-                        width: '28px',
-                        height: '28px',
-                        fontSize: '1.2rem',
-                        cursor: selectedQty <= med.minQuantity ? 'not-allowed' : 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '6px'
-                      }}
+                      aria-label="Decrease quantity"
                     >
                       -
                     </button>
-                    <span style={{
-                      width: '28px',
-                      textAlign: 'center',
-                      fontWeight: 800,
-                      fontSize: '0.9rem',
-                      color: 'var(--primary)'
-                    }}>
-                      {selectedQty}
-                    </span>
+                    <span>{selectedQty}</span>
                     <button
+                      type="button"
                       onClick={() => handleIncrement(med.id)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--text-primary)',
-                        width: '28px',
-                        height: '28px',
-                        fontSize: '1.1rem',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '6px'
-                      }}
+                      aria-label="Increase quantity"
                     >
                       +
                     </button>
                   </div>
 
-                  {/* Add to Cart button */}
                   <button
+                    type="button"
                     onClick={() => onAddToCart(med, selectedQty)}
-                    className="btn btn-primary"
-                    style={{
-                      flexGrow: 1,
-                      padding: '0.7rem'
-                    }}
+                    className="btn btn-primary med-add-btn"
                   >
                     <ShoppingCart size={16} />
                     <span>Add to Cart</span>
                   </button>
                 </div>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,120 +1,176 @@
-import React from 'react';
-import { ShoppingCart, Video, Pill, ShieldAlert } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { ShoppingCart, Video, Menu, X, Sun, Moon, Pill } from 'lucide-react';
+
+const THEME_KEY = 'medidrop-theme';
+
+function getInitialTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === 'dark' || saved === 'light') return saved;
+  } catch {
+    // ignore
+  }
+  return 'light';
+}
 
 export default function Navbar({ cartCount, onCartClick, onConsultationClick }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(getInitialTheme);
+  const location = useLocation();
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      // ignore
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 768) setMenuOpen(false);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
+
+  const handleConsult = () => {
+    closeMenu();
+    onConsultationClick();
+  };
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const whyUsHref = location.pathname === '/' ? '#features' : '/#features';
+
+  const desktopNavItems = (
+    <>
+      <NavLink to="/remedies" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+        Remedies
+      </NavLink>
+      <a href={whyUsHref} className="nav-link" onClick={closeMenu}>Why Us</a>
+      <button type="button" onClick={handleConsult} className="btn btn-outline nav-consult-btn">
+        <Video size={16} />
+        <span>Consult Doctor</span>
+      </button>
+    </>
+  );
+
+  const mobileNavItems = (
+    <>
+      <NavLink to="/remedies" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMenu}>
+        Remedies
+      </NavLink>
+      <a href={whyUsHref} className="nav-link" onClick={closeMenu}>Why Us</a>
+      <button type="button" onClick={handleConsult} className="btn btn-outline nav-consult-btn nav-consult-mobile">
+        <Video size={16} />
+        <span>Consult Doctor</span>
+      </button>
+    </>
+  );
+
   return (
-    <nav className="glass" style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      padding: '1rem 2rem',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      borderBottom: '1px solid var(--card-border)',
-      borderTop: 'none',
-      borderLeft: 'none',
-      borderRight: 'none',
-      borderRadius: '0 0 var(--radius-md) var(--radius-md)'
-    }}>
-      {/* Brand Logo */}
-      <a href="/" className="brand-logo-link">
-        <div className="brand-logo-icon">
-          <div className="bottle-neck" />
-          <div className="bottle-body">
-            <div className="bottle-fluid" />
-            <div className="bottle-drop" />
+    <>
+      <nav className={`site-nav glass ${menuOpen ? 'menu-open' : ''}`}>
+        <Link to="/" className="brand-logo-link" onClick={closeMenu}>
+          <div className="brand-logo-icon">
+            <div className="bottle-neck" />
+            <div className="bottle-body">
+              <div className="bottle-fluid" />
+              <div className="bottle-drop" />
+            </div>
+            <span className="brand-logo-ring" />
           </div>
-          <span className="brand-logo-ring" />
-        </div>
-        <div className="brand-logo-copy">
-          <span className="brand-title">MEDI DROP<span className="brand-extension">.net</span></span>
-          <span className="brand-tagline">Modernized Homeopathy, highlighted</span>
-        </div>
-      </a>
+          <div className="brand-logo-copy">
+            <span className="brand-title">MEDI DROP<span className="brand-extension">.net</span></span>
+          </div>
+        </Link>
 
-      {/* Navigation Options */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1.5rem'
-      }}>
-        <a href="#medicines" style={{
-          textDecoration: 'none',
-          color: 'var(--text-secondary)',
-          fontSize: '0.9rem',
-          fontWeight: 500,
-          transition: 'color 0.2s'
-        }} onMouseEnter={(e) => e.target.style.color = 'var(--primary)'}
-           onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}>
-          Remedies
-        </a>
-        <a href="#features" style={{
-          textDecoration: 'none',
-          color: 'var(--text-secondary)',
-          fontSize: '0.9rem',
-          fontWeight: 500,
-          transition: 'color 0.2s'
-        }} onMouseEnter={(e) => e.target.style.color = 'var(--primary)'}
-           onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}>
-          Why Us
-        </a>
-        
-        {/* consultation action */}
-        <button 
-          onClick={onConsultationClick}
-          className="btn btn-outline"
-          style={{
-            padding: '0.45rem 1rem',
-            fontSize: '0.85rem',
-            borderRadius: '10px'
-          }}
-        >
-          <Video size={16} />
-          <span>Consult Doctor</span>
-        </button>
+        <div className="nav-links nav-links-desktop">
+          {desktopNavItems}
+        </div>
 
-        {/* Cart Trigger */}
-        <button 
-          onClick={onCartClick}
-          style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid var(--card-border)',
-            borderRadius: '12px',
-            padding: '0.6rem',
-            cursor: 'pointer',
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--text-primary)',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--primary)';
-            e.currentTarget.style.background = 'var(--primary-tint)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--card-border)';
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-          }}
-        >
-          <ShoppingCart size={20} />
-          {cartCount > 0 && (
-            <span className="badge badge-primary" style={{
-              position: 'absolute',
-              top: '-6px',
-              right: '-6px',
-              width: '18px',
-              height: '18px',
-              fontSize: '0.7rem',
-              boxShadow: '0 0 8px rgba(16, 185, 129, 0.8)'
-            }}>
-              {cartCount}
-            </span>
-          )}
-        </button>
+        <div className="nav-actions">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="nav-theme-btn"
+            aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+            title={theme === 'light' ? 'Dark mode' : 'Light mode'}
+          >
+            {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          </button>
+
+          <Link
+            to="/remedies"
+            className="nav-remedies-icon-btn"
+            aria-label="Remedies"
+            onClick={closeMenu}
+          >
+            <Pill size={18} strokeWidth={2.25} />
+            <span>Remedies</span>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleConsult}
+            className="nav-consult-icon-btn"
+            aria-label="Video consulting"
+          >
+            <Video size={18} strokeWidth={2.25} />
+            <span>Consult</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onCartClick}
+            className="nav-cart-btn"
+            aria-label="Open cart"
+          >
+            <ShoppingCart size={20} />
+            {cartCount > 0 && (
+              <span className="badge badge-primary nav-cart-badge">{cartCount}</span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="nav-menu-btn"
+            onClick={() => setMenuOpen(prev => !prev)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
+      </nav>
+
+      <div
+        className={`nav-backdrop ${menuOpen ? 'visible' : ''}`}
+        onClick={closeMenu}
+        aria-hidden={!menuOpen}
+      />
+      <div
+        className={`nav-links nav-links-mobile ${menuOpen ? 'open' : ''}`}
+        aria-hidden={!menuOpen}
+      >
+        {mobileNavItems}
       </div>
-    </nav>
+    </>
   );
 }
