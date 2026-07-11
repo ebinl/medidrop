@@ -3701,9 +3701,18 @@ video {
   border-radius: 999px;
 }
 
+.admin-login-logo {
+  display: block;
+  height: 48px;
+  width: auto;
+  max-width: min(220px, 100%);
+  object-fit: contain;
+  margin: 0.35rem 0 0.15rem;
+}
+
 .admin-login-card h1 {
-  font-size: 1.55rem;
-  margin: 0.35rem 0 0;
+  font-size: 1.35rem;
+  margin: 0.15rem 0 0;
   color: var(--text-primary);
   background: none;
   -webkit-text-fill-color: var(--text-primary);
@@ -3780,31 +3789,44 @@ video {
   backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 40;
 }
 
 .admin-brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  color: var(--primary);
+  gap: 0.65rem;
+  text-decoration: none;
+  min-width: 0;
+  color: inherit;
 }
 
-.admin-brand strong {
+.admin-brand-logo {
+  height: 40px;
+  width: auto;
+  max-width: min(180px, 46vw);
+  object-fit: contain;
   display: block;
-  color: var(--text-primary);
-  font-size: 0.95rem;
 }
 
-.admin-brand span {
-  font-size: 0.72rem;
-  color: var(--text-muted);
+.admin-brand-tag {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-tint);
+  border: 1px solid rgba(var(--primary-rgb), 0.16);
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
 }
 
 .admin-top-actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.55rem;
+  flex-shrink: 0;
 }
 
 .admin-link-btn {
@@ -3824,52 +3846,64 @@ video {
   font-size: 0.82rem;
 }
 
-.admin-shell {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 0;
-  min-height: calc(100vh - 64px);
-}
-
-.admin-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 1.25rem 0.9rem;
-  border-right: 1px solid var(--card-border);
-  background: var(--surface);
-}
-
-.admin-nav-btn {
-  display: flex;
+.admin-menu-toggle {
+  display: none;
   align-items: center;
-  gap: 0.55rem;
-  width: 100%;
-  border: none;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.admin-menu-backdrop {
+  display: none;
+}
+
+.admin-menubar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0.75rem clamp(1rem, 3vw, 1.75rem);
+  border-bottom: 1px solid var(--card-border);
+  background: var(--surface);
+  position: sticky;
+  top: 57px;
+  z-index: 30;
+}
+
+.admin-menubar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid transparent;
   background: transparent;
   color: var(--text-secondary);
-  padding: 0.7rem 0.8rem;
+  padding: 0.55rem 0.85rem;
   border-radius: 12px;
   font: inherit;
   font-weight: 650;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   cursor: pointer;
-  text-align: left;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.admin-nav-btn:hover {
+.admin-menubar-btn:hover {
   background: var(--surface-muted);
   color: var(--text-primary);
 }
 
-.admin-nav-btn.active {
+.admin-menubar-btn.active {
   background: var(--primary-tint);
   color: var(--primary);
+  border-color: rgba(var(--primary-rgb), 0.18);
 }
 
 .admin-count {
-  margin-left: auto;
+  margin-left: 0.15rem;
   font-size: 0.72rem;
   font-weight: 800;
   background: var(--surface-muted);
@@ -3878,13 +3912,21 @@ video {
   border-radius: 999px;
 }
 
-.admin-nav-btn.active .admin-count {
+.admin-menubar-btn.active .admin-count {
   background: color-mix(in srgb, var(--primary) 18%, transparent);
   color: var(--primary);
 }
 
+.admin-count-unread {
+  background: rgba(var(--secondary-rgb), 0.18) !important;
+  color: var(--secondary) !important;
+}
+
 .admin-main {
   padding: clamp(1.1rem, 3vw, 1.75rem);
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .admin-panel {
@@ -3899,6 +3941,14 @@ video {
   margin-bottom: 1.15rem;
 }
 
+.admin-panel-head-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
 .admin-panel-head h2 {
   margin: 0 0 0.25rem;
   font-size: 1.25rem;
@@ -3911,6 +3961,13 @@ video {
   margin: 0;
   color: var(--text-muted);
   font-size: 0.88rem;
+}
+
+.admin-clear-all {
+  padding: 0.45rem 0.75rem;
+  min-height: auto;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 
 .admin-banner {
@@ -3948,6 +4005,16 @@ video {
   border-radius: 14px;
   padding: 1rem 1.05rem;
   background: var(--surface-muted);
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.admin-contact-card.is-unread {
+  border-color: rgba(var(--secondary-rgb), 0.35);
+  background: color-mix(in srgb, var(--surface) 70%, rgba(var(--secondary-rgb), 0.08));
+}
+
+.admin-contact-card.is-read {
+  opacity: 0.88;
 }
 
 .admin-contact-top {
@@ -3958,12 +4025,48 @@ video {
   margin-bottom: 0.4rem;
 }
 
+.admin-contact-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.admin-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--secondary);
+  flex-shrink: 0;
+}
+
 .admin-contact-top h3 {
   margin: 0;
   font-size: 1rem;
   color: var(--text-primary);
   background: none;
   -webkit-text-fill-color: var(--text-primary);
+}
+
+.admin-status-pill {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+}
+
+.is-unread-pill {
+  color: var(--secondary);
+  background: rgba(var(--secondary-rgb), 0.14);
+}
+
+.is-read-pill {
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--card-border);
 }
 
 .admin-contact-top span {
@@ -4011,6 +4114,50 @@ video {
 
 .admin-contact-meta a:hover {
   text-decoration: underline;
+}
+
+.admin-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--card-border);
+}
+
+.admin-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(var(--primary-rgb), 0.18);
+  background: var(--primary-tint);
+  color: var(--primary);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.4rem 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.admin-action-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+}
+
+.admin-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-action-danger {
+  background: rgba(192, 57, 43, 0.08);
+  border-color: rgba(192, 57, 43, 0.22);
+  color: #a93226;
+}
+
+.admin-action-danger:hover:not(:disabled) {
+  background: rgba(192, 57, 43, 0.14);
 }
 
 .admin-consult-pay {
@@ -4208,33 +4355,53 @@ video {
 }
 
 @media (max-width: 900px) {
-  .admin-shell {
-    grid-template-columns: 1fr;
+  .admin-menu-toggle {
+    display: inline-flex;
   }
 
-  .admin-nav {
-    position: sticky;
-    top: 57px;
-    z-index: 15;
-    flex-direction: row;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    border-right: none;
-    border-bottom: 1px solid var(--card-border);
-    padding: 0.65rem 0.75rem;
-    gap: 0.45rem;
+  .admin-menu-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    border: none;
+    background: rgba(45, 41, 38, 0.35);
+    cursor: pointer;
   }
 
-  .admin-nav::-webkit-scrollbar {
-    display: none;
+  .admin-menubar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(300px, 86vw);
+    z-index: 45;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0.35rem;
+    padding: 5rem 1rem 1.5rem;
+    border-bottom: none;
+    border-left: 1px solid var(--card-border);
+    box-shadow: -12px 0 40px rgba(45, 41, 38, 0.18);
+    transform: translateX(105%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto;
   }
 
-  .admin-nav-btn {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.82rem;
+  .admin-menubar.is-open {
+    transform: translateX(0);
+  }
+
+  .admin-menubar-btn {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.85rem 0.95rem;
+    font-size: 0.92rem;
+  }
+
+  .admin-menubar-btn .admin-count {
+    margin-left: auto;
   }
 
   .admin-main {
@@ -4273,19 +4440,20 @@ video {
 
   .admin-topbar {
     padding: 0.7rem 0.85rem;
-    gap: 0.65rem;
+    gap: 0.5rem;
   }
 
-  .admin-brand strong {
-    font-size: 0.85rem;
+  .admin-brand-logo {
+    height: 34px;
+    max-width: min(140px, 42vw);
   }
 
-  .admin-brand span {
+  .admin-brand-tag {
     display: none;
   }
 
   .admin-link-btn {
-    font-size: 0.78rem;
+    display: none;
   }
 
   .admin-logout {
@@ -4296,21 +4464,9 @@ video {
     display: none;
   }
 
-  .admin-nav {
-    top: 52px;
-    padding-left: 0.65rem;
-    padding-right: 0.65rem;
-  }
-
-  .admin-nav-btn {
-    gap: 0.4rem;
-    padding: 0.5rem 0.65rem;
-    font-size: 0.78rem;
-  }
-
-  .admin-count {
-    font-size: 0.65rem;
-    padding: 0.12rem 0.38rem;
+  .admin-menu-toggle {
+    width: 38px;
+    height: 38px;
   }
 
   .admin-main {
@@ -4323,6 +4479,16 @@ video {
 
   .admin-panel-head p {
     font-size: 0.8rem;
+  }
+
+  .admin-panel-head-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-clear-all {
+    width: 100%;
+    justify-content: center;
   }
 
   .admin-form-grid {
@@ -4346,13 +4512,22 @@ video {
     align-items: flex-start;
   }
 
-  .admin-contact-top span {
+  .admin-contact-top > span {
     white-space: normal;
   }
 
   .admin-contact-meta {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .admin-contact-actions {
+    flex-direction: column;
+  }
+
+  .admin-action-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .admin-consult-pay {
@@ -4369,15 +4544,11 @@ video {
   }
 
   .admin-input {
-    font-size: 16px; /* prevents iOS zoom */
+    font-size: 16px;
   }
 }
 
 @media (max-width: 380px) {
-  .admin-nav-btn span.admin-count {
-    display: none;
-  }
-
   .admin-remedy-meta {
     grid-template-columns: 1fr;
   }

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  LayoutDashboard,
   MessageSquare,
   Pill,
   LogOut,
@@ -15,12 +14,28 @@ import {
   Calendar,
   Pencil,
   X,
+  Menu,
+  CheckCheck,
+  Trash2,
+  EyeOff,
 } from 'lucide-react';
-import { subscribeContacts } from '../services/contacts';
+import {
+  clearAllContacts,
+  deleteContact,
+  markContactRead,
+  subscribeContacts,
+} from '../services/contacts';
 import { subscribeConsultations } from '../services/consultations';
 import { addRemedy, seedDefaultRemedies, subscribeRemedies, updateRemedy } from '../services/remedies';
 
 const ADMIN_SESSION_KEY = 'medidrop-admin-auth';
+
+const MENU_ITEMS = [
+  { id: 'contacts', label: 'Contacts', icon: MessageSquare },
+  { id: 'consultations', label: 'Consultations', icon: Video },
+  { id: 'remedies', label: 'Remedies', icon: Pill },
+  { id: 'add', label: 'Add Remedy', icon: Plus },
+];
 
 const emptyRemedy = {
   name: '',
@@ -61,6 +76,27 @@ export default function AdminPage({ addToast }) {
   const [remedyForm, setRemedyForm] = useState(emptyRemedy);
   const [editingId, setEditingId] = useState(null);
   const [savingRemedy, setSavingRemedy] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [contactBusyId, setContactBusyId] = useState(null);
+  const [clearingContacts, setClearingContacts] = useState(false);
+
+  const unreadContacts = contacts.filter((c) => !c.read).length;
+
+  const getMenuCount = (id) => {
+    if (id === 'contacts') return unreadContacts || contacts.length;
+    if (id === 'consultations') return consultations.length;
+    if (id === 'remedies') return remedies.length;
+    return null;
+  };
+
+  const selectTab = (nextTab) => {
+    if (nextTab === 'add' && tab !== 'add') {
+      setEditingId(null);
+      setRemedyForm(emptyRemedy);
+    }
+    setTab(nextTab);
+    setMenuOpen(false);
+  };
 
   useEffect(() => {
     if (!isAuthed) return undefined;
@@ -157,6 +193,73 @@ export default function AdminPage({ addToast }) {
     setTab('contacts');
     setEditingId(null);
     setRemedyForm(emptyRemedy);
+    setMenuOpen(false);
+  };
+
+  const handleMarkContact = async (item) => {
+    setContactBusyId(item.id);
+    try {
+      await markContactRead(item.id, !item.read);
+      addToast?.({
+        title: item.read ? 'Marked Unread' : 'Marked Read',
+        message: item.read ? 'Message moved back to unread.' : 'Message marked as read.',
+        type: 'success',
+      });
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Update Failed',
+        message: 'Could not update message status.',
+        type: 'error',
+      });
+    } finally {
+      setContactBusyId(null);
+    }
+  };
+
+  const handleClearContact = async (item) => {
+    if (!window.confirm(`Clear message from ${item.name}?`)) return;
+    setContactBusyId(item.id);
+    try {
+      await deleteContact(item.id);
+      addToast?.({
+        title: 'Cleared',
+        message: 'Contact message removed.',
+        type: 'info',
+      });
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Clear Failed',
+        message: 'Could not delete this message.',
+        type: 'error',
+      });
+    } finally {
+      setContactBusyId(null);
+    }
+  };
+
+  const handleClearAllContacts = async () => {
+    if (!contacts.length) return;
+    if (!window.confirm(`Clear all ${contacts.length} contact messages?`)) return;
+    setClearingContacts(true);
+    try {
+      await clearAllContacts();
+      addToast?.({
+        title: 'Inbox Cleared',
+        message: 'All contact messages were removed.',
+        type: 'success',
+      });
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Clear Failed',
+        message: 'Could not clear contacts.',
+        type: 'error',
+      });
+    } finally {
+      setClearingContacts(false);
+    }
   };
 
   const handleRemedyChange = (e) => {
@@ -176,6 +279,7 @@ export default function AdminPage({ addToast }) {
       benefits: Array.isArray(remedy.benefits) ? remedy.benefits.join(', ') : '',
     });
     setTab('add');
+    setMenuOpen(false);
   };
 
   const cancelEditRemedy = () => {
@@ -237,7 +341,12 @@ export default function AdminPage({ addToast }) {
               <ShieldCheck size={18} />
               Admin Access
             </div>
-            <h1>MEDI DROP Admin</h1>
+            <img
+              src="/medi-drop-logo-full.png"
+              alt="MEDI DROP"
+              className="admin-login-logo"
+            />
+            <h1>Admin Dashboard</h1>
             <p>Sign in to review contact messages and manage remedies.</p>
 
             <label htmlFor="admin-user">Username</label>
@@ -277,15 +386,17 @@ export default function AdminPage({ addToast }) {
   }
 
   return (
-    <div className="admin-page">
+    <div className={`admin-page ${menuOpen ? 'admin-menu-open' : ''}`}>
       <header className="admin-topbar">
-        <div className="admin-brand">
-          <LayoutDashboard size={20} />
-          <div>
-            <strong>MEDI DROP Admin</strong>
-            <span>Dashboard</span>
-          </div>
-        </div>
+        <Link to="/" className="admin-brand" aria-label="MEDI DROP home">
+          <img
+            src="/medi-drop-logo-full.png"
+            alt="MEDI DROP"
+            className="admin-brand-logo"
+          />
+          <span className="admin-brand-tag">Admin</span>
+        </Link>
+
         <div className="admin-top-actions">
           <Link to="/" className="admin-link-btn">
             View site
@@ -294,60 +405,79 @@ export default function AdminPage({ addToast }) {
             <LogOut size={16} />
             <span className="admin-logout-label">Logout</span>
           </button>
+          <button
+            type="button"
+            className="admin-menu-toggle"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </header>
 
-      <div className="admin-shell">
-        <nav className="admin-nav">
-          <button
-            type="button"
-            className={`admin-nav-btn ${tab === 'contacts' ? 'active' : ''}`}
-            onClick={() => setTab('contacts')}
-          >
-            <MessageSquare size={16} />
-            Contacts
-            <span className="admin-count">{contacts.length}</span>
-          </button>
-          <button
-            type="button"
-            className={`admin-nav-btn ${tab === 'consultations' ? 'active' : ''}`}
-            onClick={() => setTab('consultations')}
-          >
-            <Video size={16} />
-            Consultations
-            <span className="admin-count">{consultations.length}</span>
-          </button>
-          <button
-            type="button"
-            className={`admin-nav-btn ${tab === 'remedies' ? 'active' : ''}`}
-            onClick={() => setTab('remedies')}
-          >
-            <Pill size={16} />
-            Remedies
-            <span className="admin-count">{remedies.length}</span>
-          </button>
-          <button
-            type="button"
-            className={`admin-nav-btn ${tab === 'add' ? 'active' : ''}`}
-            onClick={() => {
-              setEditingId(null);
-              setRemedyForm(emptyRemedy);
-              setTab('add');
-            }}
-          >
-            <Plus size={16} />
-            {editingId ? 'Editing…' : 'Add Remedy'}
-          </button>
-        </nav>
+      {menuOpen && (
+        <button
+          type="button"
+          className="admin-menu-backdrop"
+          aria-label="Close menu"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
 
-        <main className="admin-main">
+      <nav className={`admin-menubar ${menuOpen ? 'is-open' : ''}`} aria-label="Admin sections">
+        {MENU_ITEMS.map(({ id, label, icon: Icon }) => {
+          const count = getMenuCount(id);
+          const isActive = tab === id || (id === 'add' && editingId && tab === 'add');
+          return (
+            <button
+              key={id}
+              type="button"
+              className={`admin-menubar-btn ${isActive ? 'active' : ''}`}
+              onClick={() => selectTab(id)}
+            >
+              <Icon size={16} />
+              <span>{id === 'add' && editingId ? 'Edit Remedy' : label}</span>
+              {count != null && (
+                <span className={`admin-count ${id === 'contacts' && unreadContacts ? 'admin-count-unread' : ''}`}>
+                  {id === 'contacts' && unreadContacts ? unreadContacts : count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+
+      <main className="admin-main">
           {dataError && <div className="admin-banner">{dataError}</div>}
 
           {tab === 'contacts' && (
             <section className="admin-panel">
-              <div className="admin-panel-head">
-                <h2>Contact form submissions</h2>
-                <p>Messages sent from the public contact page.</p>
+              <div className="admin-panel-head admin-panel-head-row">
+                <div>
+                  <h2>Contact form submissions</h2>
+                  <p>
+                    {unreadContacts
+                      ? `${unreadContacts} unread · ${contacts.length} total`
+                      : 'Messages sent from the public contact page.'}
+                  </p>
+                </div>
+                {contacts.length > 0 && (
+                  <button
+                    type="button"
+                    className="btn btn-outline admin-clear-all"
+                    onClick={handleClearAllContacts}
+                    disabled={clearingContacts}
+                  >
+                    {clearingContacts ? (
+                      <Loader2 className="admin-spin" size={15} />
+                    ) : (
+                      <Trash2 size={15} />
+                    )}
+                    Clear all
+                  </button>
+                )}
               </div>
 
               {loadingContacts ? (
@@ -360,9 +490,20 @@ export default function AdminPage({ addToast }) {
               ) : (
                 <div className="admin-contact-list">
                   {contacts.map((item) => (
-                    <article key={item.id} className="admin-contact-card">
+                    <article
+                      key={item.id}
+                      className={`admin-contact-card ${item.read ? 'is-read' : 'is-unread'}`}
+                    >
                       <div className="admin-contact-top">
-                        <h3>{item.name}</h3>
+                        <div className="admin-contact-title">
+                          {!item.read && <span className="admin-unread-dot" aria-label="Unread" />}
+                          <h3>{item.name}</h3>
+                          {item.read ? (
+                            <span className="admin-status-pill is-read-pill">Read</span>
+                          ) : (
+                            <span className="admin-status-pill is-unread-pill">Unread</span>
+                          )}
+                        </div>
                         <span>
                           <Clock size={13} />
                           {formatDate(item.createdAt)}
@@ -381,6 +522,32 @@ export default function AdminPage({ addToast }) {
                             {item.phone}
                           </a>
                         )}
+                      </div>
+                      <div className="admin-contact-actions">
+                        <button
+                          type="button"
+                          className="admin-action-btn"
+                          onClick={() => handleMarkContact(item)}
+                          disabled={contactBusyId === item.id}
+                        >
+                          {contactBusyId === item.id ? (
+                            <Loader2 className="admin-spin" size={14} />
+                          ) : item.read ? (
+                            <EyeOff size={14} />
+                          ) : (
+                            <CheckCheck size={14} />
+                          )}
+                          {item.read ? 'Mark unread' : 'Mark as read'}
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-action-btn admin-action-danger"
+                          onClick={() => handleClearContact(item)}
+                          disabled={contactBusyId === item.id}
+                        >
+                          <Trash2 size={14} />
+                          Clear
+                        </button>
                       </div>
                     </article>
                   ))}
@@ -704,8 +871,7 @@ export default function AdminPage({ addToast }) {
               </form>
             </section>
           )}
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
