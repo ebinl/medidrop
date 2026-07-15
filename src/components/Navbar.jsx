@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ShoppingCart, Video, Menu, X, Sun, Moon, Pill } from 'lucide-react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { ShoppingCart, Video, Menu, X, Sun, Moon, Pill, LogIn, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const THEME_KEY = 'medidrop-theme';
 
@@ -14,10 +15,12 @@ function getInitialTheme() {
   return 'light';
 }
 
-export default function Navbar({ cartCount, onCartClick, onConsultationClick }) {
+export default function Navbar({ cartCount, onCartClick, onConsultationClick, addToast }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState(getInitialTheme);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isAdmin } = useAuth();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -53,10 +56,89 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
   };
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  const handleLogout = async () => {
+    closeMenu();
+    try {
+      await logout();
+      addToast?.({
+        title: 'Signed out',
+        message: 'Come back soon.',
+        type: 'info',
+      });
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Logout failed',
+        message: 'Please try again.',
+        type: 'error',
+      });
+    }
   };
 
   const whyUsHref = location.pathname === '/' ? '#features' : '/#features';
+  const displayName = user?.displayName || user?.email?.split('@')[0] || 'Account';
+
+  const authDesktop = user ? (
+    <>
+      {isAdmin && (
+        <Link to="/admin" className="btn btn-outline nav-auth-btn" onClick={closeMenu}>
+          <LayoutDashboard size={15} />
+          <span>Admin</span>
+        </Link>
+      )}
+      <span className="nav-user-chip" title={user.email || ''}>
+        <User size={14} />
+        <span>{displayName}</span>
+      </span>
+      <button type="button" className="btn btn-outline nav-auth-btn" onClick={handleLogout}>
+        <LogOut size={15} />
+        <span>Logout</span>
+      </button>
+    </>
+  ) : (
+    <>
+      <Link to="/login" className="nav-link nav-auth-link" onClick={closeMenu}>
+        Login
+      </Link>
+      <Link to="/signup" className="btn btn-outline nav-auth-btn" onClick={closeMenu}>
+        <LogIn size={15} />
+        <span>Sign Up</span>
+      </Link>
+    </>
+  );
+
+  const authMobile = user ? (
+    <>
+      {isAdmin && (
+        <Link to="/admin" className="btn btn-outline nav-auth-btn nav-auth-mobile" onClick={closeMenu}>
+          <LayoutDashboard size={15} />
+          <span>Admin</span>
+        </Link>
+      )}
+      <div className="nav-user-chip nav-user-chip-mobile">
+        <User size={14} />
+        <span>{displayName}</span>
+      </div>
+      <button type="button" className="btn btn-outline nav-auth-btn nav-auth-mobile" onClick={handleLogout}>
+        <LogOut size={15} />
+        <span>Logout</span>
+      </button>
+    </>
+  ) : (
+    <>
+      <Link to="/login" className="nav-link" onClick={closeMenu}>
+        Login
+      </Link>
+      <Link to="/signup" className="btn btn-outline nav-auth-btn nav-auth-mobile" onClick={closeMenu}>
+        <LogIn size={15} />
+        <span>Sign Up</span>
+      </Link>
+    </>
+  );
 
   const desktopNavItems = (
     <>
@@ -71,6 +153,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
         <Video size={16} />
         <span>Consult Doctor</span>
       </button>
+      {authDesktop}
     </>
   );
 
@@ -87,6 +170,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
         <Video size={16} />
         <span>Consult Doctor</span>
       </button>
+      {authMobile}
     </>
   );
 
@@ -126,6 +210,18 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
             <span>Remedies</span>
           </Link>
 
+          {!user && (
+            <Link
+              to="/login"
+              className="nav-auth-icon-btn"
+              aria-label="Login"
+              onClick={closeMenu}
+            >
+              <LogIn size={18} strokeWidth={2.25} />
+              <span>Login</span>
+            </Link>
+          )}
+
           <button
             type="button"
             onClick={handleConsult}
@@ -151,7 +247,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick }) 
           <button
             type="button"
             className="nav-menu-btn"
-            onClick={() => setMenuOpen(prev => !prev)}
+            onClick={() => setMenuOpen((prev) => !prev)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
           >

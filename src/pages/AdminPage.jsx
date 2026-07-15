@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import {
   MessageSquare,
   Pill,
@@ -27,8 +27,7 @@ import {
 } from '../services/contacts';
 import { subscribeConsultations } from '../services/consultations';
 import { addRemedy, seedDefaultRemedies, subscribeRemedies, updateRemedy } from '../services/remedies';
-
-const ADMIN_SESSION_KEY = 'medidrop-admin-auth';
+import { useAuth } from '../context/AuthContext';
 
 const MENU_ITEMS = [
   { id: 'contacts', label: 'Contacts', icon: MessageSquare },
@@ -59,12 +58,7 @@ function formatDate(date) {
 }
 
 export default function AdminPage({ addToast }) {
-  const [isAuthed, setIsAuthed] = useState(
-    () => sessionStorage.getItem(ADMIN_SESSION_KEY) === '1'
-  );
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
+  const { user, loading: authLoading, isAdmin, logout } = useAuth();
   const [tab, setTab] = useState('contacts');
   const [contacts, setContacts] = useState([]);
   const [consultations, setConsultations] = useState([]);
@@ -79,6 +73,8 @@ export default function AdminPage({ addToast }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactBusyId, setContactBusyId] = useState(null);
   const [clearingContacts, setClearingContacts] = useState(false);
+
+  const isAuthed = Boolean(isAdmin);
 
   const unreadContacts = contacts.filter((c) => !c.read).length;
 
@@ -168,32 +164,21 @@ export default function AdminPage({ addToast }) {
     };
   }, [isAuthed]);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (username.trim() === 'admin' && password === 'admin') {
-      sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
-      setIsAuthed(true);
-      setLoginError('');
-      setPassword('');
-      addToast?.({
-        title: 'Welcome',
-        message: 'Signed in to the admin dashboard.',
-        type: 'success',
-      });
-      return;
-    }
-    setLoginError('Invalid username or password.');
-  };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem(ADMIN_SESSION_KEY);
-    setIsAuthed(false);
-    setUsername('');
-    setPassword('');
+  const handleLogout = async () => {
     setTab('contacts');
     setEditingId(null);
     setRemedyForm(emptyRemedy);
     setMenuOpen(false);
+    try {
+      await logout();
+      addToast?.({
+        title: 'Signed out',
+        message: 'Admin session ended.',
+        type: 'info',
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleMarkContact = async (item) => {
@@ -332,11 +317,28 @@ export default function AdminPage({ addToast }) {
     }
   };
 
-  if (!isAuthed) {
+  if (authLoading) {
     return (
       <div className="admin-page">
         <div className="admin-login-wrap">
-          <form className="admin-login-card glass" onSubmit={handleLogin}>
+          <div className="admin-login-card glass admin-auth-status">
+            <Loader2 className="admin-spin" size={28} />
+            <p>Checking admin access…</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user && !isAdmin) {
+    return <Navigate to="/login" replace state={{ from: '/admin' }} />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="admin-page">
+        <div className="admin-login-wrap">
+          <div className="admin-login-card glass">
             <div className="admin-login-badge">
               <ShieldCheck size={18} />
               Admin Access
@@ -346,40 +348,21 @@ export default function AdminPage({ addToast }) {
               alt="MEDI DROP"
               className="admin-login-logo"
             />
-            <h1>Admin Dashboard</h1>
-            <p>Sign in to review contact messages and manage remedies.</p>
-
-            <label htmlFor="admin-user">Username</label>
-            <input
-              id="admin-user"
-              className="admin-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoComplete="username"
-              required
-            />
-
-            <label htmlFor="admin-pass">Password</label>
-            <input
-              id="admin-pass"
-              type="password"
-              className="admin-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
-
-            {loginError && <p className="admin-error">{loginError}</p>}
-
-            <button type="submit" className="btn btn-primary admin-login-btn">
-              Sign In
+            <h1>Access denied</h1>
+            <p>
+              You’re signed in as <strong>{user.email}</strong>, but this account is not an admin.
+              Sign in with an admin account from the login page.
+            </p>
+            <Link to="/login" className="btn btn-primary admin-login-btn" state={{ from: '/admin' }}>
+              Go to Login
+            </Link>
+            <button type="button" className="btn btn-outline admin-login-btn" onClick={handleLogout}>
+              Sign out
             </button>
-
             <Link to="/" className="admin-back-link">
               ← Back to website
             </Link>
-          </form>
+          </div>
         </div>
       </div>
     );
@@ -560,7 +543,7 @@ export default function AdminPage({ addToast }) {
             <section className="admin-panel">
               <div className="admin-panel-head">
                 <h2>Doctor consultations</h2>
-                <p>Bookings from the video consultation form (₹200).</p>
+                <p>Bookings from the video consultation form (₹49).</p>
               </div>
 
               {loadingConsultations ? (
@@ -594,7 +577,7 @@ export default function AdminPage({ addToast }) {
 
                       <div className="admin-consult-pay">
                         <span className="admin-pay-badge">
-                          ₹{item.amount || 200} · {(item.paymentMethod || 'upi').toUpperCase()}
+                          ₹{item.amount || 49} · {(item.paymentMethod || 'upi').toUpperCase()}
                         </span>
                         {item.paymentMethod === 'upi' && item.upiRefNo && (
                           <span>UPI Ref: {item.upiRefNo}</span>

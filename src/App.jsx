@@ -8,12 +8,15 @@ import HomePage from './pages/HomePage';
 import RemediesPage from './pages/RemediesPage';
 import ContactPage from './pages/ContactPage';
 import AdminPage from './pages/AdminPage';
+import AuthPage from './pages/AuthPage';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import { AuthProvider } from './context/AuthContext';
 
 function AppShell() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/signup';
 
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -87,17 +90,20 @@ function AppShell() {
     setCartItems([]);
   };
 
+  const hideChrome = isAdminRoute || isAuthRoute;
+
   return (
-    <div className={`app-container ${isAdminRoute ? 'app-admin' : ''}`}>
-      {!isAdminRoute && (
+    <div className={`app-container ${isAdminRoute ? 'app-admin' : ''} ${isAuthRoute ? 'app-auth' : ''}`}>
+      {!hideChrome && (
         <Navbar
           cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
           onCartClick={() => setIsCartOpen(true)}
           onConsultationClick={() => setIsConsultationOpen(true)}
+          addToast={addToast}
         />
       )}
 
-      <main className={`content-wrapper ${isAdminRoute ? 'content-wrapper-admin' : ''}`}>
+      <main className={`content-wrapper ${isAdminRoute || isAuthRoute ? 'content-wrapper-admin' : ''}`}>
         <Routes>
           <Route
             path="/"
@@ -118,11 +124,13 @@ function AppShell() {
               />
             }
           />
+          <Route path="/login" element={<AuthPage addToast={addToast} mode="login" />} />
+          <Route path="/signup" element={<AuthPage addToast={addToast} mode="signup" />} />
           <Route path="/admin" element={<AdminPage addToast={addToast} />} />
         </Routes>
       </main>
 
-      {!isAdminRoute && (
+      {!hideChrome && (
         <>
           <Footer onConsultationClick={() => setIsConsultationOpen(true)} />
 
@@ -156,8 +164,10 @@ function AppShell() {
 export default function App() {
   return (
     <BrowserRouter>
-      <ScrollToTop />
-      <AppShell />
+      <AuthProvider>
+        <ScrollToTop />
+        <AppShell />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

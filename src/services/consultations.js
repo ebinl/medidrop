@@ -22,7 +22,7 @@ export async function submitConsultation(data) {
     upiRefNo: data.upiRefNo || '',
     cardHolder: data.cardHolder || '',
     cardLast4: data.cardLast4 || '',
-    amount: 200,
+    amount: 49,
     status: 'booked',
     createdAt: serverTimestamp(),
   });

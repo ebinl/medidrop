@@ -158,7 +158,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
       });
       addToast({
         title: "Booking Successful",
-        message: "Your ₹200 payment was confirmed and video session is scheduled.",
+        message: "Your ₹49 payment was confirmed and video session is scheduled.",
         type: "success"
       });
     } catch (err) {
@@ -198,7 +198,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
             </div>
           </div>
           <div className="consult-header-actions">
-            <span className="consult-fee-badge">₹200</span>
+            <span className="consult-fee-badge">₹49</span>
             <button type="button" onClick={resetModal} className="modal-close-btn consult-close" aria-label="Close">
               <X size={20} />
             </button>
@@ -331,7 +331,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
 
               <button type="submit" className="btn btn-primary consult-submit">
                 <span>Proceed to Payment</span>
-                <span className="consult-submit-fee">₹200</span>
+                <span className="consult-submit-fee">₹49</span>
               </button>
             </form>
           )}
@@ -389,7 +389,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
                       <rect x="10" y="65" width="10" height="5" />
                       <rect x="42" y="42" width="16" height="16" fill="var(--primary)" rx="4" />
                     </svg>
-                    <span>SCAN TO PAY ₹200</span>
+                    <span>SCAN TO PAY ₹49</span>
                   </div>
 
                   <div className="consult-upi-id">
@@ -540,7 +540,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
                         ) : (
                           <>
                             <CreditCard size={16} />
-                            Pay ₹200
+                            Pay ₹49
                           </>
                         )}
                       </button>
@@ -576,7 +576,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
                 </div>
                 <div className="consult-summary-fee">
                   <span>Consultation Fee</span>
-                  <strong>₹200 Paid</strong>
+                  <strong>₹49 Paid</strong>
                 </div>
               </div>
 

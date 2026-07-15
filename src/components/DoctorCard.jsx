@@ -107,7 +107,7 @@ export default function DoctorCard({ onConsultationClick }) {
             </button>
             <button type="button" className="btn btn-primary" onClick={onConsultationClick}>
               <Video size={16} />
-              Get Consultation (₹200)
+              Get Consultation (₹49)
             </button>
           </div>
         </div>
