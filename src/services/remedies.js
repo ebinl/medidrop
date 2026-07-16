@@ -4,8 +4,6 @@ import {
   doc,
   getDocs,
   onSnapshot,
-  orderBy,
-  query,
   serverTimestamp,
   updateDoc,
   writeBatch,
@@ -14,6 +12,7 @@ import { db } from '../firebase';
 import { DEFAULT_MEDICINES, REMEDY_IMAGE } from '../data/defaultMedicines';
 
 const remediesRef = collection(db, 'remedies');
+const SEED_TIMEOUT_MS = 12000;
 
 function parseBenefits(benefits) {
   if (Array.isArray(benefits)) return benefits;
@@ -72,6 +71,19 @@ export function dedupeRemedies(items = []) {
   );
 }
 
+/** Local catalog used when Firestore is empty, slow, or unavailable. */
+export function getLocalCatalog() {
+  return dedupeRemedies(
+    DEFAULT_MEDICINES.map((med) => ({
+      ...med,
+      image: med.image || REMEDY_IMAGE,
+      sortOrder: med.sortOrder ?? med.id,
+      isDefault: true,
+      fromFirestore: false,
+    }))
+  );
+}
+
 async function commitBatchOps(ops) {
   const CHUNK = 400;
   for (let i = 0; i < ops.length; i += CHUNK) {
@@ -114,7 +126,12 @@ export function seedDefaultRemedies() {
 }
 
 async function seedDefaultRemediesOnce() {
-  const snapshot = await getDocs(remediesRef);
+  const snapshot = await Promise.race([
+    getDocs(remediesRef),
+    new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Firestore seed timed out')), 12000);
+    }),
+  ]);
   const byName = new Map();
 
   snapshot.docs.forEach((d) => {
@@ -251,27 +268,16 @@ export async function updateRemedy(id, data) {
 }
 
 export function subscribeRemedies(onData, onError) {
-  let fallbackUnsub = null;
-  const q = query(remediesRef, orderBy('sortOrder', 'asc'));
-  const unsub = onSnapshot(
-    q,
+  // Unordered snapshot + client sort. orderBy('sortOrder') hides docs
+  // missing that field and was crashing when query/orderBy weren't imported.
+  return onSnapshot(
+    remediesRef,
     (snapshot) => {
       onData(dedupeRemedies(snapshot.docs.map(mapRemedyDoc)));
     },
     (err) => {
-      console.warn('Remedies ordered query failed, falling back:', err);
-      fallbackUnsub = onSnapshot(
-        remediesRef,
-        (snapshot) => {
-          onData(dedupeRemedies(snapshot.docs.map(mapRemedyDoc)));
-        },
-        onError
-      );
+      console.warn('Remedies subscribe failed:', err);
+      onError?.(err);
     }
   );
-
-  return () => {
-    unsub();
-    fallbackUnsub?.();
-  };
 }

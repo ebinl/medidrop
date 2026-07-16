@@ -5,8 +5,7 @@ import { Award, Briefcase, GraduationCap, Stethoscope, Mail, Video, Clock, Langu
 const DOCTOR = {
   name: 'Dr. Ancy Shaji',
   title: 'Senior Homeopathic Physician',
-  image:
-    'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=640&q=80',
+  image: '/dr-ancy-consulting-room.png',
   experience: '12+ years clinical practice',
   patients: '8,500+ patients treated',
   qualifications: [
@@ -17,7 +16,7 @@ const DOCTOR = {
   specialties: ['Chronic cases', 'Pediatric care', 'Allergy & immunity', 'Lifestyle disorders'],
   languages: 'English, Malayalam, Hindi',
   availability: 'Mon–Sat · 10:00 AM – 8:00 PM',
-  bio: 'Temporary profile copy. Focused on individualized homeopathic care with video consultations and personalized remedy plans for lasting wellness.',
+  bio: 'Temporary profile copy. Focused on individualized homeopathic care with consultations and personalized remedy plans for lasting wellness.',
 };
 
 export default function DoctorCard({ onConsultationClick }) {
@@ -107,7 +106,7 @@ export default function DoctorCard({ onConsultationClick }) {
             </button>
             <button type="button" className="btn btn-primary" onClick={onConsultationClick}>
               <Video size={16} />
-              Get Consultation (₹49)
+              Get Consultation (₹99)
             </button>
           </div>
         </div>

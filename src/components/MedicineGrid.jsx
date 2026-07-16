@@ -1,12 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { DEFAULT_MEDICINES, REMEDY_IMAGE } from '../data/defaultMedicines';
-import { dedupeRemedies, seedDefaultRemedies, subscribeRemedies } from '../services/remedies';
+import {
+  dedupeRemedies,
+  getLocalCatalog,
+  seedDefaultRemedies,
+  subscribeRemedies,
+} from '../services/remedies';
 
 export { DEFAULT_MEDICINES as MEDICINES, REMEDY_IMAGE };
 
 export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
-  const [medicines, setMedicines] = useState(() => dedupeRemedies(DEFAULT_MEDICINES));
+  const [medicines, setMedicines] = useState(() => getLocalCatalog());
   const [quantities, setQuantities] = useState(() =>
     DEFAULT_MEDICINES.reduce((acc, med) => ({ ...acc, [med.id]: med.minQuantity }), {})
   );
@@ -14,28 +19,23 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
   const distinctMedicines = useMemo(() => dedupeRemedies(medicines), [medicines]);
 
   useEffect(() => {
-    let unsub = () => {};
     let cancelled = false;
 
-    (async () => {
-      try {
-        await seedDefaultRemedies();
-      } catch (err) {
-        console.error('Failed to seed remedies:', err);
+    const unsub = subscribeRemedies(
+      (items) => {
+        if (cancelled) return;
+        const distinct = dedupeRemedies(items);
+        setMedicines(distinct.length > 0 ? distinct : getLocalCatalog());
+      },
+      (err) => {
+        console.error('Failed to load remedies:', err);
+        if (!cancelled) setMedicines(getLocalCatalog());
       }
+    );
 
-      if (cancelled) return;
-
-      unsub = subscribeRemedies(
-        (items) => {
-          const distinct = dedupeRemedies(items);
-          setMedicines(distinct.length > 0 ? distinct : dedupeRemedies(DEFAULT_MEDICINES));
-        },
-        () => {
-          if (!cancelled) setMedicines(dedupeRemedies(DEFAULT_MEDICINES));
-        }
-      );
-    })();
+    seedDefaultRemedies().catch((err) => {
+      console.error('Failed to seed remedies:', err);
+    });
 
     return () => {
       cancelled = true;

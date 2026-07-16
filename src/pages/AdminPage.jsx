@@ -26,7 +26,14 @@ import {
   subscribeContacts,
 } from '../services/contacts';
 import { subscribeConsultations } from '../services/consultations';
-import { addRemedy, dedupeRemedies, seedDefaultRemedies, subscribeRemedies, updateRemedy } from '../services/remedies';
+import {
+  addRemedy,
+  dedupeRemedies,
+  getLocalCatalog,
+  seedDefaultRemedies,
+  subscribeRemedies,
+  updateRemedy,
+} from '../services/remedies';
 import { useAuth } from '../context/AuthContext';
 
 const MENU_ITEMS = [
@@ -106,58 +113,68 @@ export default function AdminPage({ addToast }) {
     let unsubRemedies = () => {};
     let cancelled = false;
 
-    (async () => {
-      try {
-        await seedDefaultRemedies();
-      } catch (err) {
+    // Subscribe immediately — do not wait for seed (seed can hang on slow/blocked Firestore)
+    unsubContacts = subscribeContacts(
+      (items) => {
+        setContacts(items);
+        setLoadingContacts(false);
+        setDataError('');
+      },
+      (err) => {
         console.error(err);
-        if (!cancelled) {
-          setDataError('Could not seed remedies. Check Firestore rules and that the database is created.');
-        }
+        setLoadingContacts(false);
+        setDataError('Could not load data. Check Firestore rules and that the database is created.');
       }
+    );
 
-      if (cancelled) return;
+    unsubConsultations = subscribeConsultations(
+      (items) => {
+        setConsultations(items);
+        setLoadingConsultations(false);
+      },
+      (err) => {
+        console.error(err);
+        setLoadingConsultations(false);
+        setDataError('Could not load consultations. Check Firestore rules and that the database is created.');
+      }
+    );
 
-      unsubContacts = subscribeContacts(
-        (items) => {
-          setContacts(items);
-          setLoadingContacts(false);
-          setDataError('');
-        },
-        (err) => {
-          console.error(err);
-          setLoadingContacts(false);
-          setDataError('Could not load data. Check Firestore rules and that the database is created.');
-        }
-      );
+    let remediesLoaded = false;
 
-      unsubConsultations = subscribeConsultations(
-        (items) => {
-          setConsultations(items);
-          setLoadingConsultations(false);
-        },
-        (err) => {
-          console.error(err);
-          setLoadingConsultations(false);
-          setDataError('Could not load consultations. Check Firestore rules and that the database is created.');
-        }
-      );
+    unsubRemedies = subscribeRemedies(
+      (items) => {
+        if (cancelled) return;
+        remediesLoaded = true;
+        const distinct = dedupeRemedies(items);
+        setRemedies(distinct.length > 0 ? distinct : getLocalCatalog());
+        setLoadingRemedies(false);
+      },
+      (err) => {
+        console.error(err);
+        if (cancelled) return;
+        remediesLoaded = true;
+        setRemedies(getLocalCatalog());
+        setLoadingRemedies(false);
+        setDataError('Could not load remedies from Firebase — showing local catalog.');
+      }
+    );
 
-      unsubRemedies = subscribeRemedies(
-        (items) => {
-          setRemedies(dedupeRemedies(items));
-          setLoadingRemedies(false);
-        },
-        (err) => {
-          console.error(err);
-          setLoadingRemedies(false);
-          setDataError('Could not load remedies. Check Firestore rules and that the database is created.');
-        }
-      );
-    })();
+    const remediesTimeout = setTimeout(() => {
+      if (cancelled || remediesLoaded) return;
+      setRemedies((prev) => (prev.length > 0 ? prev : getLocalCatalog()));
+      setLoadingRemedies(false);
+    }, 8000);
+
+    seedDefaultRemedies().catch((err) => {
+      console.error(err);
+      if (!cancelled) {
+        setDataError('Could not seed remedies. Check Firestore rules and that the database is created.');
+      }
+    });
 
     return () => {
       cancelled = true;
+      clearTimeout(remediesTimeout);
       unsubContacts();
       unsubConsultations();
       unsubRemedies();
@@ -546,7 +563,7 @@ export default function AdminPage({ addToast }) {
             <section className="admin-panel">
               <div className="admin-panel-head">
                 <h2>Doctor consultations</h2>
-                <p>Bookings from the video consultation form (₹49).</p>
+                <p>Bookings from the consultation form (₹99).</p>
               </div>
 
               {loadingConsultations ? (
@@ -580,7 +597,7 @@ export default function AdminPage({ addToast }) {
 
                       <div className="admin-consult-pay">
                         <span className="admin-pay-badge">
-                          ₹{item.amount || 49} · {(item.paymentMethod || 'upi').toUpperCase()}
+                          ₹{item.amount || 99} · {(item.paymentMethod || 'upi').toUpperCase()}
                         </span>
                         {item.paymentMethod === 'upi' && item.upiRefNo && (
                           <span>UPI Ref: {item.upiRefNo}</span>
