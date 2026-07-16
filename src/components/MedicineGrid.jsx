@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { DEFAULT_MEDICINES, REMEDY_IMAGE } from '../data/defaultMedicines';
-import { seedDefaultRemedies, subscribeRemedies } from '../services/remedies';
+import { dedupeRemedies, seedDefaultRemedies, subscribeRemedies } from '../services/remedies';
 
 export { DEFAULT_MEDICINES as MEDICINES, REMEDY_IMAGE };
 
 export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
-  const [medicines, setMedicines] = useState(DEFAULT_MEDICINES);
+  const [medicines, setMedicines] = useState(() => dedupeRemedies(DEFAULT_MEDICINES));
   const [quantities, setQuantities] = useState(() =>
     DEFAULT_MEDICINES.reduce((acc, med) => ({ ...acc, [med.id]: med.minQuantity }), {})
   );
+
+  const distinctMedicines = useMemo(() => dedupeRemedies(medicines), [medicines]);
 
   useEffect(() => {
     let unsub = () => {};
@@ -26,10 +28,11 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
 
       unsub = subscribeRemedies(
         (items) => {
-          if (items.length > 0) setMedicines(items);
+          const distinct = dedupeRemedies(items);
+          setMedicines(distinct.length > 0 ? distinct : dedupeRemedies(DEFAULT_MEDICINES));
         },
         () => {
-          if (!cancelled) setMedicines(DEFAULT_MEDICINES);
+          if (!cancelled) setMedicines(dedupeRemedies(DEFAULT_MEDICINES));
         }
       );
     })();
@@ -44,7 +47,7 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
     setQuantities((prev) => {
       const next = { ...prev };
       let changed = false;
-      medicines.forEach((med) => {
+      distinctMedicines.forEach((med) => {
         if (next[med.id] == null) {
           next[med.id] = med.minQuantity;
           changed = true;
@@ -52,7 +55,7 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
       });
       return changed ? next : prev;
     });
-  }, [medicines]);
+  }, [distinctMedicines]);
 
   const handleIncrement = (id) => {
     setQuantities((prev) => ({ ...prev, [id]: (prev[id] || 1) + 1 }));
@@ -78,11 +81,11 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
       )}
 
       <div className="medicines-grid">
-        {medicines.map((med) => {
+        {distinctMedicines.map((med) => {
           const selectedQty = quantities[med.id] || med.minQuantity;
 
           return (
-            <article key={med.id} className="med-card">
+            <article key={`${med.id}-${med.name}`} className="med-card">
               <div className="med-card-media">
                 <span className="med-category">{med.category}</span>
                 <img

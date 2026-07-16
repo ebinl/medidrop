@@ -26,7 +26,7 @@ import {
   subscribeContacts,
 } from '../services/contacts';
 import { subscribeConsultations } from '../services/consultations';
-import { addRemedy, seedDefaultRemedies, subscribeRemedies, updateRemedy } from '../services/remedies';
+import { addRemedy, dedupeRemedies, seedDefaultRemedies, subscribeRemedies, updateRemedy } from '../services/remedies';
 import { useAuth } from '../context/AuthContext';
 
 const MENU_ITEMS = [
@@ -145,7 +145,7 @@ export default function AdminPage({ addToast }) {
 
       unsubRemedies = subscribeRemedies(
         (items) => {
-          setRemedies(items);
+          setRemedies(dedupeRemedies(items));
           setLoadingRemedies(false);
         },
         (err) => {
@@ -307,9 +307,12 @@ export default function AdminPage({ addToast }) {
       console.error(err);
       addToast?.({
         title: 'Save Failed',
-        message: editingId
-          ? 'Could not update remedy. Check Firestore permissions.'
-          : 'Could not add remedy. Check Firestore permissions.',
+        message:
+          err?.code === 'remedy/duplicate-name'
+            ? 'A remedy with this name already exists.'
+            : editingId
+              ? 'Could not update remedy. Check Firestore permissions.'
+              : 'Could not add remedy. Check Firestore permissions.',
         type: 'error',
       });
     } finally {
