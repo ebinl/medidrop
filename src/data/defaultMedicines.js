@@ -10,6 +10,9 @@ export const DEFAULT_MEDICINES = [
       'Highly effective natural remedy for relieving muscle aches, bruises, joint stiffness, and recovery after minor physical strain.',
     price: 180,
     minQuantity: 1,
+    sortOrder: 1,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Relieves muscle soreness', 'Accelerates bruise recovery', 'Reduces joint inflammation'],
   },
   {
@@ -21,6 +24,9 @@ export const DEFAULT_MEDICINES = [
       'Ideal homeopathic solution for severe acidity, stomach bloating, indigestion, hangovers, and general gastric discomfort.',
     price: 150,
     minQuantity: 1,
+    sortOrder: 2,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Relieves acid reflux & bloating', 'Soothes gastric irritation', 'Eases hangover nausea'],
   },
   {
@@ -32,6 +38,9 @@ export const DEFAULT_MEDICINES = [
       'The primary homeopathic choice for acute sudden-onset chills, dry tickly coughs, and cold symptoms triggered by dry winds.',
     price: 160,
     minQuantity: 1,
+    sortOrder: 3,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Soothes sudden-onset cold', 'Calms tickly dry coughs', 'Eases respiratory tension'],
   },
   {
@@ -43,6 +52,9 @@ export const DEFAULT_MEDICINES = [
       'Indicated for sharp joint pain, stiffness, and body soreness that is aggravated by movement and relieved by rest.',
     price: 190,
     minQuantity: 1,
+    sortOrder: 4,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Relieves sharp joint pains', 'Eases muscle stiffness', 'Reduces movement pain'],
   },
   {
@@ -54,6 +66,9 @@ export const DEFAULT_MEDICINES = [
       'Promotes restoration and relieves tearing pain in ligaments, tendons, and muscles. Works best for pain relieved by continuous motion.',
     price: 175,
     minQuantity: 1,
+    sortOrder: 5,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Eases lower back pain', 'Restores sprained ligaments', 'Relieves stiff joints'],
   },
   {
@@ -65,6 +80,9 @@ export const DEFAULT_MEDICINES = [
       'Specially formulated to address mental fatigue, stage fright, dull headaches, performance anxiety, and physical weakness.',
     price: 210,
     minQuantity: 1,
+    sortOrder: 6,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Reduces performance anxiety', 'Alleviates tension headaches', 'Relieves nervous trembling'],
   },
   {
@@ -76,6 +94,9 @@ export const DEFAULT_MEDICINES = [
       'Gentle natural soothing drops suitable for children experiencing teething irritation, colic cramps, and associated restlessness.',
     price: 145,
     minQuantity: 1,
+    sortOrder: 7,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Calms teething discomfort', 'Relieves abdominal colic', 'Soothes emotional irritability'],
   },
   {
@@ -87,6 +108,9 @@ export const DEFAULT_MEDICINES = [
       'Quick relief for insect bites, red hives, allergic skin swellings, burning rashes, and heat-induced stings.',
     price: 185,
     minQuantity: 1,
+    sortOrder: 8,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Soothes stinging insect bites', 'Reduces hives & puffiness', 'Cools burning skin allergies'],
   },
   {
@@ -98,6 +122,9 @@ export const DEFAULT_MEDICINES = [
       'Perfect remedy for seasonal hay fever, runny nose with burning nasal discharge, sneezing, and watery, irritated eyes.',
     price: 155,
     minQuantity: 1,
+    sortOrder: 9,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Relieves constant sneezing', 'Soothes burning runny nose', 'Calms watery itchy eyes'],
   },
   {
@@ -109,6 +136,9 @@ export const DEFAULT_MEDICINES = [
       'Reputed homeopathic remedy for painless wart removal, flattening skin tags, fading blemishes, and clearing chronic skin issues.',
     price: 220,
     minQuantity: 1,
+    sortOrder: 10,
+    isDefault: true,
+    image: REMEDY_IMAGE,
     benefits: ['Aids in painless wart removal', 'Flattens skin tags & nodules', 'Purifies skin blemishes'],
   },
 ];

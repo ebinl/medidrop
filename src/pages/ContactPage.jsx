@@ -116,7 +116,7 @@ export default function ContactPage({ onConsultationClick, addToast }) {
               className="btn btn-secondary contact-consult-btn"
               onClick={onConsultationClick}
             >
-              Book Video Consultation
+              Book Consultation
             </button>
           </aside>
 

@@ -158,7 +158,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
       });
       addToast({
         title: "Booking Successful",
-        message: "Your ₹49 payment was confirmed and video session is scheduled.",
+        message: "Your ₹99 payment was confirmed and video session is scheduled.",
         type: "success"
       });
     } catch (err) {
@@ -193,12 +193,12 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
               <Video size={20} strokeWidth={2.25} />
             </div>
             <div className="consult-header-text">
-              <h3>Doctor Video Consultation</h3>
+              <h3>Doctor Consultation</h3>
               <p>Book a live session with a senior practitioner</p>
             </div>
           </div>
           <div className="consult-header-actions">
-            <span className="consult-fee-badge">₹49</span>
+            <span className="consult-fee-badge">₹99</span>
             <button type="button" onClick={resetModal} className="modal-close-btn consult-close" aria-label="Close">
               <X size={20} />
             </button>
@@ -331,7 +331,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
 
               <button type="submit" className="btn btn-primary consult-submit">
                 <span>Proceed to Payment</span>
-                <span className="consult-submit-fee">₹49</span>
+                <span className="consult-submit-fee">₹99</span>
               </button>
             </form>
           )}
@@ -389,7 +389,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
                       <rect x="10" y="65" width="10" height="5" />
                       <rect x="42" y="42" width="16" height="16" fill="var(--primary)" rx="4" />
                     </svg>
-                    <span>SCAN TO PAY ₹49</span>
+                    <span>SCAN TO PAY ₹99</span>
                   </div>
 
                   <div className="consult-upi-id">
@@ -540,7 +540,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
                         ) : (
                           <>
                             <CreditCard size={16} />
-                            Pay ₹49
+                            Pay ₹99
                           </>
                         )}
                       </button>
@@ -576,12 +576,12 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
                 </div>
                 <div className="consult-summary-fee">
                   <span>Consultation Fee</span>
-                  <strong>₹49 Paid</strong>
+                  <strong>₹99 Paid</strong>
                 </div>
               </div>
 
               <p className="consult-success-note">
-                A video consult link has been sent to <strong>{formData.email}</strong>. Join 5 minutes before your slot.
+                A consult link has been sent to <strong>{formData.email}</strong>. Join 5 minutes before your slot.
               </p>
 
               <button type="button" onClick={resetModal} className="btn btn-primary consult-submit">

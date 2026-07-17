@@ -25,7 +25,7 @@ export default function Hero({ onConsultationClick }) {
           </h1>
 
           <p className="hero-sub">
-            Get customized homeopathic remedies prepared with precision. Consult online with certified homeo-specialists instantly for just <strong>₹49</strong>.
+            Get customized homeopathic remedies prepared with precision. Consult online with certified homeo-specialists instantly for just <strong>₹99</strong>.
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export default function Hero({ onConsultationClick }) {
             className="btn btn-secondary hero-cta-btn hero-cta-pulse"
           >
             <Video size={18} />
-            <span>Video Consult (₹49)</span>
+            <span>Consult (₹99)</span>
           </button>
         </div>
       </div>
@@ -63,11 +63,11 @@ export default function Hero({ onConsultationClick }) {
         <div className="glass-interactive hero-stat-card">
           <Calendar size={22} className="hero-stat-icon secondary" />
           <span className="hero-stat-value">24/7</span>
-          <span className="hero-stat-label">Instant Video Support</span>
+          <span className="hero-stat-label">Instant Consult Support</span>
         </div>
         <div className="glass-interactive hero-stat-card">
           <Stethoscope size={22} className="hero-stat-icon primary" />
-          <span className="hero-stat-value">₹49</span>
+          <span className="hero-stat-value">₹99</span>
           <span className="hero-stat-label">Online Doctor Consultation</span>
         </div>
       </div>

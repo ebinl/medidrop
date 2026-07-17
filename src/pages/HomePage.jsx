@@ -65,7 +65,7 @@ export default function HomePage({ onConsultationClick, onAddToCart }) {
             onClick={onConsultationClick}
             className="btn btn-secondary consult-cta-btn"
           >
-            <span>Book Appointment for ₹49</span>
+            <span>Book Appointment for ₹99</span>
           </button>
         </div>
       </section>
