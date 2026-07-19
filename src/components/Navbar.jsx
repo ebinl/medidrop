@@ -21,6 +21,8 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin } = useAuth();
+  const isHome = location.pathname === '/';
+  const [overHero, setOverHero] = useState(isHome);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -34,6 +36,27 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isHome) {
+      setOverHero(false);
+      return undefined;
+    }
+
+    const update = () => {
+      const hero = document.querySelector('.hero-banner');
+      const cutoff = hero ? hero.offsetHeight - 72 : window.innerHeight * 0.7;
+      setOverHero(window.scrollY < cutoff);
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [isHome]);
 
   useEffect(() => {
     const onResize = () => {
@@ -176,7 +199,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
 
   return (
     <>
-      <nav className={`site-nav glass ${menuOpen ? 'menu-open' : ''}`}>
+      <nav className={`site-nav glass ${menuOpen ? 'menu-open' : ''} ${overHero && !menuOpen ? 'site-nav--over-hero' : ''}`}>
         <Link to="/" className="brand-logo-link" onClick={closeMenu} aria-label="MEDI DROP home">
           <img
             src="/medi-drop-logo-full.png"

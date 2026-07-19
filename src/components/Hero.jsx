@@ -1,10 +1,6 @@
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Video, Calendar, ShieldCheck, Stethoscope, Users } from 'lucide-react';
-
-const Spline = lazy(() => import('@splinetool/react-spline'));
-
-const SPLINE_SCENE = 'https://prod.spline.design/RjtGKtaYIJq8yubz/scene.splinecode';
 
 export default function Hero({ onConsultationClick }) {
   return (
@@ -12,45 +8,46 @@ export default function Hero({ onConsultationClick }) {
       <div className="hero-glow" aria-hidden="true" />
 
       <div className="hero-banner">
-        <div className="hero-intro">
+        <img
+          src="/hero-banner.jpg"
+          alt=""
+          className="hero-banner-bg"
+          width={1024}
+          height={682}
+          decoding="async"
+          fetchPriority="high"
+          aria-hidden="true"
+        />
+        <div className="hero-banner-scrim" aria-hidden="true" />
+
+        <div className="hero-banner-content">
           <div className="hero-badge glass">
-            <ShieldCheck size={14} />
+            <ShieldCheck size={16} />
             <span>100% Certified Safe & Natural Solutions</span>
           </div>
 
           <h1 className="hero-title">
-            Premium Homeopathy Remedies Delivered{' '}
-            <br className="hero-br" />
-            <span className="hero-title-accent">Directly to Your Doorstep</span>
+            Natural Healing.{' '}
+            <span className="hero-title-accent">Lasting Wellness.</span>
           </h1>
 
           <p className="hero-sub">
-            Get customized homeopathic remedies prepared with precision. Consult online with certified homeo-specialists instantly for just <strong>₹99</strong>.
+            Gentle, effective and holistic homeopathic care with personalized remedies prepared with precision. Consult online with certified specialists for just <strong>₹99</strong>.
           </p>
-        </div>
 
-        <div className="hero-spline-wrap" aria-hidden="true">
-          <Suspense fallback={<div className="hero-spline-fallback" />}>
-            <Spline
-              scene={SPLINE_SCENE}
-              className="hero-spline"
-              style={{ width: '100%', height: '100%' }}
-            />
-          </Suspense>
-        </div>
-
-        <div className="hero-ctas">
-          <Link to="/remedies" className="btn btn-primary hero-cta-btn">
-            Browse Remedies
-          </Link>
-          <button
-            type="button"
-            onClick={onConsultationClick}
-            className="btn btn-secondary hero-cta-btn hero-cta-pulse"
-          >
-            <Video size={18} />
-            <span>Consult (₹99)</span>
-          </button>
+          <div className="hero-ctas">
+            <Link to="/remedies" className="btn btn-primary hero-cta-btn">
+              Browse Remedies
+            </Link>
+            <button
+              type="button"
+              onClick={onConsultationClick}
+              className="btn btn-secondary hero-cta-btn hero-cta-pulse"
+            >
+              <Video size={20} />
+              <span>Consult (₹99)</span>
+            </button>
+          </div>
         </div>
       </div>
 

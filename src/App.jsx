@@ -91,9 +91,10 @@ function AppShell() {
   };
 
   const hideChrome = isAdminRoute || isAuthRoute;
+  const isHome = location.pathname === '/';
 
   return (
-    <div className={`app-container ${isAdminRoute ? 'app-admin' : ''} ${isAuthRoute ? 'app-auth' : ''}`}>
+    <div className={`app-container ${isAdminRoute ? 'app-admin' : ''} ${isAuthRoute ? 'app-auth' : ''} ${isHome ? 'app-home' : ''}`}>
       {!hideChrome && (
         <Navbar
           cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
