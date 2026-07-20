@@ -12,7 +12,7 @@ const DOCTOR = {
     'BHMS — Bachelor of Homeopathic Medicine & Surgery',
     'Certified Classical Homeopathy Practitioner',
   ],
-  specialties: ['Chronic cases', 'Thyroid','Pediatric care', 'Allergy & immunity', 'Lifestyle disorders'],
+  specialties: ['Chronic cases', 'Thyroid', 'Pediatric care', 'Allergy & immunity', 'Lifestyle disorders'],
   languages: 'English, Malayalam, Hindi',
   availability: 'Mon–Sat · 10:00 AM – 8:00 PM',
   bio: 'Focused on individualized homeopathic care with consultations and personalized remedy plans for lasting wellness.',

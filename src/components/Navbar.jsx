@@ -44,8 +44,8 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
     }
 
     const update = () => {
-      const hero = document.querySelector('.hero-banner');
-      const cutoff = hero ? hero.offsetHeight - 72 : window.innerHeight * 0.7;
+      const hero = document.querySelector('.hero-section');
+      const cutoff = hero ? hero.offsetHeight - 64 : window.innerHeight * 0.85;
       setOverHero(window.scrollY < cutoff);
     };
 
