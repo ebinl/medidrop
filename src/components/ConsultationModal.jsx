@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Video, ShieldCheck, CreditCard, Check, Copy, RefreshCw, Smartphone, Calendar, Clock, User, Mail, Phone, Stethoscope } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { submitConsultation } from '../services/consultations';
+import { notifyDoctorConsultation } from '../services/consultationEmail';
 
 const STEPS = [
   { id: 1, label: 'Details' },
@@ -141,13 +142,29 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
 
     try {
       const digits = cardData.number.replace(/\s/g, '');
-      await submitConsultation({
+      const payload = {
         ...formData,
         paymentMethod,
         upiRefNo: paymentMethod === 'upi' ? upiRefNo : '',
         cardHolder: paymentMethod === 'card' ? cardData.holder.trim() : '',
         cardLast4: paymentMethod === 'card' ? digits.slice(-4) : '',
-      });
+      };
+
+      await submitConsultation(payload);
+
+      let doctorNotified = false;
+
+      try {
+        const emailResult = await notifyDoctorConsultation(payload);
+        doctorNotified = emailResult.sent === true;
+      } catch (emailErr) {
+        console.error(emailErr);
+        addToast({
+          title: 'Booking Saved',
+          message: 'Consultation saved, but the doctor Gmail alert failed. Our team will still review your booking.',
+          type: 'warning',
+        });
+      }
 
       setIsProcessing(false);
       setStep(3);
@@ -157,9 +174,11 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
         origin: { y: 0.6 }
       });
       addToast({
-        title: "Booking Successful",
-        message: "Your ₹99 payment was confirmed and video session is scheduled.",
-        type: "success"
+        title: 'Booking Successful',
+        message: doctorNotified
+          ? 'Your ₹99 payment was confirmed. Dr. Ancy Shaji has been notified by email with your details.'
+          : 'Your ₹99 payment was confirmed and your video session is scheduled.',
+        type: 'success',
       });
     } catch (err) {
       console.error(err);
