@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Mail, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
 import { submitContact } from '../services/contacts';
 
 export default function ContactPage({ onConsultationClick, addToast }) {
@@ -77,7 +77,7 @@ export default function ContactPage({ onConsultationClick, addToast }) {
           <aside className="glass contact-info-panel">
             <h2>Clinic details</h2>
             <p className="contact-info-lead">
-              Placeholder details — replace with your real clinic address and hours before launch.
+              Reach us by email or book a consultation online. We respond to messages during clinic hours.
             </p>
 
             <ul className="contact-info-list">
@@ -89,24 +89,17 @@ export default function ContactPage({ onConsultationClick, addToast }) {
                 </div>
               </li>
               <li>
-                <span className="contact-info-icon"><Phone size={16} /></span>
+                <span className="contact-info-icon"><Clock size={16} /></span>
                 <div>
-                  <strong>Phone</strong>
-                  <a href="tel:+919000000000">+91 90000 00000</a>
+                  <strong>Hours</strong>
+                  <span>Mon–Sat · 10:00 AM – 8:00 PM</span>
                 </div>
               </li>
               <li>
                 <span className="contact-info-icon"><MapPin size={16} /></span>
                 <div>
-                  <strong>Address</strong>
-                  <span>Clinic address placeholder, City, State — 000000</span>
-                </div>
-              </li>
-              <li>
-                <span className="contact-info-icon"><Clock size={16} /></span>
-                <div>
-                  <strong>Hours</strong>
-                  <span>Mon–Sat · 10:00 AM – 8:00 PM</span>
+                  <strong>Consultations</strong>
+                  <span>Online video consults available across India</span>
                 </div>
               </li>
             </ul>

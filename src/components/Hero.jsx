@@ -8,18 +8,6 @@ export default function Hero({ onConsultationClick }) {
       <div className="hero-glow" aria-hidden="true" />
 
       <div className="hero-banner">
-        <img
-          src="/hero-banner.jpg"
-          alt=""
-          className="hero-banner-bg"
-          width={1024}
-          height={682}
-          decoding="async"
-          fetchPriority="high"
-          aria-hidden="true"
-        />
-        <div className="hero-banner-scrim" aria-hidden="true" />
-
         <div className="hero-banner-content">
           <div className="hero-badge glass">
             <ShieldCheck size={16} />
@@ -27,8 +15,8 @@ export default function Hero({ onConsultationClick }) {
           </div>
 
           <h1 className="hero-title">
-            Natural Healing.{' '}
-            <span className="hero-title-accent">Lasting Wellness.</span>
+            <span className="hero-title-line">Premium Homeopathic Remedies Delivered</span>
+            <span className="hero-title-line hero-title-accent">Directly to Your Doorstep</span>
           </h1>
 
           <p className="hero-sub">

@@ -6,17 +6,16 @@ const DOCTOR = {
   name: 'Dr. Ancy Shaji',
   title: 'Senior Homeopathic Physician',
   image: '/dr-ancy-consulting-room.png',
-  experience: '12+ years clinical practice',
-  patients: '8,500+ patients treated',
+  experience: '20+ years clinical practice',
+  patients: '15000+ patients treated',
   qualifications: [
     'BHMS — Bachelor of Homeopathic Medicine & Surgery',
-    'MD (Hom.) — Materia Medica',
     'Certified Classical Homeopathy Practitioner',
   ],
-  specialties: ['Chronic cases', 'Pediatric care', 'Allergy & immunity', 'Lifestyle disorders'],
+  specialties: ['Chronic cases', 'Thyroid','Pediatric care', 'Allergy & immunity', 'Lifestyle disorders'],
   languages: 'English, Malayalam, Hindi',
   availability: 'Mon–Sat · 10:00 AM – 8:00 PM',
-  bio: 'Temporary profile copy. Focused on individualized homeopathic care with consultations and personalized remedy plans for lasting wellness.',
+  bio: 'Focused on individualized homeopathic care with consultations and personalized remedy plans for lasting wellness.',
 };
 
 export default function DoctorCard({ onConsultationClick }) {

@@ -357,6 +357,62 @@ h1, h2, h3, h4, h5, h6 {
   padding-top: 0;
 }
 
+/* Fixed repeating page background — content scrolls above */
+body:has(.app-page-bg) {
+  background: transparent;
+  animation: none;
+}
+
+.app-container.app-page-bg {
+  position: relative;
+  isolation: isolate;
+  background: transparent;
+}
+
+.app-container.app-page-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/hero-banner.jpg');
+  background-repeat: repeat;
+  background-size: min(520px, 72vw) auto;
+  background-position: center top;
+  background-attachment: fixed;
+  pointer-events: none;
+}
+
+.app-container.app-page-bg::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: rgba(252, 248, 240, 0.68);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .app-container.app-page-bg::after {
+  background: rgba(22, 19, 17, 0.74);
+}
+
+.app-container.app-page-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.app-page-bg .remedies-hero,
+.app-page-bg .contact-hero {
+  background: transparent;
+}
+
+.app-page-bg .features-section,
+.app-page-bg .doctor-section,
+.app-page-bg .medicines-section,
+.app-page-bg .consult-cta-section,
+.app-page-bg .home-remedies-more {
+  background: transparent;
+}
+
 .content-wrapper {
   flex-grow: 1;
   padding-bottom: 5rem;
@@ -511,18 +567,18 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 18px;
   overflow: hidden;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 16 / 9;
   min-height: 0;
+  max-height: 420px;
   background: var(--surface-muted);
+  isolation: isolate;
 }
 
 .doctor-card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 2%;
-  transform: scale(2.15);
-  transform-origin: center 5%;
+  object-position: center 18%;
   display: block;
 }
 
@@ -694,8 +750,8 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 801px) {
   .doctor-card {
-    grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
-    align-items: stretch;
+    grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+    align-items: start;
     gap: clamp(1.25rem, 2.5vw, 2rem);
   }
 
@@ -703,16 +759,15 @@ h1, h2, h3, h4, h5, h6 {
     grid-column: 1;
     grid-row: 1;
     width: 100%;
-    height: 100%;
-    min-height: 480px;
-    aspect-ratio: auto;
-    align-self: stretch;
+    height: auto;
+    min-height: 0;
+    max-height: 320px;
+    aspect-ratio: 16 / 9;
+    align-self: start;
   }
 
   .doctor-card-image {
-    object-position: center 1%;
-    transform: scale(2.2);
-    transform-origin: center 4%;
+    object-position: center 16%;
   }
 
   .doctor-card-body {
@@ -724,15 +779,14 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 800px) {
   .doctor-card-media {
-    aspect-ratio: 3 / 4;
-    max-width: 300px;
-    margin-inline: auto;
+    aspect-ratio: 16 / 9;
+    max-height: 360px;
+    max-width: none;
+    margin-inline: 0;
   }
 
   .doctor-card-image {
-    object-position: center 2%;
-    transform: scale(2.15);
-    transform-origin: center 5%;
+    object-position: center 18%;
   }
 
   .doctor-card-body {
@@ -743,13 +797,12 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 480px) {
   .doctor-card-media {
     max-width: none;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 10;
+    max-height: 280px;
   }
 
   .doctor-card-image {
-    object-position: center 1%;
-    transform: scale(2.1);
-    transform-origin: center 4%;
+    object-position: center 20%;
   }
 
   .doctor-meta-grid {
@@ -1264,63 +1317,25 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   width: 100%;
   max-width: none;
-  height: 100dvh;
-  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0;
-  overflow: hidden;
+  min-height: min(100dvh, 900px);
   margin: 0;
-  isolation: isolate;
-}
-
-.hero-banner-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  z-index: 0;
-}
-
-.hero-banner-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 78% 62% at 50% 48%,
-      rgba(252, 248, 240, 0.9) 0%,
-      rgba(252, 248, 240, 0.58) 48%,
-      rgba(252, 248, 240, 0.18) 78%,
-      rgba(252, 248, 240, 0.05) 100%
-    );
-}
-
-[data-theme="dark"] .hero-banner-scrim {
-  background:
-    radial-gradient(
-      ellipse 78% 62% at 50% 48%,
-      rgba(28, 24, 22, 0.88) 0%,
-      rgba(28, 24, 22, 0.55) 48%,
-      rgba(28, 24, 22, 0.16) 78%,
-      rgba(28, 24, 22, 0.04) 100%
-    );
+  background: transparent;
 }
 
 .hero-banner-content {
   position: relative;
   z-index: 2;
-  width: min(100%, 52rem);
+  width: min(100%, 56rem);
   margin: 0 auto;
   padding: calc(4.5rem + 0.75rem) clamp(1.25rem, 4vw, 2.5rem) clamp(1.5rem, 4vw, 2.5rem);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: transparent;
 }
 
 .hero-badge {
@@ -1340,15 +1355,28 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-title {
-  font-size: clamp(2.35rem, 6.5vw, 4.4rem);
-  line-height: 1.05;
-  max-width: 13ch;
-  margin: 0 0 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: min(100%, 52rem);
+  margin: 0 auto 1.2rem;
+  padding: 0;
+  text-align: center;
+  gap: 0.2em;
+}
+
+.hero-title-line {
+  display: block;
+  width: 100%;
+  font-size: clamp(2rem, 6vw, 4.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
   background: none;
   -webkit-text-fill-color: var(--text-primary);
-  text-align: center;
-  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 .hero-title-accent {
@@ -1356,15 +1384,18 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .hero-sub {
   font-size: clamp(1.05rem, 2.5vw, 1.3rem);
   color: var(--text-secondary);
   max-width: 40rem;
+  width: 100%;
   margin: 0 auto 1.85rem;
   line-height: 1.55;
   text-align: center;
+  text-wrap: balance;
 }
 
 .hero-glow {
@@ -1440,17 +1471,10 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .hero-banner {
-    height: 100dvh;
-    min-height: 100dvh;
-    margin: 0;
-  }
-
-  .hero-banner-bg {
-    object-position: center center;
+    min-height: min(100dvh, 920px);
   }
 
   .hero-banner-content {
-    width: min(100%, 56rem);
     padding: calc(4.5rem + 1rem) clamp(2rem, 5vw, 4rem) 2.5rem;
   }
 
@@ -1461,9 +1485,14 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .hero-title {
-    font-size: clamp(3.2rem, 5vw, 4.6rem);
-    max-width: 13ch;
+    max-width: min(100%, 56rem);
     margin-bottom: 1.25rem;
+    gap: 0.22em;
+  }
+
+  .hero-title-line {
+    font-size: clamp(2.75rem, 4.8vw, 4.6rem);
+    line-height: 1.1;
   }
 
   .hero-sub {
@@ -1508,44 +1537,23 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 640px) {
   .hero-banner {
-    height: 100dvh;
-    min-height: 100dvh;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .hero-banner-bg {
-    object-position: center 30%;
-  }
-
-  .hero-banner-scrim {
-    background:
-      radial-gradient(
-        ellipse 95% 70% at 50% 55%,
-        rgba(252, 248, 240, 0.9) 0%,
-        rgba(252, 248, 240, 0.62) 50%,
-        rgba(252, 248, 240, 0.22) 100%
-      );
-  }
-
-  [data-theme="dark"] .hero-banner-scrim {
-    background:
-      radial-gradient(
-        ellipse 95% 70% at 50% 55%,
-        rgba(28, 24, 22, 0.88) 0%,
-        rgba(28, 24, 22, 0.58) 50%,
-        rgba(28, 24, 22, 0.2) 100%
-      );
+    min-height: auto;
+    padding-bottom: 0.5rem;
   }
 
   .hero-banner-content {
-    width: min(100%, 28rem);
+    width: 100%;
     padding: calc(4.5rem + 0.5rem) 1.15rem 1.5rem;
   }
 
   .hero-title {
-    max-width: none;
-    font-size: clamp(2.1rem, 9vw, 2.75rem);
+    max-width: min(100%, 100%);
+    gap: 0.18em;
+  }
+
+  .hero-title-line {
+    font-size: clamp(1.85rem, 8.2vw, 2.65rem);
+    line-height: 1.14;
   }
 
   .hero-sub {

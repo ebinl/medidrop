@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
 
 export default function Footer({ onConsultationClick }) {
   return (
@@ -16,7 +16,7 @@ export default function Footer({ onConsultationClick }) {
               />
             </Link>
             <p className="footer-text">
-              Temporary placeholder copy. Premium homeopathic remedies and online doctor consultations for everyday wellness.
+              Premium homeopathic remedies and online doctor consultations for everyday wellness.
             </p>
           </div>
 
@@ -38,10 +38,10 @@ export default function Footer({ onConsultationClick }) {
           <div className="footer-col">
             <h4 className="footer-heading">Support</h4>
             <ul className="footer-links">
-              <li><span>Shipping Policy (temp)</span></li>
-              <li><span>Returns & Refunds (temp)</span></li>
-              <li><span>Privacy Policy (temp)</span></li>
-              <li><span>Terms of Use (temp)</span></li>
+              <li><span>Shipping Policy</span></li>
+              <li><span>Returns & Refunds</span></li>
+              <li><span>Privacy Policy</span></li>
+              <li><span>Terms of Use</span></li>
             </ul>
           </div>
 
@@ -53,12 +53,8 @@ export default function Footer({ onConsultationClick }) {
                 <span>hello@medidrop.net</span>
               </li>
               <li>
-                <Phone size={14} />
-                <span>+91 90000 00000</span>
-              </li>
-              <li>
                 <MapPin size={14} />
-                <span>Clinic address placeholder, City</span>
+                <span>Online consultations · Mon–Sat, 10:00 AM – 8:00 PM</span>
               </li>
             </ul>
           </div>
@@ -66,7 +62,7 @@ export default function Footer({ onConsultationClick }) {
 
         <div className="footer-bottom">
           <p className="footer-copy">
-            &copy; {new Date().getFullYear()} MEDI DROP. Temporary footer content — update before launch.
+            &copy; {new Date().getFullYear()} MEDI DROP. All rights reserved.
           </p>
           <p className="footer-note">
             For informational purposes only. Not a substitute for professional medical advice.

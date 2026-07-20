@@ -92,9 +92,10 @@ function AppShell() {
 
   const hideChrome = isAdminRoute || isAuthRoute;
   const isHome = location.pathname === '/';
+  const hasPageBg = !isAdminRoute && !isAuthRoute;
 
   return (
-    <div className={`app-container ${isAdminRoute ? 'app-admin' : ''} ${isAuthRoute ? 'app-auth' : ''} ${isHome ? 'app-home' : ''}`}>
+    <div className={`app-container ${isAdminRoute ? 'app-admin' : ''} ${isAuthRoute ? 'app-auth' : ''} ${isHome ? 'app-home' : ''} ${hasPageBg ? 'app-page-bg' : ''}`}>
       {!hideChrome && (
         <Navbar
           cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
