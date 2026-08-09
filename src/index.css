@@ -129,6 +129,32 @@ body {
   animation: gradientShift 10s ease infinite;
   color-scheme: var(--color-scheme);
   transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.content-wrapper,
+.hero-section,
+.features-section,
+.doctor-section,
+.medicines-section,
+.consult-cta-section,
+.contact-page,
+.remedies-page,
+.site-footer {
+  min-width: 0;
+}
+
+h1, h2, h3, h4, p, span, a, li, label, button {
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -382,6 +408,22 @@ body:has(.app-page-bg) {
   pointer-events: none;
 }
 
+/* Fixed backgrounds break on many phones/tablets — scroll with page instead */
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) {
+  .app-container.app-page-bg::before,
+  .app-container.app-page-bg::after {
+    position: absolute;
+    inset: 0;
+    height: auto;
+    min-height: 100%;
+    background-attachment: scroll;
+  }
+
+  .app-container.app-page-bg {
+    min-height: 100dvh;
+  }
+}
+
 .app-container.app-page-bg::after {
   content: '';
   position: fixed;
@@ -437,10 +479,21 @@ body:has(.app-page-bg) {
   background: transparent;
 }
 
+.app-page-bg .glass,
+.app-page-bg .glass-interactive,
+.app-page-bg .doctor-card,
+.app-page-bg .med-card,
+.app-page-bg .feature-card,
+.app-page-bg .contact-form,
+.app-page-bg .contact-info-panel {
+  background: color-mix(in srgb, var(--card-bg) 92%, transparent);
+}
+
 .content-wrapper {
   flex-grow: 1;
   padding-bottom: 5rem;
   width: 100%;
+  overflow-x: hidden;
 }
 
 /* —— Remedies page —— */
@@ -591,7 +644,8 @@ body:has(.app-page-bg) {
   border-radius: 18px;
   overflow: hidden;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 16 / 9;
+  max-height: 420px;
   min-height: 0;
   background: var(--surface-muted);
   isolation: isolate;
@@ -601,9 +655,7 @@ body:has(.app-page-bg) {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 2%;
-  transform: scale(2.15);
-  transform-origin: center 5%;
+  object-position: center 18%;
   display: block;
 }
 
@@ -775,8 +827,8 @@ body:has(.app-page-bg) {
 
 @media (min-width: 801px) {
   .doctor-card {
-    grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
-    align-items: stretch;
+    grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+    align-items: start;
     gap: clamp(1.25rem, 2.5vw, 2rem);
   }
 
@@ -784,18 +836,15 @@ body:has(.app-page-bg) {
     grid-column: 1;
     grid-row: 1;
     width: 100%;
-    height: 100%;
-    min-height: 100%;
-    max-height: none;
-    aspect-ratio: auto;
-    align-self: stretch;
+    height: auto;
+    min-height: 0;
+    max-height: 300px;
+    aspect-ratio: 16 / 9;
+    align-self: start;
   }
 
   .doctor-card-image {
-    object-fit: cover;
-    object-position: center 2%;
-    transform: scale(2.15);
-    transform-origin: center 5%;
+    object-position: center 16%;
   }
 
   .doctor-card-body {
@@ -807,16 +856,14 @@ body:has(.app-page-bg) {
 
 @media (max-width: 800px) {
   .doctor-card-media {
-    aspect-ratio: 3 / 4;
-    max-width: 280px;
-    max-height: none;
-    margin-inline: auto;
+    aspect-ratio: 16 / 9;
+    max-width: none;
+    max-height: 340px;
+    margin-inline: 0;
   }
 
   .doctor-card-image {
-    object-position: center 2%;
-    transform: scale(2.15);
-    transform-origin: center 5%;
+    object-position: center 18%;
   }
 
   .doctor-card-body {
@@ -844,7 +891,8 @@ body:has(.app-page-bg) {
 @media (max-width: 480px) {
   .doctor-card-media {
     max-width: none;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 16 / 10;
+    max-height: 260px;
   }
 
   .doctor-meta-grid {
@@ -852,18 +900,17 @@ body:has(.app-page-bg) {
   }
 
   .doctor-card-actions {
-    flex-direction: row;
-    flex-wrap: nowrap;
+    flex-direction: column;
   }
 
   .doctor-card-actions .btn {
-    width: auto;
-    flex: 1 1 0;
+    width: 100%;
+    flex: 1 1 auto;
     min-width: 0;
-    min-height: 2.15rem;
-    padding: 0.4rem 0.55rem;
-    font-size: 0.72rem;
-    white-space: nowrap;
+    min-height: 2.5rem;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.85rem;
+    white-space: normal;
   }
 }
 
@@ -1077,7 +1124,7 @@ body:has(.app-page-bg) {
   left: 0;
   right: 0;
   z-index: 100;
-  padding: 0.85rem clamp(1rem, 4vw, 2rem);
+  padding: max(0.85rem, env(safe-area-inset-top)) clamp(1rem, 4vw, 2rem) 0.85rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1597,17 +1644,19 @@ body:has(.app-page-bg) {
 
 @media (max-width: 768px) {
   .hero-section {
-    height: 100dvh;
-    max-height: 100dvh;
-    min-height: 100dvh;
-    overflow: hidden;
-    justify-content: space-between;
+    min-height: auto;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    justify-content: flex-start;
     box-sizing: border-box;
+    padding-bottom: 0.5rem;
   }
 
   .hero-banner {
-    flex: 1 1 auto;
-    min-height: 0;
+    flex: none;
+    min-height: auto;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1616,7 +1665,8 @@ body:has(.app-page-bg) {
 
   .hero-banner-content {
     width: 100%;
-    padding: calc(4.5rem + 0.65rem) 1.2rem 1.15rem;
+    max-width: 100%;
+    padding: calc(4.5rem + env(safe-area-inset-top, 0px) + 0.65rem) 1.2rem 1.25rem;
     gap: 0;
   }
 
@@ -1642,6 +1692,7 @@ body:has(.app-page-bg) {
     font-size: clamp(1.9rem, 7.8vw, 2.45rem);
     line-height: 1.28;
     letter-spacing: -0.02em;
+    hyphens: auto;
   }
 
   .hero-sub {
@@ -1673,12 +1724,12 @@ body:has(.app-page-bg) {
   }
 
   .hero-stats {
-    flex: 0 0 auto;
+    flex: none;
     width: 100%;
     max-width: 100%;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.55rem;
-    padding: 0.85rem 0.85rem calc(0.9rem + env(safe-area-inset-bottom, 0px));
+    padding: 1rem 0.85rem calc(1rem + env(safe-area-inset-bottom, 0px));
     margin: 0;
   }
 
