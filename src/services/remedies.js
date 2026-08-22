@@ -5,6 +5,7 @@ import {
   getDocs,
   onSnapshot,
   serverTimestamp,
+  setDoc,
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
@@ -280,4 +281,34 @@ export function subscribeRemedies(onData, onError) {
       onError?.(err);
     }
   );
+}
+
+export function subscribeRemediesHeader(onData, onError) {
+  const headerRef = doc(db, 'settings', 'remedies_header');
+  return onSnapshot(
+    headerRef,
+    (docSnap) => {
+      if (docSnap.exists()) {
+        onData(docSnap.data());
+      } else {
+        onData({
+          title: 'Select Homeopathic Remedies',
+          description: 'Explore pure organic dilutions prepared with care. Check minimum quantities before adding remedies to your cart.'
+        });
+      }
+    },
+    (err) => {
+      console.warn('Remedies header subscribe failed:', err);
+      onError?.(err);
+    }
+  );
+}
+
+export async function updateRemediesHeader(data) {
+  const headerRef = doc(db, 'settings', 'remedies_header');
+  await setDoc(headerRef, {
+    title: data.title.trim(),
+    description: data.description.trim(),
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
 }

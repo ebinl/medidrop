@@ -6,6 +6,7 @@ import {
   getLocalCatalog,
   seedDefaultRemedies,
   subscribeRemedies,
+  subscribeRemediesHeader,
 } from '../services/remedies';
 
 export { DEFAULT_MEDICINES as MEDICINES, REMEDY_IMAGE };
@@ -15,13 +16,18 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
   const [quantities, setQuantities] = useState(() =>
     DEFAULT_MEDICINES.reduce((acc, med) => ({ ...acc, [med.id]: med.minQuantity }), {})
   );
+  const [headerSettings, setHeaderSettings] = useState({
+    title: 'Select Homeopathic Remedies',
+    description: 'Explore pure organic dilutions prepared with care. Check minimum quantities before adding remedies to your cart.',
+  });
+  const [expandedIds, setExpandedIds] = useState({});
 
   const distinctMedicines = useMemo(() => dedupeRemedies(medicines), [medicines]);
 
   useEffect(() => {
     let cancelled = false;
 
-    const unsub = subscribeRemedies(
+    const unsubRemedies = subscribeRemedies(
       (items) => {
         if (cancelled) return;
         const distinct = dedupeRemedies(items);
@@ -33,13 +39,27 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
       }
     );
 
+    const unsubHeader = subscribeRemediesHeader(
+      (data) => {
+        if (cancelled) return;
+        setHeaderSettings({
+          title: data.title || 'Select Homeopathic Remedies',
+          description: data.description || 'Explore pure organic dilutions prepared with care. Check minimum quantities before adding remedies to your cart.',
+        });
+      },
+      (err) => {
+        console.error('Failed to load remedies header:', err);
+      }
+    );
+
     seedDefaultRemedies().catch((err) => {
       console.error('Failed to seed remedies:', err);
     });
 
     return () => {
       cancelled = true;
-      unsub();
+      unsubRemedies();
+      unsubHeader();
     };
   }, []);
 
@@ -73,9 +93,9 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
       {!compactHeader && (
         <div className="section-header medicines-header">
           <span className="section-eyebrow">Doctor Recommended</span>
-          <h2 className="section-title medicines-title">Select Homeopathic Remedies</h2>
+          <h2 className="section-title medicines-title">{headerSettings.title}</h2>
           <p className="section-desc">
-            Explore pure organic dilutions prepared with care. Check minimum quantities before adding remedies to your cart.
+            {headerSettings.description}
           </p>
         </div>
       )}
@@ -83,6 +103,7 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
       <div className="medicines-grid">
         {distinctMedicines.map((med) => {
           const selectedQty = quantities[med.id] || med.minQuantity;
+          const isExpanded = !!expandedIds[med.id];
 
           return (
             <article key={`${med.id}-${med.name}`} className="med-card">
@@ -102,7 +123,21 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
                   <span>{med.scientificName}</span>
                 </div>
 
-                <p className="med-desc">{med.description}</p>
+                <div className="med-desc-wrap" style={{ display: 'flex', flexDirection: 'column' }}>
+                  <p className={`med-desc ${isExpanded ? 'is-expanded' : 'is-clamped'}`}>
+                    {med.description}
+                  </p>
+                  {med.description && med.description.length > 80 && (
+                    <button
+                      type="button"
+                      className="med-desc-toggle"
+                      onClick={() => setExpandedIds(prev => ({ ...prev, [med.id]: !prev[med.id] }))}
+                      style={{ alignSelf: 'flex-start' }}
+                    >
+                      {isExpanded ? 'Read less' : 'Read more'}
+                    </button>
+                  )}
+                </div>
 
                 <div className="med-benefits">
                   {(med.benefits || []).map((benefit) => (

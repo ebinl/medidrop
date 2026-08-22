@@ -827,8 +827,8 @@ body:has(.app-page-bg) {
 
 @media (min-width: 801px) {
   .doctor-card {
-    grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    align-items: stretch;
     gap: clamp(1.25rem, 2.5vw, 2rem);
   }
 
@@ -836,15 +836,14 @@ body:has(.app-page-bg) {
     grid-column: 1;
     grid-row: 1;
     width: 100%;
-    height: auto;
+    height: 100%;
     min-height: 0;
-    max-height: 300px;
-    aspect-ratio: 16 / 9;
-    align-self: start;
+    max-height: none;
+    aspect-ratio: auto;
   }
 
   .doctor-card-image {
-    object-position: center 16%;
+    object-position: center;
   }
 
   .doctor-card-body {
@@ -2160,9 +2159,35 @@ body:has(.app-page-bg) {
   margin: 0;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   line-height: 1.5;
+}
+
+.med-desc.is-clamped {
+  -webkit-line-clamp: 2;
+}
+
+.med-desc.is-expanded {
+  -webkit-line-clamp: none;
+}
+
+.med-desc-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.25rem;
+  transition: color 0.2s ease;
+}
+
+.med-desc-toggle:hover {
+  text-decoration: underline;
 }
 
 .med-benefits {

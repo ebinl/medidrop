@@ -32,6 +32,8 @@ import {
   getLocalCatalog,
   seedDefaultRemedies,
   subscribeRemedies,
+  subscribeRemediesHeader,
+  updateRemediesHeader,
   updateRemedy,
 } from '../services/remedies';
 import { useAuth } from '../context/AuthContext';
@@ -80,6 +82,8 @@ export default function AdminPage({ addToast }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactBusyId, setContactBusyId] = useState(null);
   const [clearingContacts, setClearingContacts] = useState(false);
+  const [headerForm, setHeaderForm] = useState({ title: '', description: '' });
+  const [savingHeader, setSavingHeader] = useState(false);
 
   const isAuthed = Boolean(isAdmin);
 
@@ -111,6 +115,7 @@ export default function AdminPage({ addToast }) {
     let unsubContacts = () => {};
     let unsubConsultations = () => {};
     let unsubRemedies = () => {};
+    let unsubHeader = () => {};
     let cancelled = false;
 
     // Subscribe immediately — do not wait for seed (seed can hang on slow/blocked Firestore)
@@ -159,6 +164,19 @@ export default function AdminPage({ addToast }) {
       }
     );
 
+    unsubHeader = subscribeRemediesHeader(
+      (data) => {
+        if (cancelled) return;
+        setHeaderForm({
+          title: data.title || '',
+          description: data.description || '',
+        });
+      },
+      (err) => {
+        console.error('Failed to load header configurations:', err);
+      }
+    );
+
     const remediesTimeout = setTimeout(() => {
       if (cancelled || remediesLoaded) return;
       setRemedies((prev) => (prev.length > 0 ? prev : getLocalCatalog()));
@@ -178,6 +196,7 @@ export default function AdminPage({ addToast }) {
       unsubContacts();
       unsubConsultations();
       unsubRemedies();
+      unsubHeader();
     };
   }, [isAuthed]);
 
@@ -334,6 +353,37 @@ export default function AdminPage({ addToast }) {
       });
     } finally {
       setSavingRemedy(false);
+    }
+  };
+
+  const handleSaveHeader = async (e) => {
+    e.preventDefault();
+    if (!headerForm.title.trim() || !headerForm.description.trim()) {
+      addToast?.({
+        title: 'Missing Info',
+        message: 'Title and description are required.',
+        type: 'warning',
+      });
+      return;
+    }
+
+    setSavingHeader(true);
+    try {
+      await updateRemediesHeader(headerForm);
+      addToast?.({
+        title: 'Header Updated',
+        message: 'Storefront remedies header was successfully updated.',
+        type: 'success',
+      });
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Save Failed',
+        message: 'Could not update storefront header settings.',
+        type: 'error',
+      });
+    } finally {
+      setSavingHeader(false);
     }
   };
 
@@ -634,6 +684,46 @@ export default function AdminPage({ addToast }) {
               <div className="admin-panel-head">
                 <h2>All remedies</h2>
                 <p>Catalog stored in Firebase — includes the original 10 remedies plus any you add.</p>
+              </div>
+
+              <div className="admin-login-card glass" style={{ width: '100%', maxWidth: 'none', margin: '0 0 2rem 0', padding: '1.5rem', textAlign: 'left', display: 'block' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '750', marginBottom: '0.25rem', color: 'var(--text-primary)' }}>Storefront remedies header</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Customize the title and description shown on the remedies storefront section.</p>
+                <form onSubmit={handleSaveHeader} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="admin-field" style={{ width: '100%' }}>
+                      <label htmlFor="header-title" style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Section Title</label>
+                      <input
+                        id="header-title"
+                        className="admin-input"
+                        value={headerForm.title}
+                        onChange={(e) => setHeaderForm(prev => ({ ...prev, title: e.target.value }))}
+                        placeholder="Select Homeopathic Remedies"
+                        required
+                      />
+                    </div>
+                    <div className="admin-field" style={{ width: '100%' }}>
+                      <label htmlFor="header-desc" style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Section Description</label>
+                      <textarea
+                        id="header-desc"
+                        className="admin-input admin-textarea"
+                        rows={2}
+                        value={headerForm.description}
+                        onChange={(e) => setHeaderForm(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Explore pure organic dilutions prepared with care..."
+                        required
+                      />
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', minHeight: '2.4rem', padding: '0.5rem 1.25rem' }} disabled={savingHeader}>
+                    {savingHeader ? (
+                      <>
+                        <Loader2 className="admin-spin" size={15} />
+                        Saving...
+                      </>
+                    ) : 'Update Storefront Header'}
+                  </button>
+                </form>
               </div>
 
               {loadingRemedies ? (
