@@ -530,7 +530,7 @@ export default function AdminPage({ addToast }) {
 
     setSavingRemedy(true);
     const existingRemedy = editingId ? remedies.find((r) => r.id === editingId) : null;
-    const finalImage = remedyForm.image || existingRemedy?.image || '/remedy-bottle.png';
+    const finalImage = remedyForm.image || existingRemedy?.image || '/homeo-remedy.png';
 
     const payload = {
       ...remedyForm,
@@ -701,7 +701,7 @@ export default function AdminPage({ addToast }) {
               Admin Access
             </div>
             <img
-              src="/medi-drop-logo-full.png"
+              src="/medidrop-brand-logo.png"
               alt="MEDI DROP"
               className="admin-login-logo"
             />
@@ -730,7 +730,7 @@ export default function AdminPage({ addToast }) {
       <header className="admin-topbar">
         <Link to="/" className="admin-brand" aria-label="MEDI DROP home">
           <img
-            src="/medi-drop-logo-full.png"
+            src="/medidrop-brand-logo.png"
             alt="MEDI DROP"
             className="admin-brand-logo"
           />
@@ -1465,7 +1465,7 @@ export default function AdminPage({ addToast }) {
                                         <td>
                                           <div className="admin-order-item-cell">
                                             <img
-                                              src={item.image || '/remedy-bottle.png'}
+                                              src={item.image || '/homeo-remedy.png'}
                                               alt={item.name}
                                               className="admin-order-item-thumb"
                                             />
@@ -1715,7 +1715,7 @@ export default function AdminPage({ addToast }) {
                                       <td>
                                         <div className="admin-product-cell">
                                           <img
-                                            src={r.image || '/remedy-bottle.png'}
+                                            src={r.image || '/homeo-remedy.png'}
                                             alt={r.name}
                                             className="admin-product-row-thumb"
                                             loading="lazy"
@@ -1835,7 +1835,7 @@ export default function AdminPage({ addToast }) {
                                   <div className="admin-remedy-card-top">
                                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
                                       <img
-                                        src={r.image || '/remedy-bottle.png'}
+                                        src={r.image || '/homeo-remedy.png'}
                                         alt={r.name}
                                         className="admin-product-row-thumb"
                                         loading="lazy"
@@ -2090,7 +2090,7 @@ export default function AdminPage({ addToast }) {
                     <div className="admin-image-picker-card">
                       <div className="admin-image-preview-col">
                         <img
-                          src={remedyForm.image || (editingId ? (remedies.find(r => r.id === editingId)?.image || '/remedy-bottle.png') : '/remedy-bottle.png')}
+                          src={remedyForm.image || (editingId ? (remedies.find(r => r.id === editingId)?.image || '/homeo-remedy.png') : '/homeo-remedy.png')}
                           alt="Product preview"
                           className="admin-image-preview-thumb"
                         />
@@ -2141,7 +2141,7 @@ export default function AdminPage({ addToast }) {
                             style={{ fontSize: '0.82rem' }}
                             value={remedyForm.image}
                             onChange={handleRemedyChange}
-                            placeholder={editingId ? 'Leave blank to preserve current image' : 'e.g. /remedy-bottle.png or https://...'}
+                            placeholder={editingId ? 'Leave blank to preserve current image' : 'e.g. /homeo-remedy.png or https://...'}
                           />
                         </div>
 

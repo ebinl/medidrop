@@ -226,7 +226,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
       <nav className={`site-nav glass ${menuOpen ? 'menu-open' : ''} ${overHero && !menuOpen ? 'site-nav--over-hero' : ''}`}>
         <Link to="/" className="brand-logo-link" onClick={closeMenu} aria-label="MEDI DROP home">
           <img
-            src="/medi-drop-logo-full.png"
+            src="/medidrop-brand-logo.png"
             alt="medi drop"
             className="brand-logo-img"
           />

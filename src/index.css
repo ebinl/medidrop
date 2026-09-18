@@ -403,11 +403,11 @@ body:has(.app-page-bg) {
   height: calc(100vh + 50px);
   height: calc(100dvh + 50px);
   z-index: 0;
-  background-image: url('/hero-banner.jpg');
-  background-image: -webkit-image-set(url('/hero-banner.webp') 1x);
+  background-image: url('/medidrop-hero-banner.jpg');
+  background-image: -webkit-image-set(url('/medidrop-hero-banner.webp') 1x);
   background-image: image-set(
-    url('/hero-banner.webp') type('image/webp'),
-    url('/hero-banner.jpg') type('image/jpeg')
+    url('/medidrop-hero-banner.webp') type('image/webp'),
+    url('/medidrop-hero-banner.jpg') type('image/jpeg')
   );
   background-repeat: repeat;
   background-position: center top;

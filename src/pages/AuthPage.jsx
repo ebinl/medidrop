@@ -112,7 +112,7 @@ export default function AuthPage({ addToast, mode: modeProp }) {
       <div className="auth-page-inner">
         <form className="auth-card glass" onSubmit={handleSubmit}>
           <Link to="/" className="auth-logo-link" aria-label="MEDI DROP home">
-            <img src="/medi-drop-logo-full.png" alt="MEDI DROP" className="auth-logo" />
+            <img src="/medidrop-brand-logo.png" alt="MEDI DROP" className="auth-logo" />
           </Link>
 
           <div className="auth-tabs">

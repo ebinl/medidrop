@@ -10,7 +10,7 @@ export default function Footer({ onConsultationClick }) {
           <div className="footer-col footer-brand-col">
             <Link to="/" className="footer-logo-link" aria-label="MEDI DROP home">
               <img
-                src="/medi-drop-logo-full.png"
+                src="/medidrop-brand-logo.png"
                 alt="medi drop"
                 className="footer-logo-img"
               />

@@ -5,7 +5,7 @@ import { Award, Briefcase, GraduationCap, Stethoscope, Mail, Clock, Languages } 
 const DOCTOR = {
   name: 'Dr. Ancy Shaji',
   title: 'Senior Homeopathic Physician',
-  image: '/dr-ancy-consulting-room.png',
+  image: '/doctor-consultation.png',
   experience: '20+ years clinical practice',
   patients: '15000+ patients treated',
   qualifications: [

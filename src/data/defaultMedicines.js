@@ -1,4 +1,4 @@
-export const REMEDY_IMAGE = '/remedy-bottle.png';
+export const REMEDY_IMAGE = '/homeo-remedy.png';
 
 export const DEFAULT_MEDICINES = [
   {

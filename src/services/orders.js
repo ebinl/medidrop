@@ -58,7 +58,7 @@ export async function submitOrder(orderData) {
       quantity: Number(item.quantity) || 1,
       minQuantity: Number(item.minQuantity) || 1,
       subtotal: (Number(item.price) || 0) * (Number(item.quantity) || 1),
-      image: item.image || '/remedy-bottle.png',
+      image: item.image || '/homeo-remedy.png',
     })),
     subtotal: Number(orderData.subtotal) || 0,
     deliveryCharge: Number(orderData.deliveryCharge) || 0,

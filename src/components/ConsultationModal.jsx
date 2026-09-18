@@ -364,7 +364,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
               <div className="consult-upi">
                 <div className="consult-qr">
                   <img
-                    src="/upi-qr-code.png"
+                    src="/upi-payment-qr.png"
                     alt="Google Pay UPI QR Code - Scan to Pay ₹99"
                     className="consult-qr-img"
                   />
