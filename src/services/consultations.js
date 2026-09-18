@@ -104,7 +104,7 @@ export async function deleteConsultation(id) {
   saveLocalConsultations(local);
 
   try {
-    window.dispatchEvent(new CustomEvent('medidrop_consultations_updated', { detail: local })); h
+    window.dispatchEvent(new CustomEvent('medidrop_consultations_updated', { detail: local }));
   } catch {
     // ignore
   }
