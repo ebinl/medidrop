@@ -469,9 +469,20 @@ body:has(.app-page-bg) {
   background: rgba(22, 19, 17, 0.74);
 }
 
-.app-container.app-page-bg > *:not(.site-nav):not(.nav-backdrop):not(.nav-links-mobile):not(.toast-container):not(.cart-panel):not(.modal-overlay) {
+.app-container.app-page-bg > *:not(.site-nav):not(.nav-backdrop):not(.nav-links-mobile):not(.toast-container):not(.cart-panel):not(.modal-overlay):not(#medidrop-whatsapp-bot) {
   position: relative;
   z-index: 3;
+}
+
+/* WhatsApp AI Chatbot must always be fixed to viewport regardless of parent stacking context */
+#medidrop-whatsapp-bot,
+.whatsapp-chatbot-wrapper {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 9990 !important;
+  transform: none !important;
+  will-change: auto !important;
 }
 
 .app-container.app-page-bg > .site-nav {

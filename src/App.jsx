@@ -12,6 +12,7 @@ import AuthPage from './pages/AuthPage';
 import PolicyPage from './pages/PolicyPage';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import WhatsAppChatBot from './components/WhatsAppChatBot';
 import { AuthProvider } from './context/AuthContext';
 
 function AppShell() {
@@ -156,6 +157,12 @@ function AppShell() {
           <ConsultationModal
             isOpen={isConsultationOpen}
             onClose={() => setIsConsultationOpen(false)}
+            addToast={addToast}
+          />
+
+          <WhatsAppChatBot
+            onConsultationClick={() => setIsConsultationOpen(true)}
+            onAddToCart={handleAddToCart}
             addToast={addToast}
           />
         </>
