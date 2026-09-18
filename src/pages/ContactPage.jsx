@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, MapPin, Clock, Send, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Mail, MapPin, Clock, Send, MessageSquare, Phone } from 'lucide-react';
 import { submitContact } from '../services/contacts';
 
 export default function ContactPage({ onConsultationClick, addToast }) {
@@ -82,6 +82,13 @@ export default function ContactPage({ onConsultationClick, addToast }) {
 
             <ul className="contact-info-list">
               <li>
+                <span className="contact-info-icon"><Phone size={16} /></span>
+                <div>
+                  <strong>Phone / WhatsApp</strong>
+                  <a href="tel:9746758698">+91 97467 58698</a>
+                </div>
+              </li>
+              <li>
                 <span className="contact-info-icon"><Mail size={16} /></span>
                 <div>
                   <strong>Email</strong>
@@ -99,7 +106,7 @@ export default function ContactPage({ onConsultationClick, addToast }) {
                 <span className="contact-info-icon"><MapPin size={16} /></span>
                 <div>
                   <strong>Consultations</strong>
-                  <span>Online video consults available across India</span>
+                  <span>Online consults available across India</span>
                 </div>
               </li>
             </ul>

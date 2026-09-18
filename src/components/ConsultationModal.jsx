@@ -1,5 +1,20 @@
 import React, { useState } from 'react';
-import { X, Video, ShieldCheck, CreditCard, Check, Copy, RefreshCw, Smartphone, Calendar, Clock, User, Mail, Phone, Stethoscope } from 'lucide-react';
+import {
+  X,
+  ShieldCheck,
+  Check,
+  Copy,
+  RefreshCw,
+  Smartphone,
+  Calendar,
+  Clock,
+  User,
+  Mail,
+  Phone,
+  Stethoscope,
+  MessageSquare,
+  ExternalLink,
+} from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { submitConsultation } from '../services/consultations';
 import { notifyDoctorConsultation } from '../services/consultationEmail';
@@ -18,9 +33,31 @@ const TIME_SLOTS = [
   '07:00 PM - 08:00 PM',
 ];
 
+const CLINIC_PHONE = '9746758698';
+const CLINIC_PHONE_DISPLAY = '+91 97467 58698';
+
+function createWhatsAppConsultationUrl(booking) {
+  const lines = [
+    '🩺 *New Doctor Consultation Booking - MediDrop*',
+    '',
+    `👤 *Patient:* ${booking.name || 'N/A'}`,
+    `📞 *Phone:* ${booking.phone || 'N/A'}`,
+    `✉️ *Email:* ${booking.email || 'N/A'}`,
+    `📅 *Date:* ${booking.date || 'N/A'}`,
+    `⏰ *Time Slot:* ${booking.time || 'N/A'}`,
+    `💬 *Symptoms:* ${booking.symptoms || 'General Consultation'}`,
+    '',
+    `💳 *Payment:* ₹99 Paid via UPI`,
+    `🔢 *UPI Txn ID (last 4 digits):* ${booking.upiLast4 || booking.upiRefNo || 'Paid'}`,
+    `🆔 *Booking Ref:* ${booking.readableId || booking.id || 'Confirmed'}`,
+    '',
+    'Please confirm my appointment slot. Thank you!',
+  ];
+  return `https://wa.me/91${CLINIC_PHONE}?text=${encodeURIComponent(lines.join('\n'))}`;
+}
+
 export default function ConsultationModal({ isOpen, onClose, addToast }) {
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState('upi');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,33 +67,11 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
     time: ''
   });
 
-  const [cardData, setCardData] = useState({
-    holder: '',
-    number: '',
-    expiry: '',
-    cvv: ''
-  });
-  const [cvvFocused, setCvvFocused] = useState(false);
   const [upiRefNo, setUpiRefNo] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [confirmedBooking, setConfirmedBooking] = useState(null);
   const UPI_ID = 'ancyshaji1996@oksbi';
-
-  const handleCardChange = (e) => {
-    let { name, value } = e.target;
-
-    if (name === 'number') {
-      value = value.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim().substring(0, 19);
-    } else if (name === 'expiry') {
-      value = value.replace(/\//g, '').replace(/(\d{2})/g, '$1/').trim();
-      if (value.endsWith('/')) value = value.slice(0, -1);
-      value = value.substring(0, 5);
-    } else if (name === 'cvv') {
-      value = value.replace(/\D/g, '').substring(0, 3);
-    }
-
-    setCardData(prev => ({ ...prev, [name]: value }));
-  };
 
   const copyUpiId = () => {
     navigator.clipboard.writeText(UPI_ID);
@@ -99,89 +114,70 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
   };
 
   const handlePaymentSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
 
-    if (paymentMethod === 'upi') {
-      if (upiRefNo.length < 12) {
-        addToast({
-          title: "Invalid UPI Reference",
-          message: "Please enter the 12-digit transaction ID or reference number.",
-          type: "error"
-        });
-        return;
-      }
-    } else {
-      if (!cardData.holder.trim()) return;
-      if (cardData.number.replace(/\s/g, '').length < 16) {
-        addToast({
-          title: "Invalid Card Number",
-          message: "Please enter a complete 16-digit card number.",
-          type: "error"
-        });
-        return;
-      }
-      if (cardData.expiry.length < 5) {
-        addToast({
-          title: "Invalid Expiry",
-          message: "Please specify card expiration month/year (MM/YY).",
-          type: "error"
-        });
-        return;
-      }
-      if (cardData.cvv.length < 3) {
-        addToast({
-          title: "Invalid CVV",
-          message: "Please enter your 3-digit security code (CVV).",
-          type: "error"
-        });
-        return;
-      }
+    const trimmedLast4 = upiRefNo.trim();
+    if (!trimmedLast4 || trimmedLast4.length !== 4) {
+      addToast({
+        title: "Last 4 Digits Required",
+        message: "Please enter the last 4 digits of your UPI transaction ID / UTR.",
+        type: "warning"
+      });
+      return;
     }
 
     setIsProcessing(true);
 
     try {
-      const digits = cardData.number.replace(/\s/g, '');
       const payload = {
         ...formData,
-        paymentMethod,
-        upiRefNo: paymentMethod === 'upi' ? upiRefNo : '',
-        cardHolder: paymentMethod === 'card' ? cardData.holder.trim() : '',
-        cardLast4: paymentMethod === 'card' ? digits.slice(-4) : '',
+        paymentMethod: 'upi',
+        upiRefNo: trimmedLast4,
+        upiLast4: trimmedLast4,
       };
 
-      await submitConsultation(payload);
+      const result = await submitConsultation(payload);
+      const bookingRecord = {
+        ...payload,
+        id: result?.id || result?.readableId || `CONS-${Date.now().toString().slice(-6)}`,
+        readableId: result?.readableId || result?.id || `CONS-${Date.now().toString().slice(-6)}`,
+      };
 
-      let doctorNotified = false;
+      setConfirmedBooking(bookingRecord);
 
+      // Auto-open WhatsApp with prefilled message to the clinic helpline (9746758698)
+      const waUrl = createWhatsAppConsultationUrl(bookingRecord);
       try {
-        const emailResult = await notifyDoctorConsultation(payload);
-        doctorNotified = emailResult.sent === true;
-      } catch (emailErr) {
-        console.error(emailErr);
-        addToast({
-          title: 'Booking Saved',
-          message: 'Consultation saved, but the doctor Gmail alert failed. Our team will still review your booking.',
-          type: 'warning',
-        });
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
+      } catch (waErr) {
+        console.warn('Could not auto-open WhatsApp link:', waErr);
       }
+
+      // Background notify doctor via email without blocking the booking flow
+      notifyDoctorConsultation(payload).catch((emailErr) => {
+        console.warn('Doctor email notification non-critical notice:', emailErr);
+      });
 
       setIsProcessing(false);
       setStep(3);
-      confetti({
-        particleCount: 120,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+
+      try {
+        confetti({
+          particleCount: 120,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch {
+        // ignore
+      }
+
       addToast({
-        title: 'Booking Successful',
-        message: doctorNotified
-          ? 'Your ₹99 payment was confirmed. Dr. Ancy Shaji has been notified by email with your details.'
-          : 'Your ₹99 payment was confirmed and your video session is scheduled.',
+        title: 'Booking Successful!',
+        message: `Your ₹99 payment is saved. Booking alert prepared for clinic desk (${CLINIC_PHONE_DISPLAY}).`,
         type: 'success',
       });
     } catch (err) {
-      console.error(err);
+      console.error('Booking submission error:', err);
       setIsProcessing(false);
       addToast({
         title: "Booking Failed",
@@ -193,10 +189,10 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
 
   const resetModal = () => {
     setStep(1);
-    setPaymentMethod('upi');
     setFormData({ name: '', email: '', phone: '', symptoms: '', date: '', time: '' });
-    setCardData({ holder: '', number: '', expiry: '', cvv: '' });
     setUpiRefNo('');
+    setConfirmedBooking(null);
+    setIsProcessing(false);
     onClose();
   };
 
@@ -209,11 +205,11 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
         <header className="consult-header">
           <div className="consult-header-main">
             <div className="consult-icon">
-              <Video size={20} strokeWidth={2.25} />
+              <Stethoscope size={20} strokeWidth={2.25} />
             </div>
             <div className="consult-header-text">
-              <h3>Doctor Consultation</h3>
-              <p>Book a live session with a senior practitioner</p>
+              <h3>Online Doctor Consultation</h3>
+              <p>Book an online consultation with a senior practitioner</p>
             </div>
           </div>
           <div className="consult-header-actions">
@@ -357,216 +353,76 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
 
           {step === 2 && (
             <div className="consult-payment">
-              <div className="consult-pay-tabs">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('upi')}
-                  className={`consult-pay-tab ${paymentMethod === 'upi' ? 'active' : ''}`}
-                >
+              <div className="consult-upi-banner">
+                <div className="consult-upi-badge">
                   <Smartphone size={15} />
-                  UPI Payment
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('card')}
-                  className={`consult-pay-tab ${paymentMethod === 'card' ? 'active' : ''}`}
-                >
-                  <CreditCard size={15} />
-                  Card Payment
-                </button>
+                  <span>Scan to Pay via UPI</span>
+                </div>
+                <span className="consult-upi-fee-tag">₹99 Consultation Fee</span>
               </div>
 
-              {paymentMethod === 'upi' && (
-                <div className="consult-upi">
-                  <div className="consult-qr">
-                    <svg viewBox="0 0 100 100" width="112" height="112" style={{ fill: '#0a0f0d' }}>
-                      <rect x="0" y="0" width="25" height="25" />
-                      <rect x="3" y="3" width="19" height="19" fill="#fff" />
-                      <rect x="7" y="7" width="11" height="11" />
-                      <rect x="75" y="0" width="25" height="25" />
-                      <rect x="78" y="3" width="19" height="19" fill="#fff" />
-                      <rect x="82" y="7" width="11" height="11" />
-                      <rect x="0" y="75" width="25" height="25" />
-                      <rect x="3" y="78" width="19" height="19" fill="#fff" />
-                      <rect x="7" y="82" width="11" height="11" />
-                      <rect x="35" y="5" width="5" height="10" />
-                      <rect x="45" y="0" width="10" height="5" />
-                      <rect x="60" y="10" width="5" height="20" />
-                      <rect x="30" y="25" width="15" height="5" />
-                      <rect x="5" y="35" width="20" height="5" />
-                      <rect x="15" y="45" width="5" height="15" />
-                      <rect x="35" y="40" width="10" height="10" />
-                      <rect x="50" y="35" width="25" height="5" />
-                      <rect x="65" y="45" width="5" height="15" />
-                      <rect x="80" y="35" width="10" height="25" />
-                      <rect x="30" y="60" width="25" height="10" />
-                      <rect x="40" y="80" width="15" height="5" />
-                      <rect x="70" y="70" width="15" height="15" />
-                      <rect x="60" y="80" width="5" height="10" />
-                      <rect x="85" y="85" width="10" height="10" />
-                      <rect x="35" y="90" width="20" height="5" />
-                      <rect x="10" y="65" width="10" height="5" />
-                      <rect x="42" y="42" width="16" height="16" fill="var(--primary)" rx="4" />
-                    </svg>
-                    <span>SCAN TO PAY ₹99</span>
-                  </div>
-
-                  <div className="consult-upi-id">
-                    <span>UPI ID: <strong>{UPI_ID}</strong></span>
-                    <button type="button" onClick={copyUpiId} className="consult-copy-btn">
-                      {copiedUpi ? <Check size={14} /> : <Copy size={14} />}
-                      {copiedUpi ? 'Copied' : 'Copy'}
-                    </button>
-                  </div>
-
-                  <div className="consult-field">
-                    <label className="consult-label" htmlFor="consult-upi-ref">
-                      12-digit UPI Ref / UTR Number
-                    </label>
-                    <input
-                      id="consult-upi-ref"
-                      type="text"
-                      value={upiRefNo}
-                      onChange={(e) => setUpiRefNo(e.target.value.replace(/\D/g, '').substring(0, 12))}
-                      placeholder="E.g., 620581940251"
-                      maxLength={12}
-                      className="consult-input consult-input-center"
-                    />
-                  </div>
-
-                  <div className="consult-actions">
-                    <button type="button" onClick={() => setStep(1)} disabled={isProcessing} className="btn btn-outline">
-                      Back
-                    </button>
-                    <button type="button" onClick={handlePaymentSubmit} disabled={isProcessing} className="btn btn-primary">
-                      {isProcessing ? (
-                        <>
-                          <RefreshCw size={14} className="spinner" style={{ animation: 'spin 1s linear infinite' }} />
-                          Verifying...
-                        </>
-                      ) : (
-                        <>
-                          <ShieldCheck size={16} />
-                          Verify & Book
-                        </>
-                      )}
-                    </button>
+              <div className="consult-upi">
+                <div className="consult-qr">
+                  <img
+                    src="/upi-payment-qr.png"
+                    alt="Google Pay UPI QR Code - Scan to Pay ₹99"
+                    className="consult-qr-img"
+                  />
+                  <div className="consult-qr-caption">
+                    <span className="consult-qr-scan-hint">Scan with any UPI App to Pay ₹99</span>
                   </div>
                 </div>
-              )}
 
-              {paymentMethod === 'card' && (
-                <div className="consult-card-pay">
-                  <div className="consult-card-preview" style={{ perspective: '1000px' }}>
-                    <div
-                      className="consult-card-flip"
-                      style={{ transform: cvvFocused ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
-                    >
-                      <div className="consult-card-face consult-card-front">
-                        <div className="consult-card-shimmer" />
-                        <span className="consult-card-brand">MEDI DROP</span>
-                        <div className="consult-card-number">
-                          {cardData.number || '•••• •••• •••• ••••'}
-                        </div>
-                        <div className="consult-card-meta">
-                          <div>
-                            <span>Card Holder</span>
-                            <strong>{cardData.holder.toUpperCase() || 'PATIENT NAME'}</strong>
-                          </div>
-                          <div>
-                            <span>Expires</span>
-                            <strong>{cardData.expiry || 'MM/YY'}</strong>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="consult-card-face consult-card-back">
-                        <div className="consult-card-strip" />
-                        <div className="consult-card-cvv-row">
-                          <span>CVV</span>
-                          <div className="consult-card-cvv">{cardData.cvv || '•••'}</div>
-                        </div>
-                      </div>
-                    </div>
+                <div className="consult-upi-id">
+                  <div className="consult-upi-id-left">
+                    <span className="consult-upi-label">UPI ID:</span>
+                    <strong className="consult-upi-value">{UPI_ID}</strong>
                   </div>
-
-                  <form className="consult-form" onSubmit={handlePaymentSubmit}>
-                    <div className="consult-form-grid">
-                      <div className="consult-field consult-field-full">
-                        <label className="consult-label">Cardholder Name</label>
-                        <input
-                          type="text"
-                          name="holder"
-                          value={cardData.holder}
-                          onChange={handleCardChange}
-                          onFocus={() => setCvvFocused(false)}
-                          required
-                          placeholder="John Doe"
-                          className="consult-input"
-                        />
-                      </div>
-                      <div className="consult-field consult-field-full">
-                        <label className="consult-label">Card Number</label>
-                        <input
-                          type="text"
-                          name="number"
-                          value={cardData.number}
-                          onChange={handleCardChange}
-                          onFocus={() => setCvvFocused(false)}
-                          required
-                          placeholder="4111 2222 3333 4444"
-                          className="consult-input"
-                        />
-                      </div>
-                      <div className="consult-field">
-                        <label className="consult-label">Expiry</label>
-                        <input
-                          type="text"
-                          name="expiry"
-                          value={cardData.expiry}
-                          onChange={handleCardChange}
-                          onFocus={() => setCvvFocused(false)}
-                          required
-                          placeholder="MM/YY"
-                          className="consult-input consult-input-center"
-                        />
-                      </div>
-                      <div className="consult-field">
-                        <label className="consult-label">CVV</label>
-                        <input
-                          type="password"
-                          name="cvv"
-                          value={cardData.cvv}
-                          onChange={handleCardChange}
-                          onFocus={() => setCvvFocused(true)}
-                          onBlur={() => setCvvFocused(false)}
-                          required
-                          placeholder="•••"
-                          className="consult-input consult-input-center"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="consult-actions">
-                      <button type="button" onClick={() => setStep(1)} disabled={isProcessing} className="btn btn-outline">
-                        Back
-                      </button>
-                      <button type="submit" disabled={isProcessing} className="btn btn-primary">
-                        {isProcessing ? (
-                          <>
-                            <RefreshCw size={14} className="spinner" style={{ animation: 'spin 1s linear infinite' }} />
-                            Processing...
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard size={16} />
-                            Pay ₹99
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </form>
+                  <button type="button" onClick={copyUpiId} className="consult-copy-btn" title="Copy UPI ID">
+                    {copiedUpi ? <Check size={14} /> : <Copy size={14} />}
+                    {copiedUpi ? 'Copied' : 'Copy'}
+                  </button>
                 </div>
-              )}
+
+                <div className="consult-field consult-field-last4">
+                  <label className="consult-label" htmlFor="consult-upi-ref">
+                    Last 4 Digits of UPI Transaction ID / UTR
+                  </label>
+                  <input
+                    id="consult-upi-ref"
+                    type="text"
+                    inputMode="numeric"
+                    value={upiRefNo}
+                    onChange={(e) => setUpiRefNo(e.target.value.replace(/\D/g, '').substring(0, 4))}
+                    placeholder="e.g. 4251"
+                    maxLength={4}
+                    className="consult-input consult-input-center consult-input-last4"
+                    required
+                  />
+                  <span className="consult-last4-hint">
+                    Complete the ₹99 payment on your UPI app and enter the last 4 digits of your transaction ID / UTR
+                  </span>
+                </div>
+
+                <div className="consult-actions">
+                  <button type="button" onClick={() => setStep(1)} disabled={isProcessing} className="btn btn-outline">
+                    Back
+                  </button>
+                  <button type="button" onClick={handlePaymentSubmit} disabled={isProcessing} className="btn btn-primary">
+                    {isProcessing ? (
+                      <>
+                        <RefreshCw size={14} className="spinner" style={{ animation: 'spin 1s linear infinite' }} />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck size={16} />
+                        Confirm Booking
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -577,7 +433,7 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
               </div>
               <h3>Consultation Confirmed!</h3>
               <p className="consult-room-id">
-                Room ID: medidrop-{Math.floor(100000 + Math.random() * 900000)}
+                Booking Reference: <strong>{confirmedBooking?.readableId || confirmedBooking?.id || 'CONS-CONFIRMED'}</strong>
               </p>
 
               <div className="consult-summary">
@@ -594,17 +450,52 @@ export default function ConsultationModal({ isOpen, onClose, addToast }) {
                   <strong>{formData.date} · {formData.time}</strong>
                 </div>
                 <div className="consult-summary-fee">
-                  <span>Consultation Fee</span>
-                  <strong>₹99 Paid</strong>
+                  <span>Payment (UPI)</span>
+                  <strong>₹99 · Txn ID: {confirmedBooking?.upiLast4 || upiRefNo}</strong>
+                </div>
+              </div>
+
+              {/* Clinic Helpline WhatsApp & Call Action Card */}
+              <div className="consult-helpline-card">
+                <div className="consult-helpline-header">
+                  <div className="consult-helpline-badge-icon">
+                    <MessageSquare size={16} />
+                  </div>
+                  <div>
+                    <h4 className="consult-helpline-title">Alert Clinic Helpline</h4>
+                    <span className="consult-helpline-phone">{CLINIC_PHONE_DISPLAY}</span>
+                  </div>
+                </div>
+                <p className="consult-helpline-desc">
+                  Your consultation details and UPI transaction ID (<strong>{confirmedBooking?.upiLast4 || upiRefNo}</strong>) are formatted and ready to send to our clinic desk.
+                </p>
+                <div className="consult-helpline-btns">
+                  <a
+                    href={createWhatsAppConsultationUrl(confirmedBooking || { ...formData, upiLast4: upiRefNo })}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn consult-whatsapp-btn"
+                  >
+                    <MessageSquare size={16} />
+                    <span>Send via WhatsApp ({CLINIC_PHONE_DISPLAY})</span>
+                    <ExternalLink size={13} />
+                  </a>
+                  <a
+                    href={`tel:${CLINIC_PHONE}`}
+                    className="btn btn-outline consult-call-action-btn"
+                  >
+                    <Phone size={15} />
+                    <span>Call Helpline</span>
+                  </a>
                 </div>
               </div>
 
               <p className="consult-success-note">
-                A consult link has been sent to <strong>{formData.email}</strong>. Join 5 minutes before your slot.
+                Our clinic team will confirm your appointment slot and contact you for your online consultation.
               </p>
 
               <button type="button" onClick={resetModal} className="btn btn-primary consult-submit">
-                Close Window
+                Done / Close
               </button>
             </div>
           )}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin, Phone } from 'lucide-react';
 
 export default function Footer({ onConsultationClick }) {
   return (
@@ -10,7 +10,7 @@ export default function Footer({ onConsultationClick }) {
           <div className="footer-col footer-brand-col">
             <Link to="/" className="footer-logo-link" aria-label="MEDI DROP home">
               <img
-                src="/medi-drop-logo-full.png"
+                src="/medidrop-brand-logo.png"
                 alt="medi drop"
                 className="footer-logo-img"
               />
@@ -38,10 +38,10 @@ export default function Footer({ onConsultationClick }) {
           <div className="footer-col">
             <h4 className="footer-heading">Support</h4>
             <ul className="footer-links">
-              <li><span>Shipping Policy</span></li>
-              <li><span>Returns & Refunds</span></li>
-              <li><span>Privacy Policy</span></li>
-              <li><span>Terms of Use</span></li>
+              <li><Link to="/shipping-policy">Shipping Policy</Link></li>
+              <li><Link to="/returns-refunds">Returns & Refunds</Link></li>
+              <li><Link to="/privacy-policy">Privacy Policy</Link></li>
+              <li><Link to="/terms-of-use">Terms of Use</Link></li>
             </ul>
           </div>
 
@@ -49,8 +49,12 @@ export default function Footer({ onConsultationClick }) {
             <h4 className="footer-heading">Contact</h4>
             <ul className="footer-contact">
               <li>
+                <Phone size={14} />
+                <a href="tel:9746758698" className="footer-contact-link">+91 97467 58698</a>
+              </li>
+              <li>
                 <Mail size={14} />
-                <span>hello@medidrop.net</span>
+                <a href="mailto:hello@medidrop.net" className="footer-contact-link">hello@medidrop.net</a>
               </li>
               <li>
                 <MapPin size={14} />
@@ -63,9 +67,6 @@ export default function Footer({ onConsultationClick }) {
         <div className="footer-bottom">
           <p className="footer-copy">
             &copy; {new Date().getFullYear()} MEDI DROP. All rights reserved.
-          </p>
-          <p className="footer-note">
-            For informational purposes only. Not a substitute for professional medical advice.
           </p>
         </div>
       </div>

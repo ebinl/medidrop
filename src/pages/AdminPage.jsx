@@ -10,14 +10,32 @@ import {
   Clock,
   Loader2,
   ShieldCheck,
-  Video,
   Calendar,
   Pencil,
   X,
   Menu,
   CheckCheck,
   Trash2,
+  Eye,
   EyeOff,
+  Boxes,
+  Search,
+  PackageX,
+  PackageCheck,
+  ShoppingBag,
+  Upload,
+  RotateCcw,
+  MapPin,
+  Truck,
+  IndianRupee,
+  CheckCircle2,
+  AlertCircle,
+  FileText,
+  Smartphone,
+  ExternalLink,
+  Copy,
+  Check,
+  Stethoscope,
 } from 'lucide-react';
 import {
   clearAllContacts,
@@ -25,20 +43,30 @@ import {
   markContactRead,
   subscribeContacts,
 } from '../services/contacts';
-import { subscribeConsultations } from '../services/consultations';
+import { deleteConsultation, subscribeConsultations } from '../services/consultations';
+import {
+  deleteOrder,
+  subscribeOrders,
+  updateOrderStatus,
+} from '../services/orders';
 import {
   addRemedy,
   dedupeRemedies,
   getLocalCatalog,
   seedDefaultRemedies,
   subscribeRemedies,
+  subscribeRemediesHeader,
+  toggleRemedyLiveStatus,
+  toggleRemedyStockStatus,
+  updateRemediesHeader,
   updateRemedy,
 } from '../services/remedies';
 import { useAuth } from '../context/AuthContext';
 
 const MENU_ITEMS = [
   { id: 'contacts', label: 'Contacts', icon: MessageSquare },
-  { id: 'consultations', label: 'Consultations', icon: Video },
+  { id: 'consultations', label: 'Consultations Booked', icon: Stethoscope },
+  { id: 'orders', label: 'Orders Placed', icon: ShoppingBag },
   { id: 'remedies', label: 'Remedies', icon: Pill },
   { id: 'add', label: 'Add Remedy', icon: Plus },
 ];
@@ -50,7 +78,11 @@ const emptyRemedy = {
   description: '',
   price: '',
   minQuantity: '1',
+  stock: '30',
+  isLive: true,
+  inStock: true,
   benefits: '',
+  image: '',
 };
 
 function formatDate(date) {
@@ -69,25 +101,40 @@ export default function AdminPage({ addToast }) {
   const [tab, setTab] = useState('contacts');
   const [contacts, setContacts] = useState([]);
   const [consultations, setConsultations] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [remedies, setRemedies] = useState([]);
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [loadingConsultations, setLoadingConsultations] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
   const [loadingRemedies, setLoadingRemedies] = useState(true);
   const [dataError, setDataError] = useState('');
+  const [consultationSearch, setConsultationSearch] = useState('');
+  const [consultationBusyId, setConsultationBusyId] = useState(null);
+  const [copiedConsultId, setCopiedConsultId] = useState(null);
   const [remedyForm, setRemedyForm] = useState(emptyRemedy);
   const [editingId, setEditingId] = useState(null);
   const [savingRemedy, setSavingRemedy] = useState(false);
+  const [remedyBusyId, setRemedyBusyId] = useState(null);
+  const [remedyFilter, setRemedyFilter] = useState('all'); // 'all' | 'live' | 'notlive' | 'instock' | 'outofstock'
+  const [remedySearch, setRemedySearch] = useState('');
+  const [orderFilter, setOrderFilter] = useState('all'); // 'all' | 'pending' | 'processing' | 'dispatched' | 'delivered' | 'cancelled'
+  const [orderSearch, setOrderSearch] = useState('');
+  const [orderBusyId, setOrderBusyId] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactBusyId, setContactBusyId] = useState(null);
   const [clearingContacts, setClearingContacts] = useState(false);
+  const [headerForm, setHeaderForm] = useState({ title: '', description: '' });
+  const [savingHeader, setSavingHeader] = useState(false);
 
   const isAuthed = Boolean(isAdmin);
 
   const unreadContacts = contacts.filter((c) => !c.read).length;
+  const pendingOrdersCount = orders.filter((o) => (o.status || 'Pending') === 'Pending').length;
 
   const getMenuCount = (id) => {
     if (id === 'contacts') return unreadContacts || contacts.length;
     if (id === 'consultations') return consultations.length;
+    if (id === 'orders') return pendingOrdersCount || orders.length;
     if (id === 'remedies') return remedies.length;
     return null;
   };
@@ -106,11 +153,14 @@ export default function AdminPage({ addToast }) {
 
     setLoadingContacts(true);
     setLoadingConsultations(true);
+    setLoadingOrders(true);
     setLoadingRemedies(true);
 
     let unsubContacts = () => {};
     let unsubConsultations = () => {};
+    let unsubOrders = () => {};
     let unsubRemedies = () => {};
+    let unsubHeader = () => {};
     let cancelled = false;
 
     // Subscribe immediately — do not wait for seed (seed can hang on slow/blocked Firestore)
@@ -139,6 +189,19 @@ export default function AdminPage({ addToast }) {
       }
     );
 
+    unsubOrders = subscribeOrders(
+      (items) => {
+        if (cancelled) return;
+        setOrders(items);
+        setLoadingOrders(false);
+      },
+      (err) => {
+        console.error('Failed to load orders:', err);
+        if (cancelled) return;
+        setLoadingOrders(false);
+      }
+    );
+
     let remediesLoaded = false;
 
     unsubRemedies = subscribeRemedies(
@@ -156,6 +219,19 @@ export default function AdminPage({ addToast }) {
         setRemedies(getLocalCatalog());
         setLoadingRemedies(false);
         setDataError('Could not load remedies from Firebase — showing local catalog.');
+      }
+    );
+
+    unsubHeader = subscribeRemediesHeader(
+      (data) => {
+        if (cancelled) return;
+        setHeaderForm({
+          title: data.title || '',
+          description: data.description || '',
+        });
+      },
+      (err) => {
+        console.error('Failed to load header configurations:', err);
       }
     );
 
@@ -177,7 +253,9 @@ export default function AdminPage({ addToast }) {
       clearTimeout(remediesTimeout);
       unsubContacts();
       unsubConsultations();
+      unsubOrders();
       unsubRemedies();
+      unsubHeader();
     };
   }, [isAuthed]);
 
@@ -265,12 +343,73 @@ export default function AdminPage({ addToast }) {
   };
 
   const handleRemedyChange = (e) => {
-    const { name, value } = e.target;
-    setRemedyForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setRemedyForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleImageFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      addToast?.({
+        title: 'Invalid File',
+        message: 'Please select an image file (PNG, JPG, WebP, etc.).',
+        type: 'warning',
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        // Compress and scale image for fast storage & syncing
+        const canvas = document.createElement('canvas');
+        const MAX_DIM = 600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_DIM) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          }
+        } else {
+          if (height > MAX_DIM) {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/webp', 0.82);
+        setRemedyForm((prev) => ({ ...prev, image: dataUrl }));
+        addToast?.({
+          title: 'Image Loaded',
+          message: 'Product image selected and optimized.',
+          type: 'info',
+        });
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const startEditRemedy = (remedy) => {
     setEditingId(remedy.id);
+    const isLive = remedy.isLive !== false;
+    const inStock =
+      remedy.inStock !== false &&
+      (remedy.stock == null || Number(remedy.stock) > 0);
+
     setRemedyForm({
       name: remedy.name || '',
       scientificName: remedy.scientificName || '',
@@ -278,7 +417,11 @@ export default function AdminPage({ addToast }) {
       description: remedy.description || '',
       price: String(remedy.price ?? ''),
       minQuantity: String(remedy.minQuantity ?? 1),
+      stock: String(remedy.stock ?? (inStock ? 30 : 0)),
+      isLive,
+      inStock,
       benefits: Array.isArray(remedy.benefits) ? remedy.benefits.join(', ') : '',
+      image: remedy.image || '',
     });
     setTab('add');
     setMenuOpen(false);
@@ -287,6 +430,91 @@ export default function AdminPage({ addToast }) {
   const cancelEditRemedy = () => {
     setEditingId(null);
     setRemedyForm(emptyRemedy);
+  };
+
+  /** Toggle whether remedy is shown on the website (Live) or hidden (Not Live) */
+  const handleToggleLive = async (remedy) => {
+    setRemedyBusyId(remedy.id);
+    const currentlyLive = remedy.isLive !== false;
+    const nextLive = !currentlyLive;
+
+    // Optimistic local update (does not affect stock status)
+    setRemedies((prev) =>
+      prev.map((item) =>
+        item.id === remedy.id ? { ...item, isLive: nextLive } : item
+      )
+    );
+
+    try {
+      await toggleRemedyLiveStatus(remedy.id, currentlyLive);
+      addToast?.({
+        title: nextLive ? 'Remedy Is Now Live' : 'Remedy Set To Not Live',
+        message: nextLive
+          ? `"${remedy.name}" is now visible to customers on the website.`
+          : `"${remedy.name}" is now hidden and will not be shown on the website.`,
+        type: nextLive ? 'success' : 'info',
+      });
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Status Update Failed',
+        message: 'Could not update website visibility.',
+        type: 'error',
+      });
+      setRemedies((prev) =>
+        prev.map((item) =>
+          item.id === remedy.id ? { ...item, isLive: currentlyLive } : item
+        )
+      );
+    } finally {
+      setRemedyBusyId(null);
+    }
+  };
+
+  /** Toggle whether remedy is In Stock or Out of Stock (independent of website visibility) */
+  const handleToggleStock = async (remedy) => {
+    setRemedyBusyId(remedy.id);
+    const currentlyInStock =
+      remedy.inStock !== false &&
+      (remedy.stock == null || Number(remedy.stock) > 0);
+    const nextInStock = !currentlyInStock;
+    const nextStock = nextInStock ? (remedy.stock > 0 ? remedy.stock : 30) : 0;
+
+    // Optimistic local update (does not affect website visibility)
+    setRemedies((prev) =>
+      prev.map((item) =>
+        item.id === remedy.id
+          ? { ...item, inStock: nextInStock, stock: nextStock }
+          : item
+      )
+    );
+
+    try {
+      await toggleRemedyStockStatus(remedy.id, currentlyInStock);
+      addToast?.({
+        title: nextInStock ? 'Marked In Stock' : 'Marked Out of Stock',
+        message: nextInStock
+          ? `"${remedy.name}" is now marked In Stock.`
+          : `"${remedy.name}" is now marked Out of Stock on the storefront.`,
+        type: nextInStock ? 'success' : 'warning',
+      });
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Stock Update Failed',
+        message: 'Could not update stock status.',
+        type: 'error',
+      });
+      setRemedies((prev) =>
+        prev.map((item) =>
+          item.id === remedy.id
+            ? { ...item, inStock: currentlyInStock, stock: remedy.stock }
+            : item
+        )
+      );
+    } finally {
+      setRemedyBusyId(null);
+    }
   };
 
   const handleSaveRemedy = async (e) => {
@@ -301,19 +529,47 @@ export default function AdminPage({ addToast }) {
     }
 
     setSavingRemedy(true);
+    const existingRemedy = editingId ? remedies.find((r) => r.id === editingId) : null;
+    const finalImage = remedyForm.image || existingRemedy?.image || '/homeo-remedy.png';
+
+    const payload = {
+      ...remedyForm,
+      image: finalImage,
+      isLive: Boolean(remedyForm.isLive),
+      inStock: Boolean(remedyForm.inStock),
+      stock:
+        Number(remedyForm.stock) ||
+        (remedyForm.inStock ? 30 : 0),
+    };
+
     try {
       if (editingId) {
-        await updateRemedy(editingId, remedyForm);
+        await updateRemedy(editingId, payload);
+        // Also update local remedies state optimistically
+        setRemedies((prev) =>
+          prev.map((r) => (r.id === editingId ? { ...r, ...payload, id: editingId } : r))
+        );
         addToast?.({
           title: 'Remedy Updated',
-          message: 'Changes are live on the storefront.',
+          message: 'Changes, image, visibility, and stock are saved.',
           type: 'success',
         });
       } else {
-        await addRemedy(remedyForm);
+        const newId = await addRemedy(payload);
+        setRemedies((prev) => [
+          ...prev,
+          {
+            ...payload,
+            id: newId,
+            createdAt: new Date(),
+            fromFirestore: true,
+          },
+        ]);
         addToast?.({
           title: 'Remedy Added',
-          message: 'The new remedy is live on the storefront.',
+          message: payload.isLive
+            ? 'The new remedy is published on the website.'
+            : 'The new remedy is saved (Not Live / Hidden).',
           type: 'success',
         });
       }
@@ -334,6 +590,87 @@ export default function AdminPage({ addToast }) {
       });
     } finally {
       setSavingRemedy(false);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    setOrderBusyId(orderId);
+    try {
+      await updateOrderStatus(orderId, newStatus);
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+      );
+      addToast?.({
+        title: 'Status Updated',
+        message: `Order marked as "${newStatus}".`,
+        type: 'success',
+      });
+    } catch (err) {
+      console.error('Failed to update order status:', err);
+      addToast?.({
+        title: 'Update Failed',
+        message: 'Could not update order status.',
+        type: 'error',
+      });
+    } finally {
+      setOrderBusyId(null);
+    }
+  };
+
+  const handleDeleteOrder = async (order) => {
+    const orderTitle = order.orderNumber ? `#${order.orderNumber}` : 'this order';
+    if (!window.confirm(`Are you sure you want to delete ${orderTitle} for ${order.patient?.name || 'patient'}?`)) {
+      return;
+    }
+    setOrderBusyId(order.id);
+    try {
+      await deleteOrder(order.id);
+      setOrders((prev) => prev.filter((o) => o.id !== order.id));
+      addToast?.({
+        title: 'Order Deleted',
+        message: `Order ${orderTitle} was deleted.`,
+        type: 'info',
+      });
+    } catch (err) {
+      console.error('Failed to delete order:', err);
+      addToast?.({
+        title: 'Delete Failed',
+        message: 'Could not delete order.',
+        type: 'error',
+      });
+    } finally {
+      setOrderBusyId(null);
+    }
+  };
+
+  const handleSaveHeader = async (e) => {
+    e.preventDefault();
+    if (!headerForm.title.trim() || !headerForm.description.trim()) {
+      addToast?.({
+        title: 'Missing Info',
+        message: 'Title and description are required.',
+        type: 'warning',
+      });
+      return;
+    }
+
+    setSavingHeader(true);
+    try {
+      await updateRemediesHeader(headerForm);
+      addToast?.({
+        title: 'Header Updated',
+        message: 'Storefront remedies header was successfully updated.',
+        type: 'success',
+      });
+    } catch (err) {
+      console.error(err);
+      addToast?.({
+        title: 'Save Failed',
+        message: 'Could not update storefront header settings.',
+        type: 'error',
+      });
+    } finally {
+      setSavingHeader(false);
     }
   };
 
@@ -364,7 +701,7 @@ export default function AdminPage({ addToast }) {
               Admin Access
             </div>
             <img
-              src="/medi-drop-logo-full.png"
+              src="/medidrop-brand-logo.png"
               alt="MEDI DROP"
               className="admin-login-logo"
             />
@@ -393,7 +730,7 @@ export default function AdminPage({ addToast }) {
       <header className="admin-topbar">
         <Link to="/" className="admin-brand" aria-label="MEDI DROP home">
           <img
-            src="/medi-drop-logo-full.png"
+            src="/medidrop-brand-logo.png"
             alt="MEDI DROP"
             className="admin-brand-logo"
           />
@@ -559,73 +896,621 @@ export default function AdminPage({ addToast }) {
             </section>
           )}
 
-          {tab === 'consultations' && (
+          {tab === 'consultations' && (() => {
+            const filteredConsultations = consultations.filter((item) => {
+              if (!consultationSearch.trim()) return true;
+              const term = consultationSearch.toLowerCase();
+              const name = (item.name || '').toLowerCase();
+              const email = (item.email || '').toLowerCase();
+              const phone = (item.phone || '').toLowerCase();
+              const symptoms = (item.symptoms || '').toLowerCase();
+              const txn = (item.upiLast4 || item.upiRefNo || '').toLowerCase();
+              const id = (item.id || item.readableId || '').toLowerCase();
+              return (
+                name.includes(term) ||
+                email.includes(term) ||
+                phone.includes(term) ||
+                symptoms.includes(term) ||
+                txn.includes(term) ||
+                id.includes(term)
+              );
+            });
+
+            const handleDeleteConsultation = async (id, name) => {
+              if (!window.confirm(`Are you sure you want to remove consultation booking for ${name || 'this patient'}?`)) {
+                return;
+              }
+              setConsultationBusyId(id);
+              try {
+                await deleteConsultation(id);
+                addToast({
+                  title: 'Booking Removed',
+                  message: `Consultation for ${name || 'patient'} has been removed.`,
+                  type: 'info',
+                });
+              } catch (err) {
+                console.error('Delete consultation error:', err);
+                addToast({
+                  title: 'Error',
+                  message: 'Could not remove consultation.',
+                  type: 'error',
+                });
+              } finally {
+                setConsultationBusyId(null);
+              }
+            };
+
+            return (
+              <section className="admin-panel">
+                <div className="admin-panel-head admin-panel-head-row">
+                  <div>
+                    <h2>Consultations Booked</h2>
+                    <p>
+                      {consultations.length === 1
+                        ? '1 patient appointment booked'
+                        : `${consultations.length} total patient appointments booked`}
+                      {' · '}
+                      ₹{(consultations.length * 99).toLocaleString('en-IN')} total revenue collected via UPI
+                    </p>
+                  </div>
+                </div>
+
+                {/* Consultation Metric Summary Cards */}
+                <div className="admin-order-stats-grid">
+                  <div className="admin-stat-summary-card">
+                    <div className="admin-stat-icon-wrap" style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6' }}>
+                      <Stethoscope size={20} />
+                    </div>
+                    <div>
+                      <span className="admin-stat-val">{consultations.length}</span>
+                      <span className="admin-stat-lbl">Booked Sessions</span>
+                    </div>
+                  </div>
+
+                  <div className="admin-stat-summary-card">
+                    <div className="admin-stat-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}>
+                      <IndianRupee size={20} />
+                    </div>
+                    <div>
+                      <span className="admin-stat-val" style={{ color: '#10b981' }}>
+                        ₹{(consultations.length * 99).toLocaleString('en-IN')}
+                      </span>
+                      <span className="admin-stat-lbl">Fee Collected</span>
+                    </div>
+                  </div>
+
+                  <div className="admin-stat-summary-card">
+                    <div className="admin-stat-icon-wrap" style={{ background: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6' }}>
+                      <Smartphone size={20} />
+                    </div>
+                    <div>
+                      <span className="admin-stat-val" style={{ color: '#8b5cf6' }}>100%</span>
+                      <span className="admin-stat-lbl">UPI Payment</span>
+                    </div>
+                  </div>
+
+                  <div className="admin-stat-summary-card">
+                    <div className="admin-stat-icon-wrap" style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#f59e0b' }}>
+                      <Phone size={20} />
+                    </div>
+                    <div>
+                      <span className="admin-stat-val" style={{ fontSize: '1.05rem', color: '#f59e0b' }}>9746758698</span>
+                      <span className="admin-stat-lbl">Clinic Helpline</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Consultation Search Toolbar */}
+                <div className="admin-toolbar" style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
+                  <div className="admin-search-wrap" style={{ maxWidth: '420px', flex: 1 }}>
+                    <Search size={16} className="admin-search-icon" />
+                    <input
+                      type="text"
+                      value={consultationSearch}
+                      onChange={(e) => setConsultationSearch(e.target.value)}
+                      placeholder="Search by patient name, phone, symptoms, or UPI last 4..."
+                      className="admin-search-input"
+                    />
+                    {consultationSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setConsultationSearch('')}
+                        className="admin-search-clear"
+                        title="Clear search"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {loadingConsultations ? (
+                  <div className="admin-empty">
+                    <Loader2 className="admin-spin" size={22} />
+                    Loading consultations…
+                  </div>
+                ) : filteredConsultations.length === 0 ? (
+                  <div className="admin-empty">
+                    {consultationSearch
+                      ? `No consultations match "${consultationSearch}".`
+                      : 'No consultation bookings yet.'}
+                  </div>
+                ) : (
+                  <div className="admin-consult-grid">
+                    {filteredConsultations.map((item) => {
+                      const phoneDigits = (item.phone || '').replace(/\D/g, '');
+                      const txnLast4 = item.upiLast4 || item.upiRefNo || '';
+                      const bookingRef = item.readableId || item.id;
+                      const waMsg = `Hello ${item.name || 'Patient'}, this is Dr. Ancy Shaji's clinic (MediDrop) regarding your online consultation booked for ${item.date || ''} (${item.time || ''}). We have confirmed your ₹99 UPI payment (Txn ID: ${txnLast4}).`;
+                      const waUrl = phoneDigits ? `https://wa.me/91${phoneDigits.slice(-10)}?text=${encodeURIComponent(waMsg)}` : null;
+
+                      return (
+                        <article key={item.id} className="admin-consult-card">
+                          <div className="admin-consult-card-head">
+                            <div className="admin-consult-patient-meta">
+                              <span className="admin-consult-badge-id">{bookingRef}</span>
+                              <h3 className="admin-consult-patient-name">{item.name || 'Patient'}</h3>
+                            </div>
+                            <span className="admin-consult-time-ago">
+                              <Clock size={13} />
+                              {formatDate(item.createdAt)}
+                            </span>
+                          </div>
+
+                          {/* Slot & Appointment Info */}
+                          <div className="admin-consult-slot-bar">
+                            <div className="admin-consult-slot-pill">
+                              <Calendar size={14} />
+                              <strong>{item.date || 'Date TBD'}</strong>
+                            </div>
+                            <div className="admin-consult-slot-pill">
+                              <Clock size={14} />
+                              <span>{item.time || 'Time TBD'}</span>
+                            </div>
+                          </div>
+
+                          {/* Patient Health Concern / Symptoms */}
+                          <div className="admin-consult-symptoms-box">
+                            <span className="admin-consult-symptoms-label">
+                              <Stethoscope size={13} /> Health Concern / Symptoms:
+                            </span>
+                            <p className="admin-consult-symptoms-text">
+                              {item.symptoms || 'No specific symptoms described.'}
+                            </p>
+                          </div>
+
+                          {/* Payment & Verification Row */}
+                          <div className="admin-consult-payment-box">
+                            <div className="admin-consult-pay-status">
+                              <span className="admin-consult-amount-pill">₹{item.amount || 99} Paid</span>
+                              <span className="admin-consult-upi-tag">UPI Verified</span>
+                            </div>
+                            {txnLast4 && (
+                              <div className="admin-consult-utr-pill">
+                                <span>Txn ID (last 4):</span>
+                                <strong>{txnLast4}</strong>
+                                <button
+                                  type="button"
+                                  className="admin-consult-copy-btn"
+                                  title="Copy Last 4 Digits"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(txnLast4);
+                                    setCopiedConsultId(item.id);
+                                    setTimeout(() => setCopiedConsultId(null), 2000);
+                                  }}
+                                >
+                                  {copiedConsultId === item.id ? <Check size={12} /> : <Copy size={12} />}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Contact Meta Details */}
+                          <div className="admin-consult-patient-contacts">
+                            {item.email && (
+                              <a href={`mailto:${item.email}`} className="admin-consult-contact-link" title="Send Email">
+                                <Mail size={13} />
+                                <span>{item.email}</span>
+                              </a>
+                            )}
+                            {item.phone && (
+                              <a href={`tel:${item.phone}`} className="admin-consult-contact-link" title="Call Patient">
+                                <Phone size={13} />
+                                <span>{item.phone}</span>
+                              </a>
+                            )}
+                          </div>
+
+                          {/* Admin Action Buttons */}
+                          <div className="admin-consult-actions-bar">
+                            {waUrl && (
+                              <a
+                                href={waUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-outline admin-consult-wa-btn"
+                                title="Message patient on WhatsApp"
+                              >
+                                <MessageSquare size={14} />
+                                <span>WhatsApp Patient</span>
+                                <ExternalLink size={12} />
+                              </a>
+                            )}
+
+                            {item.phone && (
+                              <a
+                                href={`tel:${item.phone}`}
+                                className="btn btn-outline admin-consult-call-btn"
+                                title="Call patient phone"
+                              >
+                                <Phone size={14} />
+                                <span>Call</span>
+                              </a>
+                            )}
+
+                            <button
+                              type="button"
+                              className="btn btn-outline admin-consult-delete-btn"
+                              disabled={consultationBusyId === item.id}
+                              onClick={() => handleDeleteConsultation(item.id, item.name)}
+                              title="Remove this booking"
+                            >
+                              <Trash2 size={14} />
+                              <span>Remove</span>
+                            </button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            );
+          })()}
+
+          {tab === 'orders' && (
             <section className="admin-panel">
-              <div className="admin-panel-head">
-                <h2>Doctor consultations</h2>
-                <p>Bookings from the consultation form (₹99).</p>
+              <div className="admin-panel-head admin-panel-head-row">
+                <div>
+                  <h2>Patient Orders Placed</h2>
+                  <p>
+                    {pendingOrdersCount
+                      ? `${pendingOrdersCount} pending packaging · ${orders.length} total orders`
+                      : 'Orders placed by patients from their shopping cart.'}
+                  </p>
+                </div>
               </div>
 
-              {loadingConsultations ? (
+              {/* Order Metrics Summary Cards */}
+              <div className="admin-order-stats-grid">
+                <div className="admin-stat-summary-card">
+                  <div className="admin-stat-icon-wrap" style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6' }}>
+                    <ShoppingBag size={20} />
+                  </div>
+                  <div>
+                    <span className="admin-stat-val">{orders.length}</span>
+                    <span className="admin-stat-lbl">Total Orders</span>
+                  </div>
+                </div>
+
+                <div className="admin-stat-summary-card">
+                  <div className="admin-stat-icon-wrap" style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#f59e0b' }}>
+                    <Clock size={20} />
+                  </div>
+                  <div>
+                    <span className="admin-stat-val" style={{ color: '#f59e0b' }}>{pendingOrdersCount}</span>
+                    <span className="admin-stat-lbl">Pending Packaging</span>
+                  </div>
+                </div>
+
+                <div className="admin-stat-summary-card">
+                  <div className="admin-stat-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}>
+                    <Truck size={20} />
+                  </div>
+                  <div>
+                    <span className="admin-stat-val" style={{ color: '#10b981' }}>
+                      {orders.filter(o => o.status === 'Dispatched' || o.status === 'Delivered').length}
+                    </span>
+                    <span className="admin-stat-lbl">Shipped / Delivered</span>
+                  </div>
+                </div>
+
+                <div className="admin-stat-summary-card">
+                  <div className="admin-stat-icon-wrap" style={{ background: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6' }}>
+                    <IndianRupee size={20} />
+                  </div>
+                  <div>
+                    <span className="admin-stat-val">
+                      ₹{orders.reduce((acc, o) => acc + (Number(o.total) || 0), 0).toLocaleString('en-IN')}
+                    </span>
+                    <span className="admin-stat-lbl">Gross Order Value</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Filter & Search Toolbar */}
+              <div className="admin-toolbar" style={{ marginTop: '1.25rem', marginBottom: '1.25rem' }}>
+                <div className="admin-filter-group" role="group" aria-label="Filter orders">
+                  <button
+                    type="button"
+                    className={`admin-filter-chip ${orderFilter === 'all' ? 'active' : ''}`}
+                    onClick={() => setOrderFilter('all')}
+                  >
+                    All ({orders.length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-filter-chip ${orderFilter === 'pending' ? 'active' : ''}`}
+                    onClick={() => setOrderFilter('pending')}
+                  >
+                    Pending ({orders.filter(o => (o.status || 'Pending').toLowerCase() === 'pending').length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-filter-chip ${orderFilter === 'processing' ? 'active' : ''}`}
+                    onClick={() => setOrderFilter('processing')}
+                  >
+                    Processing ({orders.filter(o => (o.status || '').toLowerCase() === 'processing').length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-filter-chip ${orderFilter === 'dispatched' ? 'active' : ''}`}
+                    onClick={() => setOrderFilter('dispatched')}
+                  >
+                    Dispatched ({orders.filter(o => (o.status || '').toLowerCase() === 'dispatched').length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-filter-chip ${orderFilter === 'delivered' ? 'active' : ''}`}
+                    onClick={() => setOrderFilter('delivered')}
+                  >
+                    Delivered ({orders.filter(o => (o.status || '').toLowerCase() === 'delivered').length})
+                  </button>
+                </div>
+
+                <div className="admin-search-wrap">
+                  <Search size={15} />
+                  <input
+                    type="search"
+                    className="admin-search-input"
+                    value={orderSearch}
+                    onChange={(e) => setOrderSearch(e.target.value)}
+                    placeholder="Search by patient, phone, order ID..."
+                  />
+                  {orderSearch && (
+                    <button
+                      type="button"
+                      className="admin-search-clear"
+                      onClick={() => setOrderSearch('')}
+                      aria-label="Clear search"
+                    >
+                      <X size={13} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {loadingOrders ? (
                 <div className="admin-empty">
                   <Loader2 className="admin-spin" size={22} />
-                  Loading consultations…
+                  Loading patient orders…
                 </div>
-              ) : consultations.length === 0 ? (
-                <div className="admin-empty">No consultation bookings yet.</div>
-              ) : (
-                <div className="admin-contact-list">
-                  {consultations.map((item) => (
-                    <article key={item.id} className="admin-contact-card">
-                      <div className="admin-contact-top">
-                        <h3>{item.name}</h3>
-                        <span>
-                          <Clock size={13} />
-                          {formatDate(item.createdAt)}
-                        </span>
-                      </div>
-
-                      <p className="admin-subject">
-                        <Calendar size={13} />
-                        {' '}
-                        {item.date} · {item.time}
-                      </p>
-
-                      <p className="admin-message">
-                        <strong>Symptoms:</strong> {item.symptoms}
-                      </p>
-
-                      <div className="admin-consult-pay">
-                        <span className="admin-pay-badge">
-                          ₹{item.amount || 99} · {(item.paymentMethod || 'upi').toUpperCase()}
-                        </span>
-                        {item.paymentMethod === 'upi' && item.upiRefNo && (
-                          <span>UPI Ref: {item.upiRefNo}</span>
-                        )}
-                        {item.paymentMethod === 'card' && (
-                          <span>
-                            Card{item.cardLast4 ? ` •••• ${item.cardLast4}` : ''}
-                            {item.cardHolder ? ` · ${item.cardHolder}` : ''}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="admin-contact-meta">
-                        <a href={`mailto:${item.email}`}>
-                          <Mail size={14} />
-                          {item.email}
-                        </a>
-                        {item.phone && (
-                          <a href={`tel:${item.phone}`}>
-                            <Phone size={14} />
-                            {item.phone}
-                          </a>
-                        )}
-                      </div>
-                    </article>
-                  ))}
+              ) : orders.length === 0 ? (
+                <div className="admin-empty">
+                  <ShoppingBag size={32} style={{ opacity: 0.4, marginBottom: '0.5rem' }} />
+                  <p style={{ fontWeight: '600', marginBottom: '0.25rem' }}>No orders placed yet.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    When patients checkout remedies from their cart, their full order information will appear here in real-time.
+                  </p>
                 </div>
-              )}
+              ) : (() => {
+                const filteredOrders = orders.filter((o) => {
+                  const statusMatch =
+                    orderFilter === 'all'
+                      ? true
+                      : (o.status || 'Pending').toLowerCase() === orderFilter.toLowerCase();
+
+                  if (!statusMatch) return false;
+                  if (!orderSearch.trim()) return true;
+
+                  const term = orderSearch.toLowerCase().trim();
+                  const patientName = (o.patient?.name || '').toLowerCase();
+                  const patientPhone = (o.patient?.phone || '').toLowerCase();
+                  const patientEmail = (o.patient?.email || '').toLowerCase();
+                  const patientAddress = (o.patient?.address || '').toLowerCase();
+                  const orderNum = (o.orderNumber || o.id || '').toLowerCase();
+                  const itemNames = (o.items || []).map((i) => (i.name || '').toLowerCase()).join(' ');
+
+                  return (
+                    patientName.includes(term) ||
+                    patientPhone.includes(term) ||
+                    patientEmail.includes(term) ||
+                    patientAddress.includes(term) ||
+                    orderNum.includes(term) ||
+                    itemNames.includes(term)
+                  );
+                });
+
+                if (filteredOrders.length === 0) {
+                  return (
+                    <div className="admin-empty">
+                      No orders match your search or filter.
+                      <button
+                        type="button"
+                        className="btn btn-outline"
+                        style={{ marginTop: '0.75rem' }}
+                        onClick={() => {
+                          setOrderFilter('all');
+                          setOrderSearch('');
+                        }}
+                      >
+                        Reset filters
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="admin-orders-list">
+                    {filteredOrders.map((order) => {
+                      const status = order.status || 'Pending';
+                      const isBusy = orderBusyId === order.id;
+
+                      return (
+                        <article key={order.id} className="admin-order-card glass">
+                          {/* Order Header */}
+                          <div className="admin-order-header">
+                            <div className="admin-order-header-left">
+                              <div className="admin-order-id-badge">
+                                <ShoppingBag size={14} />
+                                <span>Order #{order.orderNumber || order.id.slice(-6)}</span>
+                              </div>
+                              <span className="admin-order-time">
+                                <Clock size={13} />
+                                {formatDate(order.createdAt)}
+                              </span>
+                            </div>
+
+                            <div className="admin-order-header-right">
+                              {/* Fulfillment Status Dropdown */}
+                              <div className="admin-order-status-control">
+                                <label htmlFor={`order-status-${order.id}`} className="admin-visually-hidden">
+                                  Order Status
+                                </label>
+                                <select
+                                  id={`order-status-${order.id}`}
+                                  className={`admin-order-status-select status-${status.toLowerCase()}`}
+                                  value={status}
+                                  onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                                  disabled={isBusy}
+                                >
+                                  <option value="Pending">🟡 Pending</option>
+                                  <option value="Processing">🔵 Processing</option>
+                                  <option value="Dispatched">🟣 Dispatched</option>
+                                  <option value="Delivered">🟢 Delivered</option>
+                                  <option value="Cancelled">🔴 Cancelled</option>
+                                </select>
+                              </div>
+
+                              <button
+                                type="button"
+                                className="admin-action-btn admin-action-danger"
+                                onClick={() => handleDeleteOrder(order)}
+                                disabled={isBusy}
+                                title="Delete this order"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Order Body (2 Columns on Desktop) */}
+                          <div className="admin-order-body-grid">
+                            {/* Column 1: Patient Information */}
+                            <div className="admin-order-patient-panel">
+                              <h4>Patient & Delivery Details</h4>
+                              <div className="admin-order-patient-info">
+                                <div className="admin-order-info-row">
+                                  <span className="admin-info-label">Patient Name:</span>
+                                  <strong>{order.patient?.name || '—'}</strong>
+                                </div>
+                                <div className="admin-order-info-row">
+                                  <span className="admin-info-label">Contact Phone:</span>
+                                  {order.patient?.phone ? (
+                                    <a href={`tel:${order.patient.phone}`} className="admin-order-link">
+                                      <Phone size={13} />
+                                      <span>{order.patient.phone}</span>
+                                    </a>
+                                  ) : (
+                                    <span>—</span>
+                                  )}
+                                </div>
+                                <div className="admin-order-info-row">
+                                  <span className="admin-info-label">Email Address:</span>
+                                  {order.patient?.email ? (
+                                    <a href={`mailto:${order.patient.email}`} className="admin-order-link">
+                                      <Mail size={13} />
+                                      <span>{order.patient.email}</span>
+                                    </a>
+                                  ) : (
+                                    <span>—</span>
+                                  )}
+                                </div>
+                                <div className="admin-order-info-row admin-order-address-row">
+                                  <span className="admin-info-label">Shipping Address:</span>
+                                  <div className="admin-order-address-text">
+                                    <MapPin size={13} />
+                                    <span>{order.patient?.address || '—'}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Column 2: Placed Products */}
+                            <div className="admin-order-items-panel">
+                              <h4>Products Ordered ({order.items?.length || 0} items)</h4>
+                              <div className="admin-order-items-table-wrap">
+                                <table className="admin-order-items-table">
+                                  <thead>
+                                    <tr>
+                                      <th>Item</th>
+                                      <th>Price</th>
+                                      <th>Qty</th>
+                                      <th style={{ textAlign: 'right' }}>Subtotal</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {(order.items || []).map((item, idx) => (
+                                      <tr key={idx}>
+                                        <td>
+                                          <div className="admin-order-item-cell">
+                                            <img
+                                              src={item.image || '/homeo-remedy.png'}
+                                              alt={item.name}
+                                              className="admin-order-item-thumb"
+                                            />
+                                            <div>
+                                              <strong>{item.name}</strong>
+                                              {item.scientificName && <span>{item.scientificName}</span>}
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td>₹{item.price}</td>
+                                        <td>
+                                          <span className="admin-order-qty-pill">x {item.quantity}</span>
+                                        </td>
+                                        <td style={{ textAlign: 'right', fontWeight: '650' }}>
+                                          ₹{item.subtotal || item.price * item.quantity}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              {/* Financial Summary */}
+                              <div className="admin-order-totals">
+                                <div className="admin-order-total-line">
+                                  <span>Items Subtotal:</span>
+                                  <span>₹{order.subtotal || 0}</span>
+                                </div>
+                                <div className="admin-order-total-line">
+                                  <span>Delivery Charges:</span>
+                                  <span>{order.deliveryCharge === 0 ? 'FREE' : `₹${order.deliveryCharge}`}</span>
+                                </div>
+                                <div className="admin-order-total-line admin-order-grand-total">
+                                  <strong>Total Amount:</strong>
+                                  <strong>₹{order.total || 0}</strong>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </section>
           )}
 
@@ -634,6 +1519,46 @@ export default function AdminPage({ addToast }) {
               <div className="admin-panel-head">
                 <h2>All remedies</h2>
                 <p>Catalog stored in Firebase — includes the original 10 remedies plus any you add.</p>
+              </div>
+
+              <div className="admin-login-card glass" style={{ width: '100%', maxWidth: 'none', margin: '0 0 2rem 0', padding: '1.5rem', textAlign: 'left', display: 'block' }}>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '750', marginBottom: '0.25rem', color: 'var(--text-primary)' }}>Storefront remedies header</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>Customize the title and description shown on the remedies storefront section.</p>
+                <form onSubmit={handleSaveHeader} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="admin-field" style={{ width: '100%' }}>
+                      <label htmlFor="header-title" style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Section Title</label>
+                      <input
+                        id="header-title"
+                        className="admin-input"
+                        value={headerForm.title}
+                        onChange={(e) => setHeaderForm(prev => ({ ...prev, title: e.target.value }))}
+                        placeholder="Select Homeopathic Remedies"
+                        required
+                      />
+                    </div>
+                    <div className="admin-field" style={{ width: '100%' }}>
+                      <label htmlFor="header-desc" style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>Section Description</label>
+                      <textarea
+                        id="header-desc"
+                        className="admin-input admin-textarea"
+                        rows={2}
+                        value={headerForm.description}
+                        onChange={(e) => setHeaderForm(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Explore pure organic dilutions prepared with care..."
+                        required
+                      />
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', minHeight: '2.4rem', padding: '0.5rem 1.25rem' }} disabled={savingHeader}>
+                    {savingHeader ? (
+                      <>
+                        <Loader2 className="admin-spin" size={15} />
+                        Saving...
+                      </>
+                    ) : 'Update Storefront Header'}
+                  </button>
+                </form>
               </div>
 
               {loadingRemedies ? (
@@ -650,91 +1575,389 @@ export default function AdminPage({ addToast }) {
                   </button>
                 </div>
               ) : (
-                <>
-                  <div className="admin-remedy-table-wrap admin-remedy-desktop">
-                    <table className="admin-remedy-table">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Category</th>
-                          <th>Price</th>
-                          <th>Min qty</th>
-                          <th>Source</th>
-                          <th>Added</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {remedies.map((r) => (
-                          <tr key={r.id}>
-                            <td>
-                              <strong>{r.name}</strong>
-                              <span>{r.scientificName}</span>
-                            </td>
-                            <td>{r.category || '—'}</td>
-                            <td>₹{r.price}</td>
-                            <td>{r.minQuantity}</td>
-                            <td>{r.isDefault ? 'Catalog' : 'Added'}</td>
-                            <td>{formatDate(r.createdAt)}</td>
-                            <td>
-                              <button
-                                type="button"
-                                className="admin-edit-btn"
-                                onClick={() => startEditRemedy(r)}
-                              >
-                                <Pencil size={14} />
-                                Edit
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                (() => {
+                  const totalRemedies = remedies.length;
+                  const liveCount = remedies.filter((r) => r.isLive !== false).length;
+                  const notLiveCount = totalRemedies - liveCount;
+                  const inStockCount = remedies.filter(
+                    (r) => r.inStock !== false && (r.stock == null || Number(r.stock) > 0)
+                  ).length;
+                  const outOfStockCount = totalRemedies - inStockCount;
 
-                  <div className="admin-remedy-cards admin-remedy-mobile">
-                    {remedies.map((r) => (
-                      <article key={r.id} className="admin-remedy-card">
-                        <div className="admin-remedy-card-top">
-                          <div>
-                            <h3>{r.name}</h3>
-                            {r.scientificName && <p>{r.scientificName}</p>}
-                          </div>
+                  const filteredRemedies = remedies.filter((r) => {
+                    const isLive = r.isLive !== false;
+                    const inStock = r.inStock !== false && (r.stock == null || Number(r.stock) > 0);
+
+                    if (remedyFilter === 'live' && !isLive) return false;
+                    if (remedyFilter === 'notlive' && isLive) return false;
+                    if (remedyFilter === 'instock' && !inStock) return false;
+                    if (remedyFilter === 'outofstock' && inStock) return false;
+
+                    if (remedySearch.trim()) {
+                      const q = remedySearch.toLowerCase().trim();
+                      const name = (r.name || '').toLowerCase();
+                      const sci = (r.scientificName || '').toLowerCase();
+                      const cat = (r.category || '').toLowerCase();
+                      return name.includes(q) || sci.includes(q) || cat.includes(q);
+                    }
+                    return true;
+                  });
+
+                  return (
+                    <>
+                      <div className="admin-remedies-toolbar">
+                        <div className="admin-stock-pills" role="tablist" aria-label="Filter remedies by stock and visibility">
                           <button
                             type="button"
-                            className="admin-edit-btn"
-                            onClick={() => startEditRemedy(r)}
+                            className={`admin-filter-pill ${remedyFilter === 'all' ? 'active' : ''}`}
+                            onClick={() => setRemedyFilter('all')}
                           >
-                            <Pencil size={14} />
-                            Edit
+                            All ({totalRemedies})
+                          </button>
+                          <button
+                            type="button"
+                            className={`admin-filter-pill is-live-filter ${remedyFilter === 'live' ? 'active' : ''}`}
+                            onClick={() => setRemedyFilter('live')}
+                            title="Remedies visible on public website"
+                          >
+                            <span className="admin-filter-dot is-live" />
+                            Live on Web ({liveCount})
+                          </button>
+                          <button
+                            type="button"
+                            className={`admin-filter-pill is-notlive-filter ${remedyFilter === 'notlive' ? 'active' : ''}`}
+                            onClick={() => setRemedyFilter('notlive')}
+                            title="Remedies hidden from public website"
+                          >
+                            <span className="admin-filter-dot is-notlive" />
+                            Not Live / Hidden ({notLiveCount})
+                          </button>
+                          <button
+                            type="button"
+                            className={`admin-filter-pill ${remedyFilter === 'instock' ? 'active' : ''}`}
+                            onClick={() => setRemedyFilter('instock')}
+                            title="Remedies with stock available"
+                          >
+                            In Stock ({inStockCount})
+                          </button>
+                          <button
+                            type="button"
+                            className={`admin-filter-pill is-outofstock-filter ${remedyFilter === 'outofstock' ? 'active' : ''}`}
+                            onClick={() => setRemedyFilter('outofstock')}
+                            title="Remedies marked out of stock"
+                          >
+                            Out of Stock ({outOfStockCount})
                           </button>
                         </div>
-                        <dl className="admin-remedy-meta">
-                          <div>
-                            <dt>Category</dt>
-                            <dd>{r.category || '—'}</dd>
+
+                        <div className="admin-search-box">
+                          <Search size={14} className="admin-search-icon" />
+                          <input
+                            type="text"
+                            className="admin-search-input"
+                            placeholder="Filter by name, botanical, category..."
+                            value={remedySearch}
+                            onChange={(e) => setRemedySearch(e.target.value)}
+                          />
+                          {remedySearch && (
+                            <button
+                              type="button"
+                              className="admin-search-clear"
+                              onClick={() => setRemedySearch('')}
+                              aria-label="Clear search"
+                            >
+                              <X size={12} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {filteredRemedies.length === 0 ? (
+                        <div className="admin-empty" style={{ padding: '2.5rem 1rem' }}>
+                          No remedies match the filter &ldquo;{remedyFilter}&rdquo; {remedySearch ? `with search "${remedySearch}"` : ''}.
+                          <button
+                            type="button"
+                            className="btn btn-outline"
+                            style={{ marginTop: '0.5rem' }}
+                            onClick={() => {
+                              setRemedyFilter('all');
+                              setRemedySearch('');
+                            }}
+                          >
+                            Reset filters
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="admin-remedy-table-wrap admin-remedy-desktop">
+                            <table className="admin-remedy-table">
+                              <thead>
+                                <tr>
+                                  <th>Remedy</th>
+                                  <th>Category</th>
+                                  <th>Price</th>
+                                  <th>Stock Status</th>
+                                  <th>Website Status</th>
+                                  <th style={{ textAlign: 'right' }}>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {filteredRemedies.map((r) => {
+                                  const isLive = r.isLive !== false;
+                                  const inStock =
+                                    r.inStock !== false &&
+                                    (r.stock == null || Number(r.stock) > 0);
+                                  const stockQty = r.stock != null ? r.stock : (inStock ? 30 : 0);
+                                  const isBusy = remedyBusyId === r.id;
+
+                                  return (
+                                    <tr key={r.id} className={!isLive ? 'is-row-notlive' : ''}>
+                                      <td>
+                                        <div className="admin-product-cell">
+                                          <img
+                                            src={r.image || '/homeo-remedy.png'}
+                                            alt={r.name}
+                                            className="admin-product-row-thumb"
+                                            loading="lazy"
+                                          />
+                                          <div>
+                                            <strong>{r.name}</strong>
+                                            <span>{r.scientificName || 'Standard Homeopathic Dilution'}</span>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td>{r.category || '—'}</td>
+                                      <td>₹{r.price}</td>
+                                      <td>
+                                        {inStock ? (
+                                          <div className="admin-stock-badge in-stock">
+                                            <Boxes size={13} />
+                                            <span>In Stock ({stockQty} units)</span>
+                                          </div>
+                                        ) : (
+                                          <div className="admin-stock-badge out-of-stock">
+                                            <PackageX size={13} />
+                                            <span>Out of Stock</span>
+                                          </div>
+                                        )}
+                                      </td>
+                                      <td>
+                                        {isLive ? (
+                                          <span className="admin-status-pill is-live-pill" title="Shown on customer website">
+                                            <span className="admin-live-dot" /> Live (Shown)
+                                          </span>
+                                        ) : (
+                                          <span className="admin-status-pill is-notlive-pill" title="Not shown on website (Hidden completely)">
+                                            <EyeOff size={11} /> Not Live (Hidden)
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td>
+                                        <div className="admin-row-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem' }}>
+                                          {/* Separate Stock Button */}
+                                          {inStock ? (
+                                            <button
+                                              type="button"
+                                              className="admin-action-btn admin-btn-stock-out"
+                                              onClick={() => handleToggleStock(r)}
+                                              disabled={isBusy}
+                                              title="Mark this item as Out of Stock on the website"
+                                            >
+                                              {isBusy ? <Loader2 className="admin-spin" size={13} /> : <PackageX size={13} />}
+                                              <span>Out of Stock</span>
+                                            </button>
+                                          ) : (
+                                            <button
+                                              type="button"
+                                              className="admin-action-btn admin-btn-stock-in"
+                                              onClick={() => handleToggleStock(r)}
+                                              disabled={isBusy}
+                                              title="Mark this item as In Stock"
+                                            >
+                                              {isBusy ? <Loader2 className="admin-spin" size={13} /> : <PackageCheck size={13} />}
+                                              <span>In Stock</span>
+                                            </button>
+                                          )}
+
+                                          {/* Separate Live Button (Not Live specifies not to be shown in website) */}
+                                          {isLive ? (
+                                            <button
+                                              type="button"
+                                              className="admin-action-btn admin-btn-live-hide"
+                                              onClick={() => handleToggleLive(r)}
+                                              disabled={isBusy}
+                                              title="Hide from website (Not Live)"
+                                            >
+                                              {isBusy ? <Loader2 className="admin-spin" size={13} /> : <EyeOff size={13} />}
+                                              <span>Make Not Live</span>
+                                            </button>
+                                          ) : (
+                                            <button
+                                              type="button"
+                                              className="admin-action-btn admin-btn-live-show"
+                                              onClick={() => handleToggleLive(r)}
+                                              disabled={isBusy}
+                                              title="Publish to website (Go Live)"
+                                            >
+                                              {isBusy ? <Loader2 className="admin-spin" size={13} /> : <Eye size={13} />}
+                                              <span>Go Live</span>
+                                            </button>
+                                          )}
+
+                                          <button
+                                            type="button"
+                                            className="admin-edit-btn"
+                                            onClick={() => startEditRemedy(r)}
+                                          >
+                                            <Pencil size={13} />
+                                            <span>Edit</span>
+                                          </button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
                           </div>
-                          <div>
-                            <dt>Price</dt>
-                            <dd>₹{r.price}</dd>
+
+                          <div className="admin-remedy-cards admin-remedy-mobile">
+                            {filteredRemedies.map((r) => {
+                              const isLive = r.isLive !== false;
+                              const inStock =
+                                r.inStock !== false &&
+                                (r.stock == null || Number(r.stock) > 0);
+                              const stockQty = r.stock != null ? r.stock : (inStock ? 30 : 0);
+                              const isBusy = remedyBusyId === r.id;
+
+                              return (
+                                <article key={r.id} className={`admin-remedy-card ${!isLive ? 'is-card-notlive' : ''}`}>
+                                  <div className="admin-remedy-card-top">
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                                      <img
+                                        src={r.image || '/homeo-remedy.png'}
+                                        alt={r.name}
+                                        className="admin-product-row-thumb"
+                                        loading="lazy"
+                                      />
+                                      <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                                          <h3>{r.name}</h3>
+                                          {isLive ? (
+                                            <span className="admin-status-pill is-live-pill" style={{ padding: '0.12rem 0.45rem', fontSize: '0.65rem' }}>
+                                              <span className="admin-live-dot" /> Live (Shown)
+                                            </span>
+                                          ) : (
+                                            <span className="admin-status-pill is-notlive-pill" style={{ padding: '0.12rem 0.45rem', fontSize: '0.65rem' }}>
+                                              Not Live (Hidden)
+                                            </span>
+                                          )}
+                                          {inStock ? (
+                                            <span className="admin-status-pill" style={{ background: 'rgba(var(--primary-rgb), 0.1)', color: 'var(--primary)', padding: '0.12rem 0.45rem', fontSize: '0.65rem' }}>
+                                              In Stock
+                                            </span>
+                                          ) : (
+                                            <span className="admin-status-pill" style={{ background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444', padding: '0.12rem 0.45rem', fontSize: '0.65rem' }}>
+                                              Out of Stock
+                                            </span>
+                                          )}
+                                        </div>
+                                        {r.scientificName && <p>{r.scientificName}</p>}
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      className="admin-edit-btn"
+                                      onClick={() => startEditRemedy(r)}
+                                    >
+                                      <Pencil size={13} />
+                                      Edit
+                                    </button>
+                                  </div>
+
+                                  <dl className="admin-remedy-meta">
+                                    <div>
+                                      <dt>Category</dt>
+                                      <dd>{r.category || '—'}</dd>
+                                    </div>
+                                    <div>
+                                      <dt>Price</dt>
+                                      <dd>₹{r.price}</dd>
+                                    </div>
+                                    <div>
+                                      <dt>Stock Status</dt>
+                                      <dd style={{ color: inStock ? 'var(--text-primary)' : '#ef4444' }}>
+                                        {inStock ? `In Stock (${stockQty} units)` : 'Out of Stock'}
+                                      </dd>
+                                    </div>
+                                    <div>
+                                      <dt>Website Status</dt>
+                                      <dd style={{ color: isLive ? '#10b981' : 'var(--text-muted)' }}>
+                                        {isLive ? 'Live (Visible)' : 'Not Live (Hidden)'}
+                                      </dd>
+                                    </div>
+                                  </dl>
+
+                                  <div className="admin-card-actions" style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--card-border)', flexWrap: 'wrap' }}>
+                                    {/* Separate Stock Button */}
+                                    {inStock ? (
+                                      <button
+                                        type="button"
+                                        className="admin-action-btn admin-btn-stock-out"
+                                        style={{ flex: 1, minWidth: '120px', justifyContent: 'center' }}
+                                        onClick={() => handleToggleStock(r)}
+                                        disabled={isBusy}
+                                      >
+                                        {isBusy ? <Loader2 className="admin-spin" size={13} /> : <PackageX size={13} />}
+                                        <span>Out of Stock</span>
+                                      </button>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        className="admin-action-btn admin-btn-stock-in"
+                                        style={{ flex: 1, minWidth: '120px', justifyContent: 'center' }}
+                                        onClick={() => handleToggleStock(r)}
+                                        disabled={isBusy}
+                                      >
+                                        {isBusy ? <Loader2 className="admin-spin" size={13} /> : <PackageCheck size={13} />}
+                                        <span>In Stock</span>
+                                      </button>
+                                    )}
+
+                                    {/* Separate Live Button */}
+                                    {isLive ? (
+                                      <button
+                                        type="button"
+                                        className="admin-action-btn admin-btn-live-hide"
+                                        style={{ flex: 1, minWidth: '120px', justifyContent: 'center' }}
+                                        onClick={() => handleToggleLive(r)}
+                                        disabled={isBusy}
+                                      >
+                                        {isBusy ? <Loader2 className="admin-spin" size={13} /> : <EyeOff size={13} />}
+                                        <span>Make Not Live</span>
+                                      </button>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        className="admin-action-btn admin-btn-live-show"
+                                        style={{ flex: 1, minWidth: '120px', justifyContent: 'center' }}
+                                        onClick={() => handleToggleLive(r)}
+                                        disabled={isBusy}
+                                      >
+                                        {isBusy ? <Loader2 className="admin-spin" size={13} /> : <Eye size={13} />}
+                                        <span>Go Live</span>
+                                      </button>
+                                    )}
+                                  </div>
+                                </article>
+                              );
+                            })}
                           </div>
-                          <div>
-                            <dt>Min qty</dt>
-                            <dd>{r.minQuantity}</dd>
-                          </div>
-                          <div>
-                            <dt>Source</dt>
-                            <dd>{r.isDefault ? 'Catalog' : 'Added'}</dd>
-                          </div>
-                        </dl>
-                        <span className="admin-remedy-card-date">
-                          <Clock size={12} />
-                          {formatDate(r.createdAt)}
-                        </span>
-                      </article>
-                    ))}
-                  </div>
-                </>
+                        </>
+                      )}
+                    </>
+                  );
+                })()
               )}
             </section>
           )}
@@ -812,6 +2035,125 @@ export default function AdminPage({ addToast }) {
                       onChange={handleRemedyChange}
                     />
                   </div>
+                  <div className="admin-field">
+                    <label htmlFor="remedy-stock">Stock Units Available</label>
+                    <input
+                      id="remedy-stock"
+                      name="stock"
+                      type="number"
+                      min="0"
+                      className="admin-input"
+                      value={remedyForm.stock}
+                      onChange={handleRemedyChange}
+                      placeholder="e.g. 30"
+                    />
+                  </div>
+                  <div className="admin-field admin-field-full">
+                    <label className="admin-toggle-card">
+                      <input
+                        type="checkbox"
+                        name="isLive"
+                        checked={Boolean(remedyForm.isLive)}
+                        onChange={handleRemedyChange}
+                        className="admin-toggle-checkbox"
+                      />
+                      <div className="admin-toggle-card-content">
+                        <strong>Show on Website (Live)</strong>
+                        <span>
+                          When checked, this remedy is published and visible on the website. Unchecking sets it to <em>Not Live</em> (completely hidden from the website).
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+                  <div className="admin-field admin-field-full">
+                    <label className="admin-toggle-card">
+                      <input
+                        type="checkbox"
+                        name="inStock"
+                        checked={Boolean(remedyForm.inStock)}
+                        onChange={handleRemedyChange}
+                        className="admin-toggle-checkbox"
+                      />
+                      <div className="admin-toggle-card-content">
+                        <strong>In Stock (Available for Purchase)</strong>
+                        <span>
+                          When checked, this remedy can be added to the cart. Unchecking sets it to <em>Out of Stock</em> (shows an Out of Stock badge and disables checkout on the storefront).
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div className="admin-field admin-field-full">
+                    <label style={{ display: 'block', marginBottom: '0.45rem', fontWeight: '600' }}>
+                      Product Image (Upload new or keep existing)
+                    </label>
+                    <div className="admin-image-picker-card">
+                      <div className="admin-image-preview-col">
+                        <img
+                          src={remedyForm.image || (editingId ? (remedies.find(r => r.id === editingId)?.image || '/homeo-remedy.png') : '/homeo-remedy.png')}
+                          alt="Product preview"
+                          className="admin-image-preview-thumb"
+                        />
+                        <span className="admin-image-preview-caption">
+                          {remedyForm.image
+                            ? 'New Image'
+                            : editingId
+                            ? 'Current Image'
+                            : 'Default Bottle'}
+                        </span>
+                      </div>
+                      <div className="admin-image-inputs-col">
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                          <label htmlFor="remedy-image-file-input" className="btn btn-outline" style={{ cursor: 'pointer', padding: '0.45rem 0.85rem', fontSize: '0.82rem' }}>
+                            <Upload size={14} />
+                            <span>Choose Image from Device</span>
+                          </label>
+                          <input
+                            id="remedy-image-file-input"
+                            type="file"
+                            accept="image/*"
+                            style={{ display: 'none' }}
+                            onChange={handleImageFileChange}
+                          />
+
+                          {remedyForm.image && (
+                            <button
+                              type="button"
+                              className="btn btn-outline"
+                              style={{ padding: '0.45rem 0.75rem', fontSize: '0.82rem' }}
+                              onClick={() => setRemedyForm(prev => ({ ...prev, image: '' }))}
+                              title="Reset / keep existing image"
+                            >
+                              <RotateCcw size={13} />
+                              <span>Reset to Existing</span>
+                            </button>
+                          )}
+                        </div>
+
+                        <div style={{ marginTop: '0.65rem' }}>
+                          <label htmlFor="remedy-image-url" style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>
+                            Or enter direct image URL:
+                          </label>
+                          <input
+                            id="remedy-image-url"
+                            name="image"
+                            className="admin-input"
+                            style={{ fontSize: '0.82rem' }}
+                            value={remedyForm.image}
+                            onChange={handleRemedyChange}
+                            placeholder={editingId ? 'Leave blank to preserve current image' : 'e.g. /homeo-remedy.png or https://...'}
+                          />
+                        </div>
+
+                        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', margin: '0.35rem 0 0', lineHeight: 1.4 }}>
+                          {editingId
+                            ? '💡 If no new image is chosen, the currently existing image is preserved automatically.'
+                            : '💡 If no image is provided, the standard amber glass remedy bottle is used.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="admin-field admin-field-full">
                     <label htmlFor="remedy-desc">Description</label>
                     <textarea

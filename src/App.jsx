@@ -9,8 +9,10 @@ import RemediesPage from './pages/RemediesPage';
 import ContactPage from './pages/ContactPage';
 import AdminPage from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
+import PolicyPage from './pages/PolicyPage';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import HomeoBackgroundDrop from './components/HomeoBackgroundDrop';
 import { AuthProvider } from './context/AuthContext';
 
 function AppShell() {
@@ -96,6 +98,7 @@ function AppShell() {
 
   return (
     <div className={`app-container ${isAdminRoute ? 'app-admin' : ''} ${isAuthRoute ? 'app-auth' : ''} ${isHome ? 'app-home' : ''} ${hasPageBg ? 'app-page-bg' : ''}`}>
+      {hasPageBg && <HomeoBackgroundDrop />}
       {!hideChrome && (
         <Navbar
           cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
@@ -129,6 +132,12 @@ function AppShell() {
           <Route path="/login" element={<AuthPage addToast={addToast} mode="login" />} />
           <Route path="/signup" element={<AuthPage addToast={addToast} mode="signup" />} />
           <Route path="/admin" element={<AdminPage addToast={addToast} />} />
+          <Route path="/shipping-policy" element={<PolicyPage activeTab="shipping" />} />
+          <Route path="/returns-refunds" element={<PolicyPage activeTab="returns" />} />
+          <Route path="/privacy-policy" element={<PolicyPage activeTab="privacy" />} />
+          <Route path="/terms-of-use" element={<PolicyPage activeTab="terms" />} />
+          <Route path="/policy/:tab" element={<PolicyPage />} />
+          <Route path="/policy" element={<PolicyPage activeTab="shipping" />} />
         </Routes>
       </main>
 

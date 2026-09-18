@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Loader2, Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
 import { ADMIN_EMAIL, isAdminEmail, normalizeLoginEmail, useAuth } from '../context/AuthContext';
 
 export default function AuthPage({ addToast, mode: modeProp }) {
@@ -20,6 +20,8 @@ export default function AuthPage({ addToast, mode: modeProp }) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     setError('');
@@ -110,7 +112,7 @@ export default function AuthPage({ addToast, mode: modeProp }) {
       <div className="auth-page-inner">
         <form className="auth-card glass" onSubmit={handleSubmit}>
           <Link to="/" className="auth-logo-link" aria-label="MEDI DROP home">
-            <img src="/medi-drop-logo-full.png" alt="MEDI DROP" className="auth-logo" />
+            <img src="/medidrop-brand-logo.png" alt="MEDI DROP" className="auth-logo" />
           </Link>
 
           <div className="auth-tabs">
@@ -181,7 +183,7 @@ export default function AuthPage({ addToast, mode: modeProp }) {
               <input
                 id="auth-password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 className="auth-input"
                 value={form.password}
                 onChange={handleChange}
@@ -190,6 +192,15 @@ export default function AuthPage({ addToast, mode: modeProp }) {
                 required
                 minLength={6}
               />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
 
@@ -201,7 +212,7 @@ export default function AuthPage({ addToast, mode: modeProp }) {
                 <input
                   id="auth-confirm"
                   name="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? 'text' : 'password'}
                   className="auth-input"
                   value={form.confirmPassword}
                   onChange={handleChange}
@@ -210,6 +221,15 @@ export default function AuthPage({ addToast, mode: modeProp }) {
                   required
                   minLength={6}
                 />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
           )}

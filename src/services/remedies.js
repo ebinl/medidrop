@@ -5,6 +5,7 @@ import {
   getDocs,
   onSnapshot,
   serverTimestamp,
+  setDoc,
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
@@ -71,16 +72,52 @@ export function dedupeRemedies(items = []) {
   );
 }
 
+const STORAGE_KEY = 'medi_drop_remedy_status_overrides';
+
+function getLocalOverrides() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLocalOverride(id, patch) {
+  try {
+    const current = getLocalOverrides();
+    current[String(id)] = { ...(current[String(id)] || {}), ...patch };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+  } catch (e) {
+    console.warn('Could not save local remedy override:', e);
+  }
+}
+
 /** Local catalog used when Firestore is empty, slow, or unavailable. */
 export function getLocalCatalog() {
+  const overrides = getLocalOverrides();
   return dedupeRemedies(
-    DEFAULT_MEDICINES.map((med) => ({
-      ...med,
-      image: med.image || REMEDY_IMAGE,
-      sortOrder: med.sortOrder ?? med.id,
-      isDefault: true,
-      fromFirestore: false,
-    }))
+    DEFAULT_MEDICINES.map((med) => {
+      const ov = overrides[med.id] || overrides[String(med.id)] || {};
+      const isLive = ov.isLive !== undefined ? ov.isLive : true;
+      const inStock =
+        ov.inStock !== undefined
+          ? ov.inStock
+          : ov.stock !== undefined
+          ? Number(ov.stock) > 0
+          : true;
+      const stock = ov.stock !== undefined ? Number(ov.stock) : inStock ? 30 : 0;
+      return {
+        ...med,
+        image: ov.image || med.image || REMEDY_IMAGE,
+        sortOrder: med.sortOrder ?? med.id,
+        isDefault: true,
+        fromFirestore: false,
+        isLive: Boolean(isLive),
+        inStock: Boolean(inStock),
+        stock: Math.max(0, stock),
+      };
+    })
   );
 }
 
@@ -95,6 +132,25 @@ async function commitBatchOps(ops) {
 
 function mapRemedyDoc(docSnap) {
   const data = docSnap.data();
+  const overrides = getLocalOverrides()[docSnap.id] || {};
+  const isLive = overrides.isLive !== undefined ? overrides.isLive : (data.isLive !== false);
+  const inStock =
+    overrides.inStock !== undefined
+      ? overrides.inStock
+      : data.inStock !== undefined
+      ? Boolean(data.inStock)
+      : data.stock != null
+      ? Number(data.stock) > 0
+      : true;
+  const stock =
+    overrides.stock !== undefined
+      ? Number(overrides.stock)
+      : data.stock != null
+      ? Number(data.stock)
+      : inStock
+      ? 30
+      : 0;
+
   return {
     id: docSnap.id,
     name: data.name,
@@ -109,6 +165,9 @@ function mapRemedyDoc(docSnap) {
     createdAt: data.createdAt?.toDate?.() ?? null,
     fromFirestore: true,
     isDefault: Boolean(data.isDefault),
+    isLive: Boolean(isLive),
+    inStock: Boolean(inStock),
+    stock: Math.max(0, stock),
   };
 }
 
@@ -235,6 +294,15 @@ export async function addRemedy(data) {
     throw err;
   }
 
+  const isLive = data.isLive !== false;
+  const inStock = data.inStock !== false;
+  const stock =
+    data.stock !== undefined && data.stock !== ''
+      ? Math.max(0, Number(data.stock))
+      : inStock
+      ? 30
+      : 0;
+
   const docRef = await addDoc(remediesRef, {
     name,
     scientificName: (data.scientificName || '').trim(),
@@ -243,18 +311,33 @@ export async function addRemedy(data) {
     price: Number(data.price) || 0,
     minQuantity: Math.max(1, Number(data.minQuantity) || 1),
     benefits,
-    image: REMEDY_IMAGE,
+    image: data.image || REMEDY_IMAGE,
     sortOrder: Date.now(),
     isDefault: false,
+    isLive,
+    inStock,
+    stock,
     createdAt: serverTimestamp(),
   });
+
+  saveLocalOverride(docRef.id, { isLive, inStock, stock, ...(data.image ? { image: data.image } : {}) });
   return docRef.id;
 }
 
 export async function updateRemedy(id, data) {
   const benefits = parseBenefits(data.benefits);
+  const isLive = data.isLive !== false;
+  const inStock = data.inStock !== false;
+  const stock =
+    data.stock !== undefined && data.stock !== ''
+      ? Math.max(0, Number(data.stock))
+      : inStock
+      ? 30
+      : 0;
 
-  await updateDoc(doc(db, 'remedies', id), {
+  saveLocalOverride(id, { isLive, inStock, stock, ...(data.image ? { image: data.image } : {}) });
+
+  const updatePayload = {
     name: data.name.trim(),
     scientificName: (data.scientificName || '').trim(),
     category: (data.category || '').trim(),
@@ -262,9 +345,71 @@ export async function updateRemedy(id, data) {
     price: Number(data.price) || 0,
     minQuantity: Math.max(1, Number(data.minQuantity) || 1),
     benefits,
-    image: data.image || REMEDY_IMAGE,
+    isLive,
+    inStock,
+    stock,
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  if (data.image) {
+    updatePayload.image = data.image;
+  }
+
+  await updateDoc(doc(db, 'remedies', String(id)), updatePayload);
+}
+
+/** Toggles website visibility: Live (shown on website) vs Not Live (hidden from website) */
+export async function toggleRemedyLiveStatus(id, currentIsLive) {
+  const nextIsLive = !currentIsLive;
+  saveLocalOverride(id, { isLive: nextIsLive });
+
+  try {
+    await updateDoc(doc(db, 'remedies', String(id)), {
+      isLive: nextIsLive,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn('Firestore update failed for toggleRemedyLiveStatus (local override saved):', err);
+  }
+
+  return { isLive: nextIsLive };
+}
+
+/** Toggles stock availability: In Stock vs Out of Stock */
+export async function toggleRemedyStockStatus(id, currentInStock) {
+  const nextInStock = !currentInStock;
+  const nextStock = nextInStock ? 30 : 0;
+  saveLocalOverride(id, { inStock: nextInStock, stock: nextStock });
+
+  try {
+    await updateDoc(doc(db, 'remedies', String(id)), {
+      inStock: nextInStock,
+      stock: nextStock,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn('Firestore update failed for toggleRemedyStockStatus (local override saved):', err);
+  }
+
+  return { inStock: nextInStock, stock: nextStock };
+}
+
+export async function updateRemedyStock(id, newStock) {
+  const stockNum = Math.max(0, Number(newStock) || 0);
+  const inStock = stockNum > 0;
+  saveLocalOverride(id, { stock: stockNum, inStock });
+
+  try {
+    await updateDoc(doc(db, 'remedies', String(id)), {
+      stock: stockNum,
+      inStock,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn('Firestore update failed for updateRemedyStock (local override saved):', err);
+  }
+
+  return { stock: stockNum, isLive };
 }
 
 export function subscribeRemedies(onData, onError) {
@@ -280,4 +425,34 @@ export function subscribeRemedies(onData, onError) {
       onError?.(err);
     }
   );
+}
+
+export function subscribeRemediesHeader(onData, onError) {
+  const headerRef = doc(db, 'settings', 'remedies_header');
+  return onSnapshot(
+    headerRef,
+    (docSnap) => {
+      if (docSnap.exists()) {
+        onData(docSnap.data());
+      } else {
+        onData({
+          title: 'Select Homeopathic Remedies',
+          description: 'Explore pure organic dilutions prepared with care. Check minimum quantities before adding remedies to your cart.'
+        });
+      }
+    },
+    (err) => {
+      console.warn('Remedies header subscribe failed:', err);
+      onError?.(err);
+    }
+  );
+}
+
+export async function updateRemediesHeader(data) {
+  const headerRef = doc(db, 'settings', 'remedies_header');
+  await setDoc(headerRef, {
+    title: data.title.trim(),
+    description: data.description.trim(),
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
 }
