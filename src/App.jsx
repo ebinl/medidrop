@@ -12,7 +12,6 @@ import AuthPage from './pages/AuthPage';
 import PolicyPage from './pages/PolicyPage';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
-import HomeoBackgroundDrop from './components/HomeoBackgroundDrop';
 import { AuthProvider } from './context/AuthContext';
 
 function AppShell() {
@@ -98,7 +97,6 @@ function AppShell() {
 
   return (
     <div className={`app-container ${isAdminRoute ? 'app-admin' : ''} ${isAuthRoute ? 'app-auth' : ''} ${isHome ? 'app-home' : ''} ${hasPageBg ? 'app-page-bg' : ''}`}>
-      {hasPageBg && <HomeoBackgroundDrop />}
       {!hideChrome && (
         <Navbar
           cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
