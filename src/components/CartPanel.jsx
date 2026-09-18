@@ -91,7 +91,7 @@ export default function CartPanel({ isOpen, onClose, cartItems, onUpdateQty, onR
 
       const bodyText = `Dear ${formData.name},\n\nThank you for choosing MEDI DROP.net! Your homeopathic order details are listed below.\n\n===========================================\nORDER DETAILS\n===========================================\n\n${medicineDetailsText}\n\n-------------------------------------------\nSubtotal: ₹${getSubtotal()}\nDelivery Charges: ₹${getDeliveryCharge() === 0 ? 'FREE' : '₹60'}\nTotal Amount payable: ₹${getTotal()}\n\n===========================================\nSHIPPING & CUSTOMER DETAILS\n===========================================\nPatient Name: ${formData.name}\nPersonal Email: ${formData.email}\nPhone Number: ${formData.phone}\nShipping Address:\n${formData.address}\n\n===========================================\n\nThis is a drafted order summary. We have loaded these details directly into your email client. Please send this email to confirm your dispatch. Our clinical pharmacy team will package and ship your medicine drops immediately!\n\nBest Regards,\nClinical Dispatch Team\nMEDI DROP.net Homeopathic Clinic`;
 
-      const mailtoUrl = `mailto:${formData.email}?cc=orders@medidrop.net&subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+      const mailtoUrl = `mailto:${formData.email}?cc=medidrop.co.in@gmail.com&subject=${subject}&body=${encodeURIComponent(bodyText)}`;
       window.location.href = mailtoUrl;
 
       addToast({

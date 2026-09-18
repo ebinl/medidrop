@@ -135,9 +135,9 @@ export default function PolicyPage({ activeTab: initialTab }) {
                     <Phone size={15} />
                     <span>+91 97467 58698</span>
                   </a>
-                  <a href="mailto:hello@medidrop.net" className="policy-contact-link">
+                  <a href="mailto:medidrop.co.in@gmail.com" className="policy-contact-link">
                     <Mail size={14} />
-                    <span>hello@medidrop.net</span>
+                    <span>medidrop.co.in@gmail.com</span>
                   </a>
                   <div className="policy-contact-hours">
                     <Clock size={13} />
@@ -168,7 +168,7 @@ export default function PolicyPage({ activeTab: initialTab }) {
                   <Phone size={16} />
                   <span>Call +91 97467 58698</span>
                 </a>
-                <a href="mailto:hello@medidrop.net" className="btn btn-outline">
+                <a href="mailto:medidrop.co.in@gmail.com" className="btn btn-outline">
                   <Mail size={16} />
                   <span>Email Support</span>
                 </a>
@@ -239,7 +239,7 @@ function ShippingPolicyContent() {
 
       <h2>6. Damaged or Lost Shipments</h2>
       <p>
-        If your package appears opened, tampered with, or damaged during transit, please take a photograph and notify our support desk immediately at <strong>+91 9746758698</strong> or <strong>hello@medidrop.net</strong>. We provide immediate free replacement with express priority.
+        If your package appears opened, tampered with, or damaged during transit, please take a photograph and notify our support desk immediately at <strong>+91 9746758698</strong> or <strong>medidrop.co.in@gmail.com</strong>. We provide immediate free replacement with express priority.
       </p>
     </article>
   );
@@ -265,7 +265,7 @@ function ReturnsPolicyContent() {
       <h2>3. Step-by-Step Claim Procedure</h2>
       <ol>
         <li>
-          <strong>Contact Support:</strong> Reach our customer care team via WhatsApp or call at <strong>+91 9746758698</strong> or email <strong>hello@medidrop.net</strong> within 7 days of delivery.
+          <strong>Contact Support:</strong> Reach our customer care team via WhatsApp or call at <strong>+91 9746758698</strong> or email <strong>medidrop.co.in@gmail.com</strong> within 7 days of delivery.
         </li>
         <li>
           <strong>Provide Proof:</strong> Share your Order ID (e.g. <code>MD-ORD-XXXX</code>) and clear photos of the damaged or incorrect medicines.
@@ -336,7 +336,7 @@ function PrivacyPolicyContent() {
       <div className="policy-officer-card">
         <strong>Privacy & Grievance Desk · MEDI DROP</strong>
         <p>Helpline: <a href="tel:9746758698">+91 97467 58698</a></p>
-        <p>Email: <a href="mailto:hello@medidrop.net">hello@medidrop.net</a></p>
+        <p>Email: <a href="mailto:medidrop.co.in@gmail.com">medidrop.co.in@gmail.com</a></p>
         <p>Hours: Monday – Saturday · 10:00 AM – 8:00 PM IST</p>
       </div>
     </article>
@@ -387,7 +387,7 @@ function TermsPolicyContent() {
 
       <h2>7. Customer Service Helpline</h2>
       <p>
-        For inquiries regarding terms, orders, or consultations, please contact us at <strong>+91 9746758698</strong> or email <strong>hello@medidrop.net</strong>.
+        For inquiries regarding terms, orders, or consultations, please contact us at <strong>+91 9746758698</strong> or email <strong>medidrop.co.in@gmail.com</strong>.
       </p>
     </article>
   );
