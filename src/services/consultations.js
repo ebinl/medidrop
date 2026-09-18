@@ -104,7 +104,7 @@ export async function deleteConsultation(id) {
   saveLocalConsultations(local);
 
   try {
-    window.dispatchEvent(new CustomEvent('medidrop_consultations_updated', { detail: local }));
+    window.dispatchEvent(new CustomEvent('medidrop_consultations_updated', { detail: local })); h
   } catch {
     // ignore
   }
@@ -166,7 +166,7 @@ export function subscribeConsultations(onData, onError) {
   window.addEventListener('medidrop_consultations_updated', handleLocalUpdate);
 
   // 3. Firestore snapshot listener
-  let unsubFirestore = () => {};
+  let unsubFirestore = () => { };
   try {
     const q = query(consultationsRef, orderBy('createdAt', 'desc'));
     unsubFirestore = onSnapshot(
