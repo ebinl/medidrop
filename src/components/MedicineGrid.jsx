@@ -24,6 +24,12 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
 
   const distinctMedicines = useMemo(() => dedupeRemedies(medicines), [medicines]);
 
+  // Only remedies marked Live are shown on the public website. Not Live remedies are hidden completely.
+  const visibleMedicines = useMemo(
+    () => distinctMedicines.filter((med) => med.isLive !== false),
+    [distinctMedicines]
+  );
+
   useEffect(() => {
     let cancelled = false;
 
@@ -101,14 +107,23 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
       )}
 
       <div className="medicines-grid">
-        {distinctMedicines.map((med) => {
+        {visibleMedicines.map((med) => {
+          const isOutOfStock = med.inStock === false || (med.stock != null && Number(med.stock) === 0);
           const selectedQty = quantities[med.id] || med.minQuantity;
           const isExpanded = !!expandedIds[med.id];
 
           return (
-            <article key={`${med.id}-${med.name}`} className="med-card">
+            <article
+              key={`${med.id}-${med.name}`}
+              className={`med-card ${isOutOfStock ? 'med-card-out-of-stock' : ''}`}
+            >
               <div className="med-card-media">
                 <span className="med-category">{med.category}</span>
+                {isOutOfStock && (
+                  <span className="med-out-of-stock-badge">
+                    Out of Stock
+                  </span>
+                )}
                 <img
                   src={med.image || REMEDY_IMAGE}
                   alt=""
@@ -149,15 +164,17 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
                   <div className="med-price-block">
                     <span className="med-price-label">From</span>
                     <span className="med-price">₹{med.price}</span>
-                    <span className="med-min-hint">Min {med.minQuantity} unit</span>
+                    <span className="med-min-hint">
+                      {isOutOfStock ? 'Out of stock' : `Min ${med.minQuantity} unit`}
+                    </span>
                   </div>
 
                   <div className="med-actions">
-                    <div className="med-qty">
+                    <div className={`med-qty ${isOutOfStock ? 'med-qty-disabled' : ''}`}>
                       <button
                         type="button"
                         onClick={() => handleDecrement(med.id, med.minQuantity)}
-                        disabled={selectedQty <= med.minQuantity}
+                        disabled={isOutOfStock || selectedQty <= med.minQuantity}
                         aria-label="Decrease quantity"
                       >
                         −
@@ -166,6 +183,7 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
                       <button
                         type="button"
                         onClick={() => handleIncrement(med.id)}
+                        disabled={isOutOfStock}
                         aria-label="Increase quantity"
                       >
                         +
@@ -174,11 +192,19 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
 
                     <button
                       type="button"
-                      onClick={() => onAddToCart(med, selectedQty)}
-                      className="btn btn-primary med-add-btn"
+                      onClick={() => !isOutOfStock && onAddToCart(med, selectedQty)}
+                      disabled={isOutOfStock}
+                      className={`btn med-add-btn ${isOutOfStock ? 'med-btn-out-of-stock' : 'btn-primary'}`}
+                      title={isOutOfStock ? 'Currently out of stock' : 'Add to cart'}
                     >
-                      <ShoppingCart size={15} />
-                      <span>Add</span>
+                      {isOutOfStock ? (
+                        <span>Out of Stock</span>
+                      ) : (
+                        <>
+                          <ShoppingCart size={15} />
+                          <span>Add</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

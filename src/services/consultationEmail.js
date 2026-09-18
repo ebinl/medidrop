@@ -2,16 +2,12 @@ import emailjs from '@emailjs/browser';
 import { CONSULTATION_FEE, DOCTOR_NAME, DOCTOR_NOTIFY_EMAIL } from '../config/clinic';
 
 function formatPaymentReference(data) {
-  if (data.paymentMethod === 'upi') {
-    return `UPI reference: ${data.upiRefNo || '—'}`;
-  }
-  const holder = data.cardHolder?.trim() || '—';
-  const last4 = data.cardLast4 || '****';
-  return `Card payment · ${holder} · ending ${last4}`;
+  const ref = data.upiLast4 || data.upiRefNo;
+  return ref ? `UPI Txn ID (last 4 digits): ${ref}` : 'UPI payment confirmed';
 }
 
 function buildConsultationSummary(data) {
-  const paymentMethod = data.paymentMethod === 'upi' ? 'UPI' : 'Credit / Debit Card';
+  const paymentMethod = 'UPI (Google Pay / PhonePe)';
   const lines = [
     'New MEDI DROP consultation booking',
     '',
@@ -36,7 +32,7 @@ function buildConsultationSummary(data) {
 }
 
 function buildTemplateParams(data) {
-  const paymentMethod = data.paymentMethod === 'upi' ? 'UPI' : 'Credit / Debit Card';
+  const paymentMethod = 'UPI (Google Pay / PhonePe)';
 
   return {
     to_email: DOCTOR_NOTIFY_EMAIL,

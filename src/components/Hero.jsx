@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Video, Calendar, ShieldCheck, Stethoscope, Users } from 'lucide-react';
+import { Calendar, ShieldCheck, Stethoscope, Users } from 'lucide-react';
 
 export default function Hero({ onConsultationClick }) {
   return (
@@ -32,7 +32,7 @@ export default function Hero({ onConsultationClick }) {
               onClick={onConsultationClick}
               className="btn btn-secondary hero-cta-btn hero-cta-pulse"
             >
-              <Video size={20} />
+              <Stethoscope size={20} />
               <span>Consult (₹99)</span>
             </button>
           </div>

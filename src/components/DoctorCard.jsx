@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Award, Briefcase, GraduationCap, Stethoscope, Mail, Video, Clock, Languages } from 'lucide-react';
+import { Award, Briefcase, GraduationCap, Stethoscope, Mail, Clock, Languages } from 'lucide-react';
 
 const DOCTOR = {
   name: 'Dr. Ancy Shaji',
@@ -104,8 +104,8 @@ export default function DoctorCard({ onConsultationClick }) {
               Contact Us
             </button>
             <button type="button" className="btn btn-primary" onClick={onConsultationClick}>
-              <Video size={16} />
-              Get Consultation (₹99)
+              <Stethoscope size={16} />
+              Online Consultation (₹99)
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Video, Menu, X, Sun, Moon, Pill, LogIn, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, Stethoscope, Menu, X, Sun, Moon, Pill, LogIn, LogOut, User, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const THEME_KEY = 'medidrop-theme';
@@ -60,7 +60,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
 
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth > 768) setMenuOpen(false);
+      if (window.innerWidth > 1100) setMenuOpen(false);
     };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
@@ -173,7 +173,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
         Contact
       </NavLink>
       <button type="button" onClick={handleConsult} className="btn btn-outline nav-consult-btn">
-        <Video size={16} />
+        <Stethoscope size={16} />
         <span>Consult Doctor</span>
       </button>
       {authDesktop}
@@ -190,10 +190,34 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
         Contact
       </NavLink>
       <button type="button" onClick={handleConsult} className="btn btn-outline nav-consult-btn nav-consult-mobile">
-        <Video size={16} />
+        <Stethoscope size={16} />
         <span>Consult Doctor</span>
       </button>
       {authMobile}
+      <div className="nav-mobile-divider" />
+      <button
+        type="button"
+        onClick={() => { closeMenu(); onCartClick(); }}
+        className="nav-link nav-mobile-action-row"
+      >
+        <span className="nav-mobile-action-label">
+          <ShoppingCart size={17} />
+          <span>Shopping Cart</span>
+        </span>
+        {cartCount > 0 && (
+          <span className="badge badge-primary">{cartCount}</span>
+        )}
+      </button>
+      <button
+        type="button"
+        onClick={toggleTheme}
+        className="nav-link nav-mobile-action-row"
+      >
+        <span className="nav-mobile-action-label">
+          {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+          <span>{theme === 'light' ? 'Dark Mode (DND)' : 'Light Mode (DND)'}</span>
+        </span>
+      </button>
     </>
   );
 
@@ -217,42 +241,10 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
             type="button"
             onClick={toggleTheme}
             className="nav-theme-btn"
-            aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
-            title={theme === 'light' ? 'Dark mode' : 'Light mode'}
+            aria-label={theme === 'light' ? 'Switch to dark theme (DND)' : 'Switch to light theme (DND)'}
+            title={theme === 'light' ? 'Dark mode (DND)' : 'Light mode (DND)'}
           >
             {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-          </button>
-
-          <Link
-            to="/remedies"
-            className="nav-remedies-icon-btn"
-            aria-label="Remedies"
-            onClick={closeMenu}
-          >
-            <Pill size={18} strokeWidth={2.25} />
-            <span>Remedies</span>
-          </Link>
-
-          {!user && (
-            <Link
-              to="/login"
-              className="nav-auth-icon-btn"
-              aria-label="Login"
-              onClick={closeMenu}
-            >
-              <LogIn size={18} strokeWidth={2.25} />
-              <span>Login</span>
-            </Link>
-          )}
-
-          <button
-            type="button"
-            onClick={handleConsult}
-            className="nav-consult-icon-btn"
-            aria-label="Consult"
-          >
-            <Video size={18} strokeWidth={2.25} />
-            <span>Consult</span>
           </button>
 
           <button
@@ -260,6 +252,7 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
             onClick={onCartClick}
             className="nav-cart-btn"
             aria-label="Open cart"
+            title="Cart"
           >
             <ShoppingCart size={20} />
             {cartCount > 0 && (

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { X, Trash2, Mail, MapPin, Phone, User, ShoppingBag, ArrowRight, Package, Truck, Pill } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+import { submitOrder } from '../services/orders';
+
 export default function CartPanel({ isOpen, onClose, cartItems, onUpdateQty, onRemoveItem, onClearCart, addToast }) {
   const navigate = useNavigate();
   const [isClosing, setIsClosing] = useState(false);
@@ -45,7 +47,7 @@ export default function CartPanel({ isOpen, onClose, cartItems, onUpdateQty, onR
     return null;
   };
 
-  const handleCheckoutSubmit = (e) => {
+  const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
     const errorMsg = validateForm();
     if (errorMsg) {
@@ -54,6 +56,25 @@ export default function CartPanel({ isOpen, onClose, cartItems, onUpdateQty, onR
     }
 
     setIsSubmitting(true);
+
+    try {
+      // Save order to Firestore and local storage so Admin can see it immediately in Orders Placed
+      await submitOrder({
+        patient: {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+        },
+        items: cartItems,
+        subtotal: getSubtotal(),
+        deliveryCharge: getDeliveryCharge(),
+        total: getTotal(),
+        itemCount,
+      });
+    } catch (orderErr) {
+      console.warn('Could not save order to Firestore:', orderErr);
+    }
 
     setTimeout(() => {
       confetti({
@@ -74,8 +95,8 @@ export default function CartPanel({ isOpen, onClose, cartItems, onUpdateQty, onR
       window.location.href = mailtoUrl;
 
       addToast({
-        title: 'Order Processed!',
-        message: 'Details loaded into your mail client. Please click send to finalize.',
+        title: 'Order Placed Successfully!',
+        message: 'Order recorded for clinical packaging. Details loaded into your mail client.',
         type: 'success',
         duration: 5000
       });
@@ -85,7 +106,7 @@ export default function CartPanel({ isOpen, onClose, cartItems, onUpdateQty, onR
       setStep(1);
       setFormData({ name: '', email: '', phone: '', address: '' });
       handleClose();
-    }, 2000);
+    }, 1200);
   };
 
   if (!isOpen) return null;
