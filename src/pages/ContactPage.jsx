@@ -92,7 +92,7 @@ export default function ContactPage({ onConsultationClick, addToast }) {
                 <span className="contact-info-icon"><Mail size={16} /></span>
                 <div>
                   <strong>Email</strong>
-                  <a href="mailto:hello@medidrop.net">hello@medidrop.net</a>
+                  <a href="mailto:medidrop.co.in@gmail.com">medidrop.co.in@gmail.com</a>
                 </div>
               </li>
               <li>

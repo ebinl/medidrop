@@ -54,7 +54,7 @@ export default function Footer({ onConsultationClick }) {
               </li>
               <li>
                 <Mail size={14} />
-                <a href="mailto:hello@medidrop.net" className="footer-contact-link">hello@medidrop.net</a>
+                <a href="mailto:medidrop.co.in@gmail.com" className="footer-contact-link">medidrop.co.in@gmail.com</a>
               </li>
               <li>
                 <MapPin size={14} />

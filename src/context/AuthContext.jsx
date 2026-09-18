@@ -11,9 +11,9 @@ import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
 /** Primary admin credentials for the shared login page. */
-export const ADMIN_EMAIL = 'admin@medidrop.com';
+export const ADMIN_EMAIL = 'medidrop.co.in@gmail.com';
 export const ADMIN_PASSWORD = 'Admin@2026';
-export const ADMIN_EMAILS = [ADMIN_EMAIL];
+export const ADMIN_EMAILS = [ADMIN_EMAIL, 'admin@medidrop.com'];
 
 const ADMIN_SESSION_KEY = 'medidrop-admin-session';
 
@@ -86,7 +86,8 @@ export function isAdminEmail(email) {
 }
 
 function isAdminCredentials(email, password) {
-  return normalizeLoginEmail(email) === ADMIN_EMAIL && String(password) === ADMIN_PASSWORD;
+  const normalized = normalizeLoginEmail(email);
+  return (normalized === ADMIN_EMAIL || isAdminEmail(normalized)) && String(password) === ADMIN_PASSWORD;
 }
 
 async function saveAdminProfile(user) {
