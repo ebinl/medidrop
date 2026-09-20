@@ -8,10 +8,12 @@ import {
   subscribeRemedies,
   subscribeRemediesHeader,
 } from '../services/remedies';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export { DEFAULT_MEDICINES as MEDICINES, REMEDY_IMAGE };
 
 export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
+  const sectionRef = useScrollReveal('[data-reveal]');
   const [medicines, setMedicines] = useState(() => getLocalCatalog());
   const [quantities, setQuantities] = useState(() =>
     DEFAULT_MEDICINES.reduce((acc, med) => ({ ...acc, [med.id]: med.minQuantity }), {})
@@ -95,9 +97,9 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
   };
 
   return (
-    <section id="medicines" className={`medicines-section ${compactHeader ? 'medicines-section-compact' : ''}`}>
+    <section id="medicines" className={`medicines-section ${compactHeader ? 'medicines-section-compact' : ''}`} ref={sectionRef}>
       {!compactHeader && (
-        <div className="section-header medicines-header">
+        <div className="section-header medicines-header" data-reveal="fade-down">
           <span className="section-eyebrow">Doctor Recommended</span>
           <h2 className="section-title medicines-title">{headerSettings.title}</h2>
           <p className="section-desc">
@@ -107,15 +109,18 @@ export default function MedicineGrid({ onAddToCart, compactHeader = false }) {
       )}
 
       <div className="medicines-grid">
-        {visibleMedicines.map((med) => {
+        {visibleMedicines.map((med, idx) => {
           const isOutOfStock = med.inStock === false || (med.stock != null && Number(med.stock) === 0);
           const selectedQty = quantities[med.id] || med.minQuantity;
           const isExpanded = !!expandedIds[med.id];
 
+          const stagger = (idx % 8) + 1;
           return (
             <article
               key={`${med.id}-${med.name}`}
               className={`med-card ${isOutOfStock ? 'med-card-out-of-stock' : ''}`}
+              data-reveal="scale"
+              data-stagger={stagger}
             >
               <div className="med-card-media">
                 <span className="med-category">{med.category}</span>

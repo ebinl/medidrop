@@ -118,7 +118,7 @@ function AppShell() {
               />
             }
           />
-          <Route path="/remedies" element={<RemediesPage onAddToCart={handleAddToCart} />} />
+          <Route path="/remedies" element={<RemediesPage onAddToCart={handleAddToCart} onConsultationClick={() => setIsConsultationOpen(true)} />} />
           <Route
             path="/contact"
             element={

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import {
   ShieldCheck,
   Truck,
@@ -63,6 +64,8 @@ export default function PolicyPage({ activeTab: initialTab }) {
   };
 
   const [tab, setTab] = useState(getTabFromPath);
+  const heroRef = useScrollReveal('[data-reveal]');
+  const layoutRef = useScrollReveal('[data-reveal]');
 
   useEffect(() => {
     setTab(getTabFromPath());
@@ -75,9 +78,9 @@ export default function PolicyPage({ activeTab: initialTab }) {
   return (
     <div className="policy-page">
       {/* Hero Header */}
-      <section className="policy-hero">
+      <section className="policy-hero" ref={heroRef}>
         <div className="policy-hero-inner">
-          <div className="remedies-hero-meta">
+          <div className="remedies-hero-meta" data-reveal="fade-down" data-stagger="1">
             <Link to="/" className="remedies-back">
               <ArrowLeft size={15} strokeWidth={2.25} />
               <span>Back to Home</span>
@@ -88,9 +91,9 @@ export default function PolicyPage({ activeTab: initialTab }) {
               <span>{activePolicy.badge}</span>
             </div>
           </div>
-          <h1>{activePolicy.title}</h1>
-          <p>{activePolicy.summary}</p>
-          <div className="policy-last-updated">
+          <h1 data-reveal="fade-up" data-stagger="2">{activePolicy.title}</h1>
+          <p data-reveal="fade-up" data-stagger="3">{activePolicy.summary}</p>
+          <div className="policy-last-updated" data-reveal="fade-up" data-stagger="4">
             <span>Last Updated: September 2026</span>
             <span className="policy-dot">•</span>
             <span>Official Policy for MEDI DROP</span>
@@ -100,13 +103,13 @@ export default function PolicyPage({ activeTab: initialTab }) {
 
       {/* Main Content Layout */}
       <section className="policy-content-section">
-        <div className="policy-layout">
+        <div className="policy-layout" ref={layoutRef}>
           {/* Sidebar Nav */}
           <aside className="policy-sidebar">
-            <div className="glass policy-sidebar-card">
-              <h3 className="policy-sidebar-title">Support & Legal</h3>
+            <div className="glass policy-sidebar-card" data-reveal="slide-left">
+              <h3 className="policy-sidebar-title">Support &amp; Legal</h3>
               <nav className="policy-nav-list" aria-label="Policies">
-                {Object.values(POLICIES).map((item) => {
+                {Object.values(POLICIES).map((item, idx) => {
                   const Icon = item.icon;
                   const isActive = tab === item.id;
                   return (
@@ -115,6 +118,8 @@ export default function PolicyPage({ activeTab: initialTab }) {
                       type="button"
                       onClick={() => setTab(item.id)}
                       className={`policy-nav-item ${isActive ? 'active' : ''}`}
+                      data-reveal="tab"
+                      data-stagger={idx + 1}
                     >
                       <Icon size={16} />
                       <span>{item.shortTitle}</span>
@@ -149,7 +154,7 @@ export default function PolicyPage({ activeTab: initialTab }) {
           </aside>
 
           {/* Policy Body */}
-          <main className="glass policy-article-panel">
+          <main className="glass policy-article-panel" data-reveal="slide-right">
             {tab === 'shipping' && <ShippingPolicyContent />}
             {tab === 'returns' && <ReturnsPolicyContent />}
             {tab === 'privacy' && <PrivacyPolicyContent />}
