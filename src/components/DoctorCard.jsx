@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Award, Briefcase, GraduationCap, Stethoscope, Mail, Clock, Languages } from 'lucide-react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const DOCTOR = {
   name: 'Dr. Ancy Shaji',
@@ -20,15 +21,16 @@ const DOCTOR = {
 
 export default function DoctorCard({ onConsultationClick }) {
   const navigate = useNavigate();
+  const sectionRef = useScrollReveal('[data-reveal]');
 
   return (
-    <section id="doctor" className="doctor-section">
-      <div className="section-header">
+    <section id="doctor" className="doctor-section" ref={sectionRef}>
+      <div className="section-header" data-reveal="fade-down">
         <span className="section-eyebrow">Meet Your Doctor</span>
         <h2 className="section-title">Consulting Physician</h2>
       </div>
 
-      <article className="glass doctor-card">
+      <article className="glass doctor-card" data-reveal="slide-left">
         <div className="doctor-card-media">
           <img
             src={DOCTOR.image}

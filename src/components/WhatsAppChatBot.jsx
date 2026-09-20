@@ -237,7 +237,7 @@ export default function WhatsAppChatBot({ onConsultationClick, onAddToCart, addT
     };
   }, [onDragMove, onDragEnd]);
 
-  const handleSendMessage = (textToSend) => {
+  const handleSendMessage = async (textToSend) => {
     const text = (textToSend || inputValue).trim();
     if (!text) return;
 
@@ -252,9 +252,9 @@ export default function WhatsAppChatBot({ onConsultationClick, onAddToCart, addT
     setInputValue('');
     setIsTyping(true);
 
-    // AI Response simulation with organic delay (700-1100ms)
-    setTimeout(() => {
-      const botReply = getChatbotResponse(text, messages);
+    try {
+      // Call AI (Gemini or rule-based fallback) — pass full conversation history
+      const botReply = await getChatbotResponse(text, messages);
       const newBotMsg = {
         id: `bot-${Date.now()}`,
         sender: 'bot',
@@ -264,11 +264,11 @@ export default function WhatsAppChatBot({ onConsultationClick, onAddToCart, addT
         showWhatsAppCTA: botReply.showWhatsAppCTA || false,
         whatsappPrefillText: botReply.whatsappPrefillText || `Inquiry from MEDI DROP: "${text}"`,
         quickReplies: botReply.quickReplies || null,
+        isAiPowered: botReply.isAiPowered || false,
         time: formatTime()
       };
 
       setMessages((prev) => [...prev, newBotMsg]);
-      setIsTyping(false);
 
       if (soundEnabled) {
         playChime();
@@ -277,8 +277,21 @@ export default function WhatsAppChatBot({ onConsultationClick, onAddToCart, addT
       if (!isOpen) {
         setUnreadCount((prev) => prev + 1);
       }
-    }, 850);
+    } catch (err) {
+      console.error('[MEDI DROP Chat] Error:', err);
+      setMessages((prev) => [...prev, {
+        id: `bot-err-${Date.now()}`,
+        sender: 'bot',
+        text: `I'm having trouble connecting right now. Please try again, or chat with **${CLINIC_DOCTOR_NAME}** directly on WhatsApp at **${CLINIC_PHONE_DISPLAY}**. 📱`,
+        showWhatsAppCTA: true,
+        whatsappPrefillText: `Hello Dr. Ancy, I tried the MEDI DROP chatbot but had a connection issue.`,
+        time: formatTime()
+      }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
+
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -515,6 +528,12 @@ export default function WhatsAppChatBot({ onConsultationClick, onAddToCart, addT
                   <div className="whatsapp-bubble-content">
                     {renderFormattedText(msg.text)}
                   </div>
+                  {msg.isAiPowered && (
+                    <div className="whatsapp-ai-badge">
+                      <Sparkles size={9} />
+                      <span>Gemini AI</span>
+                    </div>
+                  )}
 
                   {/* Optional Remedy Card */}
                   {msg.remedy && (

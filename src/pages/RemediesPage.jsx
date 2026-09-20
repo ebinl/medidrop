@@ -2,8 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Leaf } from 'lucide-react';
 import MedicineGrid from '../components/MedicineGrid';
+import TreatmentTabs from '../components/TreatmentTabs';
 
-export default function RemediesPage({ onAddToCart }) {
+export default function RemediesPage({ onAddToCart, onConsultationClick }) {
   return (
     <div className="remedies-page">
       <section className="remedies-hero">
@@ -25,6 +26,8 @@ export default function RemediesPage({ onAddToCart }) {
           </p>
         </div>
       </section>
+
+      <TreatmentTabs onConsultationClick={onConsultationClick} />
 
       <MedicineGrid onAddToCart={onAddToCart} compactHeader />
     </div>

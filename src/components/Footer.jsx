@@ -1,13 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 
 export default function Footer({ onConsultationClick }) {
+  const footerRef = useScrollReveal('[data-reveal]');
   return (
-    <footer className="glass site-footer">
+    <footer className="glass site-footer" ref={footerRef}>
       <div className="footer-inner">
         <div className="footer-grid">
-          <div className="footer-col footer-brand-col">
+          <div className="footer-col footer-brand-col" data-reveal="fade-up" data-stagger="1">
             <Link to="/" className="footer-logo-link" aria-label="MEDI DROP home">
               <img
                 src="/medidrop-brand-logo.png"
@@ -20,7 +22,7 @@ export default function Footer({ onConsultationClick }) {
             </p>
           </div>
 
-          <div className="footer-col">
+          <div className="footer-col" data-reveal="fade-up" data-stagger="2">
             <h4 className="footer-heading">Quick Links</h4>
             <ul className="footer-links">
               <li><Link to="/">Home</Link></li>
@@ -35,7 +37,7 @@ export default function Footer({ onConsultationClick }) {
             </ul>
           </div>
 
-          <div className="footer-col">
+          <div className="footer-col" data-reveal="fade-up" data-stagger="3">
             <h4 className="footer-heading">Support</h4>
             <ul className="footer-links">
               <li><Link to="/shipping-policy">Shipping Policy</Link></li>
@@ -45,7 +47,7 @@ export default function Footer({ onConsultationClick }) {
             </ul>
           </div>
 
-          <div className="footer-col" id="footer-contact">
+          <div className="footer-col" id="footer-contact" data-reveal="fade-up" data-stagger="4">
             <h4 className="footer-heading">Contact</h4>
             <ul className="footer-contact">
               <li>

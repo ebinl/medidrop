@@ -657,6 +657,607 @@ body:has(.app-page-bg) {
   padding-top: clamp(1.5rem, 4vw, 2.5rem);
 }
 
+/* ── Treatment Tabs ──────────────────────────────────────────────────── */
+.treatment-tabs-section {
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1rem, 4vw, 2rem);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.treatment-tabs-header {
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* ── Tab Pills Row ─────────────────────────────────────────────────── */
+.treatment-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-bottom: clamp(1.75rem, 4vw, 3rem);
+}
+
+.treatment-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--card-border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(45, 41, 38, 0.05);
+  white-space: nowrap;
+}
+
+.treatment-pill:hover {
+  border-color: color-mix(in srgb, var(--pill-color, var(--primary)) 45%, transparent);
+  color: var(--pill-color, var(--primary));
+  background: color-mix(in srgb, var(--pill-color, var(--primary)) 8%, var(--surface));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.treatment-pill--active {
+  background: color-mix(in srgb, var(--pill-color, var(--primary)) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--pill-color, var(--primary)) 60%, transparent);
+  color: var(--pill-color, var(--primary));
+  box-shadow:
+    0 4px 18px color-mix(in srgb, var(--pill-color, var(--primary)) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px) scale(1.04);
+  animation: treatmentPillPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), treatmentPillGlow 3s ease-in-out infinite alternate;
+}
+
+.treatment-pill--active:hover {
+  transform: translateY(-2px) scale(1.06);
+}
+
+.treatment-pill-emoji {
+  font-size: 1.05rem;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.treatment-pill--active .treatment-pill-emoji {
+  animation: treatmentEmojiBounce 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.treatment-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pill-color, var(--primary));
+  box-shadow: 0 0 8px var(--pill-color, var(--primary));
+  animation: treatmentDotPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes treatmentPillPop {
+  0% { transform: scale(0.94); }
+  60% { transform: scale(1.07); }
+  100% { transform: scale(1.04); }
+}
+
+@keyframes treatmentPillGlow {
+  0% { box-shadow: 0 4px 14px color-mix(in srgb, var(--pill-color, var(--primary)) 22%, transparent); }
+  100% { box-shadow: 0 6px 22px color-mix(in srgb, var(--pill-color, var(--primary)) 40%, transparent); }
+}
+
+@keyframes treatmentEmojiBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35) rotate(-12deg); }
+  80% { transform: scale(0.92) rotate(6deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes treatmentDotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.5); opacity: 1; }
+}
+
+/* ── Treatment Panel ─────────────────────────────────────────────────── */
+.treatment-panel {
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 20px 50px rgba(45, 41, 38, 0.08);
+  overflow: hidden;
+  animation: treatmentPanelEntrance 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+[data-theme="dark"] .treatment-panel {
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes treatmentPanelEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Panel Hero (2 Columns: Info & AI Photo) ─────────────────────────── */
+.treatment-panel-hero {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--accent, var(--primary)) 12%, transparent) 0%,
+      color-mix(in srgb, var(--accent, var(--primary)) 4%, transparent) 100%),
+    var(--surface);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.treatment-panel-info {
+  flex: 1.2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animated Text Elements */
+.treatment-panel-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent, var(--primary));
+  margin-bottom: 0.55rem;
+  animation: treatmentTextSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+}
+
+.treatment-sparkle-icon {
+  color: var(--accent, var(--primary));
+}
+
+.treatment-panel-title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 3.2vw, 2rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: treatmentTextSlideUp 0.36s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+.treatment-title-emoji {
+  font-size: 1.4rem;
+}
+
+.treatment-panel-tagline {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent, var(--primary));
+  margin: 0 0 0.85rem;
+  opacity: 0.95;
+  animation: treatmentTextSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.treatment-panel-desc {
+  font-size: clamp(0.86rem, 1.8vw, 0.95rem);
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin: 0 0 1.25rem;
+  max-width: 640px;
+  animation: treatmentTextSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+}
+
+/* Symptom Tags */
+.treatment-symptom-tags {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  animation: treatmentTextSlideUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.treatment-tags-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.treatment-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.treatment-symptom-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent, var(--primary)) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent, var(--primary)) 25%, transparent);
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.treatment-symptom-chip:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--accent, var(--primary)) 14%, var(--surface));
+}
+
+.treatment-chip-icon {
+  color: var(--accent, var(--primary));
+  flex-shrink: 0;
+}
+
+@keyframes treatmentTextSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── AI Generated Photo Column ───────────────────────────────────────── */
+.treatment-panel-photo-col {
+  flex: 0 0 340px;
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  animation: treatmentPhotoSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+@keyframes treatmentPhotoSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.treatment-photo-card {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1.5px solid color-mix(in srgb, var(--accent, var(--primary)) 24%, var(--card-border));
+  box-shadow:
+    0 12px 32px rgba(45, 41, 38, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+[data-theme="dark"] .treatment-photo-card {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+}
+
+.treatment-photo-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 40px rgba(45, 41, 38, 0.16),
+    0 0 24px color-mix(in srgb, var(--accent, var(--primary)) 25%, transparent);
+}
+
+.treatment-photo-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.treatment-panel-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.treatment-photo-card:hover .treatment-panel-photo {
+  transform: scale(1.05);
+}
+
+.treatment-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.4) 100%);
+  pointer-events: none;
+}
+
+.treatment-photo-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(18, 18, 18, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.treatment-photo-caption {
+  padding: 0.85rem 1.1rem;
+  background: color-mix(in srgb, var(--accent, var(--primary)) 6%, var(--surface));
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.treatment-photo-caption-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.treatment-photo-caption-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ── Remedies Section & Grid ─────────────────────────────────────────── */
+.treatment-remedies-section {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.treatment-remedies-header {
+  margin-bottom: 1.25rem;
+}
+
+.treatment-remedies-title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.treatment-remedies-sub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.treatment-remedy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 1rem;
+}
+
+.treatment-remedy-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: clamp(1.1rem, 2.5vw, 1.4rem);
+  background: var(--surface);
+  border: 1.5px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(45, 41, 38, 0.04);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  cursor: default;
+  animation: treatmentCardEntrance 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 0.06s + 0.16s);
+}
+
+.treatment-remedy-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent, var(--primary)) 40%, transparent);
+  box-shadow: 0 10px 24px rgba(45, 41, 38, 0.08);
+}
+
+@keyframes treatmentCardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.treatment-remedy-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.treatment-remedy-name {
+  font-family: var(--font-heading);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+  line-height: 1.25;
+}
+
+.treatment-remedy-potency {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-tint);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  white-space: nowrap;
+}
+
+.treatment-remedy-use {
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+  flex: 1;
+}
+
+.treatment-remedy-footer {
+  margin-top: auto;
+  padding-top: 0.4rem;
+}
+
+.treatment-remedy-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.treatment-remedy-tag::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--secondary);
+  opacity: 0.75;
+}
+
+/* ── Panel CTA Banner ────────────────────────────────────────────────── */
+.treatment-panel-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: clamp(1.25rem, 3vw, 1.85rem) clamp(1.25rem, 3vw, 2.25rem);
+  border-top: 1px solid var(--card-border);
+  background: color-mix(in srgb, var(--primary-tint) 35%, transparent);
+}
+
+.treatment-cta-info {
+  flex: 1;
+  min-width: 260px;
+}
+
+.treatment-cta-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem;
+}
+
+.treatment-cta-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.treatment-cta-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.treatment-cta-btn {
+  gap: 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.25);
+}
+
+.treatment-whatsapp-btn {
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  padding: 0.55rem 1rem;
+  border-color: #25d366;
+  color: #128c7e;
+  background: rgba(37, 211, 102, 0.08);
+}
+
+.treatment-whatsapp-btn:hover {
+  background: #25d366;
+  color: #ffffff;
+  border-color: #25d366;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .treatment-panel-hero {
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .treatment-panel-photo-col {
+    flex: none;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .treatment-photo-img-wrap {
+    height: 240px;
+  }
+}
+
+@media (max-width: 600px) {
+  .treatment-remedy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .treatment-panel-cta {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .treatment-cta-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .treatment-cta-btn,
+  .treatment-whatsapp-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .treatment-pill {
+    font-size: 0.78rem;
+    padding: 0.48rem 0.9rem;
+  }
+}
+
 .home-remedies-more {
   display: flex;
   justify-content: center;
@@ -2482,6 +3083,258 @@ body:has(.app-page-bg) {
   100% { background-position: 0% 50%; }
 }
 
+/* ============================================================
+   SCROLL REVEAL ANIMATION SYSTEM
+   Elements with [data-reveal] start hidden and animate in
+   when the .is-visible class is added by IntersectionObserver
+   ============================================================ */
+
+/* --- Keyframes --- */
+@keyframes revealFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(36px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes revealFadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-28px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes revealSlideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes revealSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes revealScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(20px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes revealZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes revealTabPop {
+  0%   { opacity: 0; transform: translateY(12px) scale(0.94); }
+  60%  { transform: translateY(-3px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes revealUnderline {
+  from { transform: scaleX(0); opacity: 0; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+@keyframes revealTextShimmer {
+  0%   { background-position: -200% center; opacity: 0; }
+  40%  { opacity: 1; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes revealEyebrow {
+  from { opacity: 0; transform: translateY(10px) scaleX(0.8); letter-spacing: 0.3em; }
+  to   { opacity: 1; transform: translateY(0) scaleX(1); letter-spacing: inherit; }
+}
+
+/* --- Base hidden state for all reveal elements --- */
+[data-reveal] {
+  opacity: 0;
+  will-change: opacity, transform, filter;
+}
+
+/* Prevent layout shift for non-JS / already visible */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal], [data-reveal].is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* --- Animation variants --- */
+
+/* Default: fade up */
+[data-reveal="fade-up"].is-visible {
+  animation: revealFadeUp 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[data-reveal="fade-down"].is-visible {
+  animation: revealFadeDown 0.33s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[data-reveal="slide-left"].is-visible {
+  animation: revealSlideLeft 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[data-reveal="slide-right"].is-visible {
+  animation: revealSlideRight 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[data-reveal="scale"].is-visible {
+  animation: revealScaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+[data-reveal="zoom"].is-visible {
+  animation: revealZoomIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+[data-reveal="tab"].is-visible {
+  animation: revealTabPop 0.31s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+[data-reveal="eyebrow"].is-visible {
+  animation: revealEyebrow 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --- Staggered delays (apply to children with data-stagger) --- */
+[data-stagger="1"] { animation-delay: 0.025s !important; }
+[data-stagger="2"] { animation-delay: 0.06s !important; }
+[data-stagger="3"] { animation-delay: 0.095s !important; }
+[data-stagger="4"] { animation-delay: 0.13s !important; }
+[data-stagger="5"] { animation-delay: 0.165s !important; }
+[data-stagger="6"] { animation-delay: 0.20s !important; }
+[data-stagger="7"] { animation-delay: 0.235s !important; }
+[data-stagger="8"] { animation-delay: 0.27s !important; }
+
+/* --- Nav link reveal (slide down from top, staggered) --- */
+.nav-link[data-reveal],
+.nav-link[data-reveal].is-visible {
+  animation: revealFadeDown 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --- Section header reveal enhancements --- */
+.section-header[data-reveal].is-visible .section-eyebrow,
+.section-header[data-reveal].is-visible span.section-eyebrow {
+  animation: revealEyebrow 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Active tab underline slide-in */
+.policy-nav-item.active::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+  transform-origin: left center;
+  animation: revealUnderline 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Policy tab button reveal */
+.policy-nav-item[data-reveal].is-visible {
+  animation: revealTabPop 0.29s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Feature cards stagger */
+.feature-card[data-reveal].is-visible {
+  animation: revealScaleUp 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Medicine cards stagger */
+.med-card[data-reveal].is-visible {
+  animation: revealScaleUp 0.33s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Policy article headings */
+.policy-article h2[data-reveal].is-visible {
+  animation: revealSlideLeft 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.policy-article p[data-reveal].is-visible,
+.policy-article ul[data-reveal].is-visible,
+.policy-article ol[data-reveal].is-visible {
+  animation: revealFadeUp 0.33s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Policy grid cards */
+.policy-card-item[data-reveal].is-visible {
+  animation: revealScaleUp 0.33s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Hero title big reveal */
+.hero-title[data-reveal].is-visible,
+h1[data-reveal].is-visible {
+  animation: revealFadeUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* CTA section */
+.consult-cta-panel[data-reveal].is-visible {
+  animation: revealScaleUp 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* DoctorCard */
+.doctor-card[data-reveal].is-visible {
+  animation: revealSlideLeft 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Footer */
+.footer-col[data-reveal].is-visible {
+  animation: revealFadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Sidebar */
+.policy-sidebar-card[data-reveal].is-visible {
+  animation: revealSlideLeft 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Policy article panel */
+.policy-article-panel[data-reveal].is-visible {
+  animation: revealSlideRight 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Loader classes */
 .spinner {
   width: 24px;
@@ -2998,7 +3851,7 @@ body:has(.app-page-bg) {
   border-radius: 12px;
   background: rgba(var(--primary-rgb), 0.1);
   border: 1px solid rgba(var(--primary-rgb), 0.25);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.35rem;
 }
 
 .consult-upi-badge {
@@ -3030,23 +3883,348 @@ body:has(.app-page-bg) {
   width: 100%;
 }
 
-.consult-qr {
-  background: #ffffff;
-  padding: 0.85rem 0.85rem 0.65rem;
-  border-radius: 20px;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.16);
-  border: 1.5px solid rgba(15, 23, 42, 0.08);
+/* Quick UPI Apps Grid */
+.consult-upi-apps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.consult-upi-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 750;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.consult-upi-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.consult-upi-app-btn {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.45rem;
+  justify-content: center;
+  gap: 0.22rem;
+  padding: 0.5rem 0.35rem;
+  border-radius: 12px;
+  background: var(--app-bg, var(--surface));
+  border: 1.5px solid var(--app-border, var(--card-border));
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-.consult-qr-img {
-  width: min(250px, 72vw);
-  height: min(250px, 72vw);
-  max-width: 260px;
-  max-height: 260px;
+.consult-upi-app-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  border-color: var(--app-color);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.consult-upi-app-icon {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.consult-upi-app-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.consult-upi-app-badge {
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.08rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--app-color);
+}
+
+.consult-upi-launch-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(37, 211, 102, 0.1);
+  border: 1px solid rgba(37, 211, 102, 0.3);
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin-top: 0.15rem;
+}
+
+.consult-launch-check {
+  color: #128c7e;
+  flex-shrink: 0;
+}
+
+/* QR Code Banner Button (Click to Open Large Zoom-in Modal) */
+.consult-qr-trigger-row {
+  width: 100%;
+}
+
+.consult-qr-zoom-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.08) 0%, rgba(var(--primary-rgb), 0.03) 100%), var(--surface);
+  border: 1.5px solid rgba(var(--primary-rgb), 0.35);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 3px 12px rgba(var(--primary-rgb), 0.08);
+  text-align: left;
+}
+
+.consult-qr-zoom-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.14) 0%, rgba(var(--primary-rgb), 0.06) 100%), var(--surface);
+  box-shadow: 0 8px 24px rgba(var(--primary-rgb), 0.16);
+}
+
+.consult-qr-zoom-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.consult-qr-icon-bubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+}
+
+.consult-qr-zoom-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.consult-qr-zoom-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 750;
+  color: var(--text-primary);
+}
+
+.consult-qr-zoom-pill {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-tint);
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--primary-rgb), 0.25);
+}
+
+.consult-qr-zoom-desc {
+  font-size: 0.71rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.consult-qr-zoom-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  border: 1px solid var(--card-border);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.consult-qr-zoom-btn:hover .consult-qr-zoom-action {
+  transform: scale(1.1);
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+/* Compact UPI ID Row */
+.consult-upi-id-compact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  border: 1px solid var(--card-border);
+}
+
+.consult-upi-id-compact-row .consult-upi-id-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.consult-upi-id-compact-row .consult-upi-value {
+  font-family: monospace;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* ── LARGE ZOOM-IN QR CODE POPUP MODAL ─────────────────────────── */
+.consult-qr-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: qrFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes qrFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.consult-qr-popup-card {
+  width: min(400px, 94vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1.5px solid var(--card-border);
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  animation: qrZoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes qrZoomIn {
+  0% { opacity: 0; transform: scale(0.88); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.consult-qr-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.15rem 0.75rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.consult-qr-popup-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.consult-qr-popup-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.consult-qr-popup-fee {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--primary-tint);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--primary-rgb), 0.25);
+}
+
+.consult-qr-popup-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: var(--surface-soft);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.consult-qr-popup-close-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.consult-qr-popup-body {
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: center;
+}
+
+.consult-qr-large-frame {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 20px;
+  box-shadow:
+    0 16px 36px rgba(15, 23, 42, 0.14),
+    0 0 0 1.5px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  width: min(270px, 80vw);
+}
+
+.consult-qr-large-img {
+  width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: contain;
   border-radius: 12px;
@@ -3055,107 +4233,168 @@ body:has(.app-page-bg) {
   image-rendering: crisp-edges;
 }
 
-.consult-qr-caption {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.08rem;
-  margin-top: 0.15rem;
-}
-
-.consult-qr-scan-hint {
-  font-size: 0.72rem;
-  font-weight: 700;
+.consult-qr-large-brand-tag {
+  font-size: 0.68rem;
+  font-weight: 750;
   color: #475569;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
-.consult-upi-id {
+.consult-qr-popup-upi-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.65rem;
+  gap: 0.75rem;
   width: 100%;
-  padding: 0.55rem 0.8rem;
+  padding: 0.6rem 0.85rem;
   border-radius: 12px;
-  background: var(--surface-muted);
+  background: var(--surface-soft);
   border: 1.5px solid var(--card-border);
+  text-align: left;
 }
 
-.consult-upi-id-left {
+.consult-qr-popup-upi-info {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.82rem;
-  color: var(--text-secondary);
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
-.consult-upi-label {
-  font-weight: 600;
+.consult-qr-popup-upi-lbl {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
   color: var(--text-muted);
 }
 
-.consult-upi-value {
+.consult-qr-popup-upi-val {
   font-family: monospace;
-  font-size: 0.84rem;
+  font-size: 0.9rem;
+  font-weight: 800;
   color: var(--text-primary);
-  font-weight: 750;
+  word-break: break-all;
 }
 
-.consult-copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: var(--primary-tint);
-  border: 1px solid rgba(var(--primary-rgb), 0.25);
-  color: var(--primary);
-  padding: 0.3rem 0.65rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 750;
-  font-size: 0.76rem;
-  font-family: inherit;
-  transition: all 0.2s ease;
+.consult-qr-popup-payee-name {
+  font-size: 0.68rem;
+  color: var(--text-muted);
 }
 
-.consult-copy-btn:hover {
-  background: var(--primary);
-  color: #fff;
+.consult-qr-popup-copy-btn {
+  flex-shrink: 0;
+  height: 1.95rem;
+  padding: 0 0.7rem;
 }
 
-.consult-field-last4 {
+.consult-qr-popup-instructions {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary-tint) 50%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  text-align: left;
   width: 100%;
+}
+
+.consult-qr-popup-done-btn {
+  width: 100%;
+  height: 2.7rem;
+  font-size: 0.86rem;
+  font-weight: 750;
+  gap: 0.45rem;
+  box-shadow: 0 6px 18px rgba(var(--primary-rgb), 0.28);
+}
+
+/* Mandatory UTR / Last 4 Digits Box */
+.consult-field-last4-box {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary-tint) 40%, var(--surface));
+  border: 2px dashed color-mix(in srgb, var(--primary) 55%, var(--card-border));
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0.4rem;
 }
 
-.consult-input-last4 {
-  font-size: 1.4rem !important;
+.consult-last4-main-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 750;
+  color: var(--text-primary);
+  cursor: pointer;
+  flex-wrap: wrap;
+}
+
+.consult-mandatory-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.12rem 0.42rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.consult-last4-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.consult-input-last4-prominent {
+  font-size: 1.35rem !important;
   font-weight: 800 !important;
-  letter-spacing: 0.3em !important;
+  letter-spacing: 0.35em !important;
   text-align: center !important;
-  width: 160px !important;
-  max-width: 100% !important;
-  height: 2.85rem !important;
-  border-radius: 12px !important;
-  border: 2px solid var(--card-border) !important;
-  background: var(--card-bg) !important;
+  width: 140px !important;
+  height: 2.65rem !important;
+  border-radius: 10px !important;
+  border: 2px solid var(--primary) !important;
+  background: var(--surface) !important;
   color: var(--text-primary) !important;
 }
 
-.consult-input-last4:focus {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2) !important;
+.consult-input-last4-prominent:focus {
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.25) !important;
 }
 
-.consult-last4-hint {
-  font-size: 0.72rem;
+.consult-last4-status {
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.consult-status-valid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+}
+
+.consult-status-waiting {
   color: var(--text-muted);
-  text-align: center;
-  margin-top: 0.35rem;
+}
+
+.consult-last4-instruction {
+  font-size: 0.69rem;
+  color: var(--text-muted);
   line-height: 1.35;
-  max-width: 320px;
+  margin: 0;
+}
+
+.disabled-btn {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  pointer-events: none;
 }
 
 .consult-actions {
@@ -3175,6 +4414,43 @@ body:has(.app-page-bg) {
 
 .consult-actions .btn-primary {
   flex: 1.6;
+}
+
+/* Email Dispatched Badge on Step 3 */
+.consult-email-dispatched-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+
+.consult-email-icon {
+  color: #2563eb;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.consult-email-dispatched-box strong {
+  font-size: 0.8rem;
+  color: #1e40af;
+  display: block;
+}
+
+.consult-email-dispatched-box p {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  margin: 0.15rem 0 0;
+  line-height: 1.35;
+}
+
+.consult-email-dispatched-box code {
+  font-weight: 700;
+  color: var(--primary);
 }
 
 /* Card payment */

@@ -3,36 +3,43 @@ import { CONSULTATION_FEE, DOCTOR_NAME, DOCTOR_NOTIFY_EMAIL } from '../config/cl
 
 function formatPaymentReference(data) {
   const ref = data.upiLast4 || data.upiRefNo;
-  return ref ? `UPI Txn ID (last 4 digits): ${ref}` : 'UPI payment confirmed';
+  return ref ? `UPI Txn ID / UTR (last 4 digits): ${ref}` : 'UPI payment confirmed';
 }
 
 function buildConsultationSummary(data) {
-  const paymentMethod = 'UPI (Google Pay / PhonePe)';
+  const paymentMethod = 'UPI (Google Pay / PhonePe / Paytm / Amazon Pay)';
   const lines = [
-    'New MEDI DROP consultation booking',
-    '',
+    '🩺 New MEDI DROP Doctor Consultation Booking',
+    '============================================',
     `Doctor: ${DOCTOR_NAME}`,
-    `Patient name: ${data.name}`,
-    `Patient email: ${data.email}`,
-    `Patient phone: ${data.phone}`,
+    `Doctor Email: ${DOCTOR_NOTIFY_EMAIL}`,
     '',
-    `Preferred date: ${data.date}`,
-    `Preferred time: ${data.time}`,
+    '👤 PATIENT DETAILS:',
+    `• Patient Name: ${data.name}`,
+    `• Patient Email: ${data.email}`,
+    `• Patient Phone: ${data.phone}`,
     '',
-    `Symptoms / concern:`,
-    data.symptoms,
+    '📅 APPOINTMENT SCHEDULE:',
+    `• Preferred Date: ${data.date}`,
+    `• Preferred Time: ${data.time}`,
     '',
-    `Payment method: ${paymentMethod}`,
-    formatPaymentReference(data),
-    `Consultation fee: ₹${CONSULTATION_FEE}`,
+    '💬 SYMPTOMS & HEALTH CONCERN:',
+    data.symptoms || 'General Consultation',
     '',
-    `Booked at: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`,
+    '💳 PAYMENT DETAILS:',
+    `• Payment Method: ${paymentMethod}`,
+    `• Receiver UPI ID: ancyshaji1996@oksbi`,
+    `• ${formatPaymentReference(data)}`,
+    `• Consultation Fee Paid: ₹${CONSULTATION_FEE}`,
+    '',
+    `🕒 Booked At: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`,
+    '============================================',
   ];
   return lines.join('\n');
 }
 
 function buildTemplateParams(data) {
-  const paymentMethod = 'UPI (Google Pay / PhonePe)';
+  const paymentMethod = 'UPI (Google Pay / PhonePe / Paytm / Amazon Pay)';
 
   return {
     to_email: DOCTOR_NOTIFY_EMAIL,
@@ -53,7 +60,16 @@ function buildTemplateParams(data) {
   };
 }
 
-/** Sends consultation details to the doctor Gmail via EmailJS (after payment step). */
+/**
+ * Direct mailto link to medidrop.co.in@gmail.com with formatted booking summary
+ */
+export function buildDoctorGmailMailtoUrl(booking) {
+  const subject = encodeURIComponent(`[MEDI DROP Booking] ₹99 Consult - ${booking.name || 'Patient'} (${booking.date || 'Scheduled'})`);
+  const body = encodeURIComponent(buildConsultationSummary(booking));
+  return `mailto:${DOCTOR_NOTIFY_EMAIL}?subject=${subject}&body=${body}`;
+}
+
+/** Sends consultation details to the doctor Gmail medidrop.co.in@gmail.com via EmailJS (after payment step). */
 export async function notifyDoctorConsultation(data) {
   const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
   const templateId = import.meta.env.VITE_EMAILJS_DOCTOR_TEMPLATE_ID;
@@ -61,11 +77,16 @@ export async function notifyDoctorConsultation(data) {
 
   if (!serviceId || !templateId || !publicKey) {
     console.warn(
-      'Doctor email skipped: set VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_DOCTOR_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY in .env'
+      `Doctor email dispatch skipped in local mode. Notification targeted to: ${DOCTOR_NOTIFY_EMAIL}. (Set VITE_EMAILJS_SERVICE_ID in .env for production SMTP).`
     );
-    return { sent: false, skipped: true };
+    return { sent: false, skipped: true, email: DOCTOR_NOTIFY_EMAIL };
   }
 
-  await emailjs.send(serviceId, templateId, buildTemplateParams(data), { publicKey });
-  return { sent: true };
+  try {
+    const res = await emailjs.send(serviceId, templateId, buildTemplateParams(data), { publicKey });
+    return { sent: true, response: res };
+  } catch (err) {
+    console.warn('EmailJS delivery attempt notice:', err);
+    return { sent: false, error: err };
+  }
 }
