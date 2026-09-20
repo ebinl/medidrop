@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Stethoscope, Menu, X, Sun, Moon, Pill, LogIn, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, Stethoscope, Menu, X, Sun, Moon, Pill, LogIn, LogOut, User, LayoutDashboard, Search, MessageCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { shareWebsiteOnWhatsApp } from '../services/shareUtils';
 
 const THEME_KEY = 'medidrop-theme';
 
@@ -15,7 +16,7 @@ function getInitialTheme() {
   return 'light';
 }
 
-export default function Navbar({ cartCount, onCartClick, onConsultationClick, addToast }) {
+export default function Navbar({ cartCount, onCartClick, onConsultationClick, onSearchClick, onShareClick, addToast }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState(getInitialTheme);
   const location = useLocation();
@@ -102,6 +103,15 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
     }
   };
 
+  const handleWhatsAppShare = () => {
+    shareWebsiteOnWhatsApp();
+    addToast?.({
+      title: 'WhatsApp Share',
+      message: 'Opening WhatsApp to share MEDI DROP with full details & consultation link.',
+      type: 'success',
+    });
+  };
+
   const whyUsHref = location.pathname === '/' ? '#features' : '/#features';
   const displayName = user?.displayName || user?.email?.split('@')[0] || 'Account';
 
@@ -165,6 +175,17 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
 
   const desktopNavItems = (
     <>
+      <button
+        type="button"
+        className="nav-search-trigger-btn"
+        onClick={onSearchClick}
+        aria-label="Instant search remedies, symptoms & consult"
+      >
+        <Search size={15} />
+        <span>Instant Search...</span>
+        <kbd className="nav-search-kbd">⌘K</kbd>
+      </button>
+
       <NavLink to="/remedies" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMenu}>
         Remedies
       </NavLink>
@@ -182,6 +203,18 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
 
   const mobileNavItems = (
     <>
+      <button
+        type="button"
+        onClick={() => { closeMenu(); onSearchClick(); }}
+        className="nav-link nav-mobile-action-row nav-mobile-search-row"
+      >
+        <span className="nav-mobile-action-label">
+          <Search size={17} />
+          <span>Instant Search Remedies & Consult</span>
+        </span>
+        <kbd className="nav-search-kbd">⌘K</kbd>
+      </button>
+
       <NavLink to="/remedies" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} onClick={closeMenu}>
         Remedies
       </NavLink>
@@ -195,6 +228,16 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
       </button>
       {authMobile}
       <div className="nav-mobile-divider" />
+      <button
+        type="button"
+        onClick={() => { closeMenu(); handleWhatsAppShare(); }}
+        className="nav-link nav-mobile-action-row"
+      >
+        <span className="nav-mobile-action-label">
+          <MessageCircle size={17} style={{ color: '#25d366' }} />
+          <span>Share on WhatsApp</span>
+        </span>
+      </button>
       <button
         type="button"
         onClick={() => { closeMenu(); onCartClick(); }}
@@ -237,6 +280,26 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
         </div>
 
         <div className="nav-actions">
+          <button
+            type="button"
+            onClick={onSearchClick}
+            className="nav-search-icon-btn"
+            aria-label="Instant search remedies and symptoms"
+            title="Search (⌘K)"
+          >
+            <Search size={18} />
+          </button>
+
+          <button
+            type="button"
+            onClick={handleWhatsAppShare}
+            className="nav-whatsapp-btn"
+            aria-label="Share website on WhatsApp"
+            title="Share website on WhatsApp"
+          >
+            <MessageCircle size={18} />
+          </button>
+
           <button
             type="button"
             onClick={toggleTheme}
@@ -286,3 +349,4 @@ export default function Navbar({ cartCount, onCartClick, onConsultationClick, ad
     </>
   );
 }
+

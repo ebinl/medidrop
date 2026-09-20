@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CartPanel from './components/CartPanel';
@@ -13,6 +13,8 @@ import PolicyPage from './pages/PolicyPage';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import WhatsAppChatBot from './components/WhatsAppChatBot';
+import QuickSearchModal from './components/QuickSearchModal';
+import SharePromoModal from './components/SharePromoModal';
 import { AuthProvider } from './context/AuthContext';
 
 function AppShell() {
@@ -23,7 +25,30 @@ function AppShell() {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchInitialQuery, setSearchInitialQuery] = useState('');
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
+
+  const handleOpenSearch = (query = '') => {
+    setSearchInitialQuery(typeof query === 'string' ? query : '');
+    setIsSearchOpen(true);
+  };
+
+  // Global Cmd+K / Ctrl+K keyboard shortcut listener for Instant Search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen((prev) => {
+          if (!prev) setSearchInitialQuery('');
+          return !prev;
+        });
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const addToast = ({ title, message, type = 'info', duration = 4000 }) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -103,6 +128,7 @@ function AppShell() {
           cartCount={cartItems.reduce((acc, item) => acc + item.quantity, 0)}
           onCartClick={() => setIsCartOpen(true)}
           onConsultationClick={() => setIsConsultationOpen(true)}
+          onSearchClick={handleOpenSearch}
           addToast={addToast}
         />
       )}
@@ -115,6 +141,7 @@ function AppShell() {
               <HomePage
                 onConsultationClick={() => setIsConsultationOpen(true)}
                 onAddToCart={handleAddToCart}
+                onSearchClick={handleOpenSearch}
               />
             }
           />
@@ -157,6 +184,20 @@ function AppShell() {
           <ConsultationModal
             isOpen={isConsultationOpen}
             onClose={() => setIsConsultationOpen(false)}
+            addToast={addToast}
+          />
+
+          <QuickSearchModal
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            initialQuery={searchInitialQuery}
+            onConsultationClick={() => setIsConsultationOpen(true)}
+            onAddToCart={handleAddToCart}
+          />
+
+          <SharePromoModal
+            isOpen={isShareOpen}
+            onClose={() => setIsShareOpen(false)}
             addToast={addToast}
           />
 

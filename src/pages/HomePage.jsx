@@ -7,14 +7,14 @@ import TreatmentTabs from '../components/TreatmentTabs';
 import { Activity, HeartPulse, Clock, ArrowRight } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
-export default function HomePage({ onConsultationClick, onAddToCart }) {
+export default function HomePage({ onConsultationClick, onAddToCart, onSearchClick }) {
   const featuresRef = useScrollReveal('[data-reveal]');
   const ctaRef = useScrollReveal('[data-reveal]');
   const remediesMoreRef = useScrollReveal('[data-reveal]');
 
   return (
     <>
-      <Hero onConsultationClick={onConsultationClick} />
+      <Hero onConsultationClick={onConsultationClick} onSearchClick={onSearchClick} />
 
       <DoctorCard onConsultationClick={onConsultationClick} />
 
