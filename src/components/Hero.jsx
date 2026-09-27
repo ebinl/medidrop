@@ -27,8 +27,8 @@ export default function Hero({ onConsultationClick, onSearchClick }) {
           </div>
 
           <h1 className="hero-title">
-            <span className="hero-title-line">Consult the Best Homeo Doctor in India &</span>
-            <span className="hero-title-line hero-title-accent">Get Pure Remedies Delivered Express</span>
+            <span className="hero-title-line">Premium Customised Homoeopathic Remedies Delivered</span>
+            <span className="hero-title-line hero-title-accent">Directly to Your Doorstep</span>
           </h1>
 
           <p className="hero-sub">
