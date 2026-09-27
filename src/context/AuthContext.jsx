@@ -21,7 +21,7 @@ const LEGACY_ADMIN_PASSWORDS = [
   ADMIN_PASSWORD,
   'admin',
   'admin12',
-  'Admin1234',
+  'Admin123',
   'password',
   'Password@123',
 ];
