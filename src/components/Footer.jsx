@@ -87,27 +87,6 @@ export default function Footer({ onConsultationClick }) {
           </div>
         </div>
 
-        {/* SEO Keywords Footer Bar */}
-        <div className="footer-seo-keywords">
-          <p className="footer-seo-heading">Popular Searches & Regional Homeopathy Care:</p>
-          <p className="footer-seo-pills">
-            <span>Best Homeo Doctor in India</span> • 
-            <span>Online Homeopathy Consultation ₹99</span> • 
-            <span>Dr. Ancy Shaji Homeopathy Doctor</span> • 
-            <span>Homeopathy Doctor Bangalore</span> • 
-            <span>Homeopathy Doctor Kerala</span> • 
-            <span>Homeopathy Doctor Mumbai</span> • 
-            <span>Homeopathy Doctor Delhi NCR</span> • 
-            <span>Homeopathy Doctor Hyderabad</span> • 
-            <span>Homeopathy Doctor Chennai</span> • 
-            <span>PCOD Homeopathic Treatment</span> • 
-            <span>Migraine Homeopathy Medicine</span> • 
-            <span>Thyroid Homeo Care</span> • 
-            <span>Buy Homeopathic Dilutions Online India</span> • 
-            <span>Constitutional Homeopathy Online</span>
-          </p>
-        </div>
-
         <div className="footer-bottom">
           <p className="footer-copy">
             &copy; {new Date().getFullYear()} MEDI DROP Homeopathy Clinic. All rights reserved. Registered Indian Medical & Homeopathic Service.
