@@ -27,7 +27,7 @@ export default function Hero({ onConsultationClick, onSearchClick }) {
           </div>
 
           <h1 className="hero-title">
-            <span className="hero-title-line">Premium Customised Homoeopathic Remedies Delivered</span>
+            <span className="hero-title-line">Premium Homeopathic Remedies Delivered</span>
             <span className="hero-title-line hero-title-accent">Directly to Your Doorstep</span>
           </h1>
 
