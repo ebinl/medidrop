@@ -4,7 +4,6 @@ import Hero from '../components/Hero';
 import DoctorCard from '../components/DoctorCard';
 import MedicineGrid from '../components/MedicineGrid';
 import TreatmentTabs from '../components/TreatmentTabs';
-import SeoAuthoritySection from '../components/SeoAuthoritySection';
 import { Activity, HeartPulse, Clock, ArrowRight } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
@@ -63,9 +62,6 @@ export default function HomePage({ onConsultationClick, onAddToCart, onSearchCli
         </Link>
       </div>
 
-      {/* High-Impact SEO Authority, Google Sitelinks & Lead Booster */}
-      <SeoAuthoritySection onConsultationClick={onConsultationClick} />
-
       <section className="consult-cta-section" ref={ctaRef}>
         <div className="glass consult-cta-panel" data-reveal="scale">
           <h3>Need a Customized Treatment Plan?</h3>
@@ -84,4 +80,5 @@ export default function HomePage({ onConsultationClick, onAddToCart, onSearchCli
     </>
   );
 }
+
 

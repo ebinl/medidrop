@@ -6,7 +6,7 @@ import { CLINIC_PHONE } from '../config/clinic';
 
 const DOCTOR = {
   name: 'Dr. Ancy Shaji',
-  title: 'Senior Homeopathic Physician • Best Homeo Doctor in India',
+  title: 'Senior Homeopathic Physician (BHMS)',
   image: '/doctor-consultation.png',
   experience: '20+ years clinical practice',
   patients: '15,000+ patients treated',
