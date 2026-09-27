@@ -251,15 +251,6 @@ export default function SeoAuthoritySection({ onConsultationClick }) {
             </p>
           </div>
 
-          <div className="glass seo-authority-card">
-            <div className="seo-auth-icon-wrap">
-              <ShieldCheck size={24} />
-            </div>
-            <h4>Hahnemannian Purity Guarantee</h4>
-            <p>
-              We dispense only 100% certified, unadulterated homeopathic potencies and mother tinctures prepared strictly according to German and Indian pharmacopoeia standards.
-            </p>
-          </div>
 
           <div className="glass seo-authority-card">
             <div className="seo-auth-icon-wrap">
