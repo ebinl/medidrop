@@ -23,7 +23,7 @@ export default function Hero({ onConsultationClick, onSearchClick }) {
         <div className="hero-banner-content">
           <div className="hero-badge glass">
             <ShieldCheck size={16} />
-            <span>Best Homeo Doctor in India • Online Consultation @ ₹99 • Doorstep Delivery</span>
+            <span>100% Certified Safe & Natural Solutions</span>
           </div>
 
           <h1 className="hero-title">
@@ -32,7 +32,7 @@ export default function Hero({ onConsultationClick, onSearchClick }) {
           </h1>
 
           <p className="hero-sub">
-            Gentle, effective and root-cause homeopathic care with personalized constitutional remedies. Consult online with senior physician <strong>Dr. Ancy Shaji (BHMS, 20+ Yrs Exp)</strong> for just <strong>₹99</strong>.
+            Gentle, effective and holistic homeopathic care with personalized remedies prepared with precision. Consult online with certified specialists for just <strong>₹99</strong>.
           </p>
 
           {/* Interactive Hero Search Form */}
