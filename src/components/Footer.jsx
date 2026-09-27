@@ -19,7 +19,7 @@ export default function Footer({ onConsultationClick }) {
               />
             </Link>
             <p className="footer-text">
-              India's premier online homeopathy clinic. Consult senior physician <strong>Dr. Ancy Shaji (BHMS)</strong> via video for ₹99 and order pure Hahnemannian potencies with express pan-India delivery.
+              India's premier online homeopathy clinic. Consult senior physician <strong>Dr. Ancy Shaji (BHMS)</strong> online for ₹99 and order pure Hahnemannian potencies with express doorstep delivery.
             </p>
             <div className="footer-badge-trust">
               <ShieldCheck size={14} />

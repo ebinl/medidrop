@@ -19,7 +19,7 @@ const DOCTOR = {
   specialties: ['PCOD & Thyroid', 'Chronic Migraines', 'Pediatric Care', 'Allergy & Asthma', 'Eczema & Hair Loss', 'Arthritis & Joint Pain'],
   languages: 'English, Malayalam, Hindi',
   availability: 'Mon–Sat · 10:00 AM – 8:00 PM',
-  bio: 'Renowned senior homeopathic physician providing individualized constitutional video consultations across India. Specialized in root-cause healing with 100% natural, side-effect-free remedies.',
+  bio: 'Renowned senior homeopathic physician providing individualized constitutional online consultations across India. Specialized in root-cause healing with 100% natural, side-effect-free remedies.',
 };
 
 export default function DoctorCard({ onConsultationClick }) {
@@ -110,7 +110,7 @@ export default function DoctorCard({ onConsultationClick }) {
             </button>
             <a
               href={`https://wa.me/91${CLINIC_PHONE}?text=${encodeURIComponent(
-                'Hello Dr. Ancy Shaji, I would like to book an online Homeopathy video consultation for ₹99.'
+                'Hello Dr. Ancy Shaji, I would like to book an online Homeopathy consultation for ₹99.'
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -121,7 +121,7 @@ export default function DoctorCard({ onConsultationClick }) {
             </a>
             <button type="button" className="btn btn-primary" onClick={onConsultationClick}>
               <Stethoscope size={16} />
-              Book Video Consult (₹99)
+              Book Online Consult (₹99)
             </button>
           </div>
         </div>

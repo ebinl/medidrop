@@ -83,7 +83,7 @@ export default function SharePromoModal({ isOpen, onClose, addToast }) {
             <div className="share-promo-perks">
               <div className="share-perk-item">
                 <span className="share-perk-emoji">🩺</span>
-                <span><strong>₹99 Video Consult</strong> with Dr. Ancy Shaji (BHMS)</span>
+                <span><strong>₹99 Online Consult</strong> with Dr. Ancy Shaji (BHMS)</span>
               </div>
               <div className="share-perk-item">
                 <span className="share-perk-emoji">🚚</span>

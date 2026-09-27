@@ -25,8 +25,8 @@ CLINIC INFORMATION:
 - WhatsApp / Phone: +91 97467 58698
 - Email: medidrop.co.in@gmail.com
 - Timings: Monday to Saturday, 10:00 AM to 8:00 PM IST
-- Video Consultation: ₹99 (via Google Meet or WhatsApp Video)
-- Pan-India Delivery: Dispatched in 24 hours, arrives in 2-4 business days. FREE shipping on orders above ₹499 (₹50 below that).
+- Online Consultation: ₹99
+- Doorstep Delivery: Dispatched in 24 hours, arrives in 2-4 business days. FREE shipping on orders above ₹499 (₹50 below that).
 - Payment: Google Pay, PhonePe, Paytm, BHIM UPI (UPI ID: ancyshaji1996@oksbi)
 
 AVAILABLE MEDICINES (30ml sealed bottles):
@@ -41,7 +41,7 @@ AVAILABLE MEDICINES (30ml sealed bottles):
 9. Allium Cepa 30C — ₹155 (Allergic rhinitis, runny nose, sneezing fits, hay fever)
 10. Thuja Occidentalis 200C — ₹220 (Warts, skin tags, corns, polyps)
 
-CHRONIC CONDITIONS (Recommend ₹99 video consultation with Dr. Ancy):
+CHRONIC CONDITIONS (Recommend ₹99 online consultation with Dr. Ancy):
 PCOD/PCOS, Migraine, Thyroid (Hypo/Hyper), Diabetes, Arthritis, Chronic Eczema, Psoriasis, Hair Fall & Alopecia, Kidney Stones, Sinusitis, Piles/Fissures, Insomnia.
 
 DOSAGE RULES:
@@ -53,7 +53,7 @@ DOSAGE RULES:
 RESPONSE RULES:
 - Provide empathetic, clinical, actionable guidance with homeopathic remedy names and dosage instructions.
 - Keep answers structured with **bold** text and bullet points.
-- Always provide next steps: booking a ₹99 video consult or chatting with Dr. Ancy on WhatsApp (+91 97467 58698).
+- Always provide next steps: booking a ₹99 online consult or chatting with Dr. Ancy on WhatsApp (+91 97467 58698).
 - For severe medical emergencies (chest pain, breathlessness, heavy trauma), advise calling 112/108 immediately.`;
 
 /**
@@ -263,14 +263,14 @@ export function getClinicalAIResponse(userMessage, query) {
       text: `🚨 **EMERGENCY ADVISORY:**\n\nFor severe emergency conditions like acute chest pain, severe breathlessness, sudden numbness, or heavy trauma, please **call 112 / 108 or go to the nearest emergency hospital immediately**.\n\nHomeopathy is for non-critical constitutional & chronic care. For urgent clinic inquiries, reach Dr. Ancy at **${CLINIC_PHONE_DISPLAY}**.`,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Urgent inquiry for Dr. Ancy Shaji from MEDI DROP website.`,
-      quickReplies: ['📱 Call Clinic Helpline', '🩺 Book Video Consult (₹99)']
+      quickReplies: ['📱 Call Clinic Helpline', '🩺 Book Online Consult (₹99)']
     };
   }
 
   // 2. GREETINGS & INTRODUCTIONS
   if (/^(hi|hello|hey|hola|namaste|good\s*morning|good\s*afternoon|good\s*evening|howdy|heyy+|hii+)\b/i.test(q) || q === 'hi' || q === 'hello' || q === 'hey') {
     return {
-      text: `Hello! 👋 Welcome to **MEDI DROP Homeopathy Clinic**.\n\nI'm your **AI Healthcare Assistant**, working alongside **${CLINIC_DOCTOR_NAME}** (BHMS). How can I help you today?\n\n• 🌿 **Remedy Recommendations** for acidity, headache, colds, joint pain, skin & hair\n• 🩺 **Book 1-on-1 Video Consult** for **₹${CONSULTATION_FEE}**\n• 💧 **Dosage & Usage Instructions** for liquid drops\n• 📦 **Medicine Orders & Fast Delivery** across India\n• 📱 **Direct WhatsApp Support** with Dr. Ancy\n\n*Type any health question or symptom to begin!*`,
+      text: `Hello! 👋 Welcome to **MEDI DROP Homeopathy Clinic**.\n\nI'm your **AI Healthcare Assistant**, working alongside **${CLINIC_DOCTOR_NAME}** (BHMS). How can I help you today?\n\n• 🌿 **Remedy Recommendations** for acidity, headache, colds, joint pain, skin & hair\n• 🩺 **Book 1-on-1 Online Consult** for **₹${CONSULTATION_FEE}**\n• 💧 **Dosage & Usage Instructions** for liquid drops\n• 📦 **Medicine Orders & Fast Delivery** across India\n• 📱 **Direct WhatsApp Support** with Dr. Ancy\n\n*Type any health question or symptom to begin!*`,
       showConsultationCTA: true,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Hello Dr. Ancy, I am visiting the MEDI DROP website and would like to inquire about treatment.`,
@@ -281,11 +281,11 @@ export function getClinicalAIResponse(userMessage, query) {
   // 3. WHO IS DOCTOR / QUALIFICATIONS
   if (/\b(who is (the )?doctor|doctor qualification|doctor qualifications|about (the )?doctor|who is dr ancy|bhms degree|doctor credentials|doctor experience|physician details|tell me about doctor)\b/i.test(q)) {
     return {
-      text: `**About Dr. Ancy Shaji (BHMS):**\n\n• **Designation**: Senior Homeopathic Physician & Founder of MEDI DROP\n• **Degree**: Bachelor of Homeopathic Medicine and Surgery (BHMS)\n• **Expertise**: Chronic lifestyle disorders, PCOD/PCOS, Thyroid balance, Migraine management, Dermatology (Eczema/Acne/Hair fall), and Pediatric wellness.\n• **Consultation**: 1-on-1 private video calls via Google Meet or WhatsApp Video for **₹${CONSULTATION_FEE}**.\n• **Phone / WhatsApp**: **${CLINIC_PHONE_DISPLAY}** 📱`,
+      text: `**About Dr. Ancy Shaji (BHMS):**\n\n• **Designation**: Senior Homeopathic Physician & Founder of MEDI DROP\n• **Degree**: Bachelor of Homeopathic Medicine and Surgery (BHMS)\n• **Expertise**: Chronic lifestyle disorders, PCOD/PCOS, Thyroid balance, Migraine management, Dermatology (Eczema/Acne/Hair fall), and Pediatric wellness.\n• **Consultation**: 1-on-1 private online consultation for **₹${CONSULTATION_FEE}**.\n• **Phone / WhatsApp**: **${CLINIC_PHONE_DISPLAY}** 📱`,
       showConsultationCTA: true,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Hello Dr. Ancy Shaji, I would like to book a consultation with you.`,
-      quickReplies: ['🩺 Book Video Consult (₹99)', '📱 WhatsApp Doctor', '🌿 View Treatments']
+      quickReplies: ['🩺 Book Online Consult (₹99)', '📱 WhatsApp Doctor', '🌿 View Treatments']
     };
   }
 
@@ -305,7 +305,7 @@ export function getClinicalAIResponse(userMessage, query) {
       showConsultationCTA: true,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Hello Dr. Ancy, I have a question about taking homeopathy with my current medications.`,
-      quickReplies: ['🩺 Book Video Consult', '💧 Dosage Guide', '📱 WhatsApp Doctor']
+      quickReplies: ['🩺 Book Online Consult', '💧 Dosage Guide', '📱 WhatsApp Doctor']
     };
   }
 
@@ -321,10 +321,10 @@ export function getClinicalAIResponse(userMessage, query) {
   // 7. CONSULTATION BOOKING & PRICING
   if (/\b(book|booking|appointment|consult|consultation|schedule|slots|slot|video call|online consult|consult fee|consultation fee|how much is consult|pricing)\b/i.test(q)) {
     return {
-      text: `**Book a 1-on-1 Video Consultation with Dr. Ancy Shaji:**\n\n• **Fee**: Only **₹${CONSULTATION_FEE}** (Special introductory clinic rate)\n• **Mode**: Private video call on Google Meet or WhatsApp Video\n• **Timings**: Mon–Sat, 10:00 AM – 8:00 PM IST\n• **What's Included**:\n  1. Complete constitutional case analysis\n  2. Custom personalized remedy prescription\n  3. Diet & lifestyle protocol\n  4. Pan-India home delivery of medicines 📦\n\nTap the button below to book your slot!`,
+      text: `**Book a 1-on-1 Online Consultation with Dr. Ancy Shaji:**\n\n• **Fee**: Only **₹${CONSULTATION_FEE}** (Special introductory clinic rate)\n• **Mode**: Private online consultation\n• **Timings**: Mon–Sat, 10:00 AM – 8:00 PM IST\n• **What's Included**:\n  1. Complete constitutional case analysis\n  2. Custom personalized remedy prescription\n  3. Diet & lifestyle protocol\n  4. Doorstep home delivery of medicines 📦\n\nTap the button below to book your slot!`,
       showConsultationCTA: true,
       showWhatsAppCTA: true,
-      whatsappPrefillText: `Hello Dr. Ancy, I would like to book a video consultation for ₹99. Please share available slots.`,
+      whatsappPrefillText: `Hello Dr. Ancy, I would like to book an online consultation for ₹99. Please share available slots.`,
       quickReplies: ['🩺 Book Consultation (₹99)', '📱 WhatsApp for Slots', '🌿 View Remedies']
     };
   }
@@ -332,7 +332,7 @@ export function getClinicalAIResponse(userMessage, query) {
   // 8. DELIVERY, SHIPPING & TRACKING
   if (/\b(delivery|deliver|shipping|ship|courier|tracking|track|pan india|order status|when will i receive|dispatch)\b/i.test(q)) {
     return {
-      text: `**MEDI DROP Shipping & Delivery Details:**\n\n• **Dispatch**: Orders are dispatched within **24 hours** from our clinical pharmacy.\n• **Delivery Time**: **2 to 4 business days** pan-India.\n• **Free Shipping**: FREE delivery on all orders **above ₹499** (₹50 flat fee for smaller orders).\n• **Packaging**: Tamper-proof, leak-proof sealed clinical glass bottles.\n• **Tracking**: Live tracking ID sent via WhatsApp & SMS after dispatch 📦\n\nTrack your order anytime via WhatsApp: **${CLINIC_PHONE_DISPLAY}**.`,
+      text: `**MEDI DROP Shipping & Delivery Details:**\n\n• **Dispatch**: Orders are dispatched within **24 hours** from our clinical pharmacy.\n• **Delivery Time**: **2 to 4 business days** doorstep delivery across India.\n• **Free Shipping**: FREE delivery on all orders **above ₹499** (₹50 flat fee for smaller orders).\n• **Packaging**: Tamper-proof, leak-proof sealed clinical glass bottles.\n• **Tracking**: Live tracking ID sent via WhatsApp & SMS after dispatch 📦\n\nTrack your order anytime via WhatsApp: **${CLINIC_PHONE_DISPLAY}**.`,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Hello MEDI DROP Team, I would like to track my order.`,
       quickReplies: ['📦 Track My Order', '🌿 Browse Remedies', '🩺 Book Consult']
@@ -399,7 +399,7 @@ export function getClinicalAIResponse(userMessage, query) {
   // 14. SPECIFIC AILMENT: PCOD, PCOS & WOMEN'S HEALTH
   if (['pcod', 'pcos', 'period', 'irregular period', 'ovarian cyst', 'hormone', 'menstrual', 'cramp', 'white discharge', 'menopause'].some(k => q.includes(k))) {
     return {
-      text: `**Homeopathic Protocol for PCOD / PCOS & Hormonal Balance:**\n\n• **Core Approach**: Homeopathy naturally regularizes your menstrual cycle, balances LH/FSH hormone ratios, dissolves ovarian cysts, and clears hormonal acne and weight gain without synthetic hormone pills.\n• **Key Constitutional Remedies**: **Pulsatilla 200C**, **Sepia 200C**, and **Calcarea Carbonica 200C**.\n• **Recommendation**: Because PCOD requires individualized remedy selection matching your exact ultrasound & symptom profile, we strongly recommend a **₹99 Video Consultation with Dr. Ancy Shaji**.`,
+      text: `**Homeopathic Protocol for PCOD / PCOS & Hormonal Balance:**\n\n• **Core Approach**: Homeopathy naturally regularizes your menstrual cycle, balances LH/FSH hormone ratios, dissolves ovarian cysts, and clears hormonal acne and weight gain without synthetic hormone pills.\n• **Key Constitutional Remedies**: **Pulsatilla 200C**, **Sepia 200C**, and **Calcarea Carbonica 200C**.\n• **Recommendation**: Because PCOD requires individualized remedy selection matching your exact ultrasound & symptom profile, we strongly recommend an **online consultation with Dr. Ancy Shaji for ₹99**.`,
       showConsultationCTA: true,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Hello Dr. Ancy, I want to consult you regarding homeopathic treatment for PCOD / PCOS.`,
@@ -421,7 +421,7 @@ export function getClinicalAIResponse(userMessage, query) {
   // 16. SPECIFIC AILMENT: SKIN, ACNE, ECZEMA, WARTS & HAIR FALL
   if (['hair', 'hair fall', 'alopecia', 'dandruff', 'skin', 'acne', 'pimple', 'eczema', 'psoriasis', 'wart', 'skin tag', 'itching', 'allergy'].some(k => q.includes(k))) {
     return {
-      text: `**Homeopathic Dermatology & Hair Care:**\n\n• **Warts & Skin Tags**: **Thuja Occidentalis 200C** (₹220) — 4 drops once daily on empty stomach for safe painless removal.\n• **Skin Allergy & Hives (Itching)**: **Apis Mellifica 30C** (₹185) — rapid relief for burning red rashes.\n• **Hair Fall & Dandruff**: Targeted constitutional therapy with **Natrum Mur 1M** & **Arnica Scalp Tonic**.\n• **Chronic Eczema & Acne**: Non-suppressive internal purification with **Sulphur 200C** / **Berberis Aquifolium**.\n\n*Book a ₹99 video consultation with Dr. Ancy for a complete customized skin/hair regimen.*`,
+      text: `**Homeopathic Dermatology & Hair Care:**\n\n• **Warts & Skin Tags**: **Thuja Occidentalis 200C** (₹220) — 4 drops once daily on empty stomach for safe painless removal.\n• **Skin Allergy & Hives (Itching)**: **Apis Mellifica 30C** (₹185) — rapid relief for burning red rashes.\n• **Hair Fall & Dandruff**: Targeted constitutional therapy with **Natrum Mur 1M** & **Arnica Scalp Tonic**.\n• **Chronic Eczema & Acne**: Non-suppressive internal purification with **Sulphur 200C** / **Berberis Aquifolium**.\n\n*Book a ₹99 online consultation with Dr. Ancy for a complete customized skin/hair regimen.*`,
       showConsultationCTA: true,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Hello Dr. Ancy, I need homeopathic guidance for skin / hair fall treatment.`,
@@ -488,11 +488,11 @@ export function getClinicalAIResponse(userMessage, query) {
 
   // 22. GENERAL INTELLIGENT FALLBACK
   return {
-    text: `Thank you for reaching out to **MEDI DROP Homeopathy Clinic**! 🌿\n\nHomeopathy provides safe, individualized natural treatments for over 80+ acute and chronic health conditions.\n\nTo give you the most accurate remedy guidance:\n• What are your primary symptoms?\n• How long have you experienced them?\n• What makes the condition better or worse?\n\nOr feel free to **chat directly with Dr. Ancy Shaji** at **${CLINIC_PHONE_DISPLAY}** or book a **₹${CONSULTATION_FEE} private video consultation** below!`,
+    text: `Thank you for reaching out to **MEDI DROP Homeopathy Clinic**! 🌿\n\nHomeopathy provides safe, individualized natural treatments for over 80+ acute and chronic health conditions.\n\nTo give you the most accurate remedy guidance:\n• What are your primary symptoms?\n• How long have you experienced them?\n• What makes the condition better or worse?\n\nOr feel free to **chat directly with Dr. Ancy Shaji** at **${CLINIC_PHONE_DISPLAY}** or book an **online consultation for ₹${CONSULTATION_FEE}** below!`,
     showConsultationCTA: true,
     showWhatsAppCTA: true,
     whatsappPrefillText: `Hello Dr. Ancy, I need homeopathic guidance for: "${userMessage}".`,
-    quickReplies: ['🩺 Book ₹99 Video Consult', '📱 Chat on WhatsApp', '🌿 Acidity & Gas', '🤧 Cold & Cough']
+    quickReplies: ['🩺 Book ₹99 Online Consult', '📱 Chat on WhatsApp', '🌿 Acidity & Gas', '🤧 Cold & Cough']
   };
 }
 

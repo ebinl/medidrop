@@ -23,7 +23,7 @@ export default function Hero({ onConsultationClick, onSearchClick }) {
         <div className="hero-banner-content">
           <div className="hero-badge glass">
             <ShieldCheck size={16} />
-            <span>Best Homeo Doctor in India • Online Video Consultation @ ₹99 • Pan-India Delivery</span>
+            <span>Best Homeo Doctor in India • Online Consultation @ ₹99 • Doorstep Delivery</span>
           </div>
 
           <h1 className="hero-title">

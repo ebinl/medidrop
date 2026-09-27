@@ -150,7 +150,7 @@ export default function WhatsAppChatBot({ onConsultationClick, onAddToCart, addT
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: `Hello! 👋 Welcome to **MEDI DROP Homeopathy Clinic**.\n\nI am your AI Healthcare Assistant, working with **${CLINIC_DOCTOR_NAME}**.\n\nHow can I help you today? You can ask about:\n• 🌿 Remedies for acidity, cold, joint pain, allergies, skin\n• 🩺 Book a 1-on-1 Video Consult for **₹${CONSULTATION_FEE}**\n• 💧 How to take liquid drops & dosage\n• 📦 Medicine delivery across India\n\nOr click below to chat on WhatsApp at **${CLINIC_PHONE_DISPLAY}**!`,
+      text: `Hello! 👋 Welcome to **MEDI DROP Homeopathy Clinic**.\n\nI am your AI Healthcare Assistant, working with **${CLINIC_DOCTOR_NAME}**.\n\nHow can I help you today? You can ask about:\n• 🌿 Remedies for acidity, cold, joint pain, allergies, skin\n• 🩺 Book a 1-on-1 Online Consult for **₹${CONSULTATION_FEE}**\n• 💧 How to take liquid drops & dosage\n• 📦 Medicine delivery across India\n\nOr click below to chat on WhatsApp at **${CLINIC_PHONE_DISPLAY}**!`,
       showWhatsAppCTA: true,
       whatsappPrefillText: `Hello Dr. Ancy, I am visiting MEDI DROP and would like to ask a question.`,
       showConsultationCTA: true,
@@ -577,7 +577,7 @@ export default function WhatsAppChatBot({ onConsultationClick, onAddToCart, addT
                       <div className="whatsapp-consult-info">
                         <Stethoscope size={16} className="whatsapp-consult-icon" />
                         <div>
-                          <strong>Book 1-on-1 Video Consult</strong>
+                          <strong>Book 1-on-1 Online Consult</strong>
                           <span>Only ₹{CONSULTATION_FEE} with {CLINIC_DOCTOR_NAME}</span>
                         </div>
                       </div>

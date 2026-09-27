@@ -21,7 +21,7 @@ import { CLINIC_PHONE } from '../config/clinic';
 import { shareWebsiteOnWhatsApp } from '../services/shareUtils';
 
 const POPULAR_QUICK_TAGS = [
-  { label: '🩺 Video Consult ₹99', query: 'consultation' },
+  { label: '🩺 Online Consult ₹99', query: 'consultation' },
   { label: '🔥 Acidity & Gas', query: 'acidity' },
   { label: '🌸 PCOD / PCOS', query: 'pcod' },
   { label: '🧠 Migraine Relief', query: 'migraine' },
@@ -189,7 +189,7 @@ export default function QuickSearchModal({
                     <span>Certified Senior Physician</span>
                   </div>
                   <h4>Online Homeopathy Consultation with Dr. Ancy Shaji</h4>
-                  <p>1-on-1 Video consultation via Google Meet/WhatsApp + personalized prescription dispatched to your doorstep.</p>
+                  <p>1-on-1 Online consultation + personalized prescription dispatched directly to your doorstep.</p>
                 </div>
                 <div className="quick-search-featured-actions">
                   <span className="quick-search-featured-price">₹99</span>
@@ -220,7 +220,7 @@ export default function QuickSearchModal({
                     <Stethoscope size={20} />
                   </div>
                   <div>
-                    <h5>Instant Video Consult</h5>
+                    <h5>Instant Online Consult</h5>
                     <p>Consult Dr. Ancy Shaji today for just ₹99</p>
                   </div>
                   <ChevronRight size={16} className="quick-service-arrow" />

@@ -12,10 +12,10 @@ _Gentle, Natural & Effective Healing with Zero Side Effects_
 Hello! 👋 I wanted to share this trusted online homeopathy healthcare portal with you:
 
 ✨ *Key Highlights:*
-• 🩺 *Online Doctor Video Consultation @ only ₹99* with certified senior homeopathic specialists.
+• 🩺 *Online Doctor Consultation @ only ₹99* with certified senior homeopathic specialists.
 • 🌿 *100% Pure Organic Dilutions & Tinctures* (Nux Vomica, Arnica, Rhus Tox, Bryonia & more).
 • 🌸 *Specialized Constitutional Protocols*: Acidity & Gas, PCOD/PCOS, Migraine, Arthritis & Joint Pain, Thyroid, Skin & Hair Fall, Child Colic.
-• 📦 *Express Pan-India Medicine Delivery* to your door (FREE shipping on orders ₹499+).
+• 📦 *Express Doorstep Medicine Delivery* (FREE shipping on orders ₹499+).
 • 💬 *Instant AI & WhatsApp Doctor Support*.
 
 🔗 *Consult online or explore remedies here:*

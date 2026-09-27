@@ -38,14 +38,14 @@ const PATIENT_REVIEWS = [
     city: 'Bangalore, Karnataka',
     condition: 'Chronic PCOD & Hormonal Acne',
     rating: 5,
-    text: 'Dr. Ancy Shaji is hands down the best homeo doctor I have consulted in India. After 3 years of hormonal medications with severe side effects, her constitutional remedy regularized my cycle in 4 months. The ₹99 video consultation and fast courier delivery to Bangalore made the whole process effortless!',
+    text: 'Dr. Ancy Shaji is hands down the best homeo doctor I have consulted in India. After 3 years of hormonal medications with severe side effects, her constitutional remedy regularized my cycle in 4 months. The ₹99 online consultation and fast courier delivery to Bangalore made the whole process effortless!',
   },
   {
     name: 'Rajesh Sharma',
     city: 'Mumbai, Maharashtra',
     condition: 'Severe Migraine & Acid Reflux',
     rating: 5,
-    text: 'I was skeptical about online homeopathy, but Dr. Ancy took 45 minutes to understand my full history. The medicine kit arrived in Mumbai in 2 days. My debilitating weekly migraines have stopped completely. Highly recommended for anyone looking for the best homeo doctor online in India.',
+    text: 'I was skeptical about online homeopathy, but Dr. Ancy took 45 minutes to understand my full history. The medicine kit arrived at my doorstep in Mumbai in 2 days. My debilitating weekly migraines have stopped completely. Highly recommended for anyone looking for the best homeo doctor online in India.',
   },
   {
     name: 'Deepa Varma',
@@ -59,19 +59,19 @@ const PATIENT_REVIEWS = [
 const FAQS = [
   {
     q: 'Who is the best homeo doctor in India for online consultation?',
-    a: 'Dr. Ancy Shaji (BHMS) is recognized among the best homeo doctors in India, bringing over 20 years of clinical experience in classical constitutional homeopathy and having successfully treated 15,000+ patients across India and globally. On MEDI DROP, you can consult Dr. Ancy Shaji directly via private video consultation for just ₹99.',
+    a: 'Dr. Ancy Shaji (BHMS) is recognized among the best homeo doctors in India, bringing over 20 years of clinical experience in classical constitutional homeopathy and having successfully treated 15,000+ patients across India and globally. On MEDI DROP, you can consult Dr. Ancy Shaji directly via private online consultation for just ₹99.',
   },
   {
-    q: 'How does an online Homeopathy video consultation work on MEDI DROP?',
-    a: 'Booking an appointment is seamless: 1. Click "Consult Doctor" and pick your convenient time slot for ₹99. 2. Connect with Dr. Ancy Shaji (BHMS) over a 1-on-1 private video call. 3. The doctor analyzes your physical, emotional, and constitutional symptoms in depth. 4. You receive an official digital prescription and your customized homeopathic medicine kit is dispatched express to your door anywhere in India.',
+    q: 'How does an online Homeopathy consultation work on MEDI DROP?',
+    a: 'Booking an appointment is seamless: 1. Click "Consult Doctor" and pick your convenient time slot for ₹99. 2. Connect with Dr. Ancy Shaji (BHMS) over a 1-on-1 private online consultation. 3. The doctor analyzes your physical, emotional, and constitutional symptoms in depth. 4. You receive an official digital prescription and your customized homeopathic medicine kit is dispatched express with doorstep delivery anywhere in India.',
   },
   {
     q: 'How much does a Homeopathy consultation cost in India on MEDI DROP?',
-    a: 'A complete 1-on-1 private video consultation with Dr. Ancy Shaji on MEDI DROP costs only ₹99 with zero hidden charges. We believe world-class constitutional homeopathic healthcare should be affordable and accessible to every Indian family.',
+    a: 'A complete 1-on-1 private online consultation with Dr. Ancy Shaji on MEDI DROP costs only ₹99 with zero hidden charges. We believe world-class constitutional homeopathic healthcare should be affordable and accessible to every Indian family.',
   },
   {
-    q: 'Does MEDI DROP deliver homeopathic medicines across all pin codes in India?',
-    a: 'Yes, we dispatch sealed, certified homeopathic dilutions, mother tinctures, and customized remedy packs to all 28,000+ PIN codes across India within 24 hours. Shipments are packaged in temperature-stable, protective boxing with real-time tracking.',
+    q: 'Does MEDI DROP provide express doorstep delivery of homeopathic medicines across India?',
+    a: 'Yes, we dispatch sealed, certified homeopathic dilutions, mother tinctures, and customized remedy packs to all 28,000+ PIN codes across India within 24 hours with reliable doorstep delivery. Shipments are packaged in temperature-stable, protective boxing with real-time tracking.',
   },
   {
     q: 'What chronic diseases can be effectively treated with Homeopathy?',
@@ -121,7 +121,7 @@ export default function SeoAuthoritySection({ onConsultationClick }) {
             </div>
             <div className="seo-sitelink-text">
               <h4>Consult Best Homeo Doctor (₹99)</h4>
-              <p>Book 1-on-1 private video consultation with Dr. Ancy Shaji (BHMS, 20+ Yrs Exp).</p>
+              <p>Book 1-on-1 private online consultation with Dr. Ancy Shaji (BHMS, 20+ Yrs Exp).</p>
             </div>
             <ArrowRight size={16} className="seo-sitelink-arrow" />
           </div>
@@ -132,7 +132,7 @@ export default function SeoAuthoritySection({ onConsultationClick }) {
             </div>
             <div className="seo-sitelink-text">
               <h4>Pure Homeopathic Remedies Store</h4>
-              <p>Certified Hahnemannian potencies & dilutions with express pan-India delivery.</p>
+              <p>Certified Hahnemannian potencies & dilutions with express doorstep delivery.</p>
             </div>
             <ArrowRight size={16} className="seo-sitelink-arrow" />
           </Link>
@@ -169,7 +169,7 @@ export default function SeoAuthoritySection({ onConsultationClick }) {
             Consult the Best Homeo Doctor in India for Your Health Condition
           </h3>
           <p className="seo-lead-sub">
-            Click your condition below to book an immediate 1-on-1 video consultation with Dr. Ancy Shaji for just <strong>₹99</strong>.
+            Click your condition below to book an immediate 1-on-1 online consultation with Dr. Ancy Shaji for just <strong>₹99</strong>.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export default function SeoAuthoritySection({ onConsultationClick }) {
               <h4 className="seo-condition-name">{cond.name}</h4>
               <p className="seo-condition-desc">{cond.desc}</p>
               <div className="seo-condition-action">
-                <span>Book Video Consult</span>
+                <span>Book Online Consult</span>
                 <ChevronRight size={14} />
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function SeoAuthoritySection({ onConsultationClick }) {
             <div className="seo-auth-icon-wrap">
               <Truck size={24} />
             </div>
-            <h4>Express Pan-India Medicine Dispatch</h4>
+            <h4>Express Doorstep Medicine Delivery</h4>
             <p>
               Prescriptions and remedy kits are dispatched within 24 hours in secure, climate-controlled packaging directly to your doorstep in over 28,000+ PIN codes across India.
             </p>
@@ -347,14 +347,14 @@ export default function SeoAuthoritySection({ onConsultationClick }) {
         </div>
       </div>
 
-      {/* Pan-India Delivery & Geographic SEO Keyword Cloud */}
+      {/* Doorstep Delivery & Geographic SEO Keyword Cloud */}
       <div className="seo-regions-block glass" data-reveal="fade-up">
         <div className="seo-regions-header">
           <MapPin size={18} className="seo-regions-icon" />
           <h4>Serving Patients Across All Indian States & Cities</h4>
         </div>
         <p className="seo-regions-desc">
-          Online Video Consultations with Dr. Ancy Shaji and express medicine delivery available across:
+          Online Consultations with Dr. Ancy Shaji and express doorstep medicine delivery available across:
         </p>
         <div className="seo-regions-tags">
           {MAJOR_REGIONS.map((region) => (
