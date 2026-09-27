@@ -23,16 +23,16 @@ export default function Hero({ onConsultationClick, onSearchClick }) {
         <div className="hero-banner-content">
           <div className="hero-badge glass">
             <ShieldCheck size={16} />
-            <span>100% Certified Safe & Natural Solutions • Pan-India Delivery</span>
+            <span>Best Homeo Doctor in India • Online Video Consultation @ ₹99 • Pan-India Delivery</span>
           </div>
 
           <h1 className="hero-title">
-            <span className="hero-title-line">Premium Homeopathic Remedies Delivered</span>
-            <span className="hero-title-line hero-title-accent">Directly to Your Doorstep</span>
+            <span className="hero-title-line">Consult the Best Homeo Doctor in India &</span>
+            <span className="hero-title-line hero-title-accent">Get Pure Remedies Delivered Express</span>
           </h1>
 
           <p className="hero-sub">
-            Gentle, effective and holistic homeopathic care with personalized remedies prepared with precision. Consult online with certified senior specialists for just <strong>₹99</strong>.
+            Gentle, effective and root-cause homeopathic care with personalized constitutional remedies. Consult online with senior physician <strong>Dr. Ancy Shaji (BHMS, 20+ Yrs Exp)</strong> for just <strong>₹99</strong>.
           </p>
 
           {/* Interactive Hero Search Form */}

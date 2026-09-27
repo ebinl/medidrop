@@ -1,22 +1,25 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Award, Briefcase, GraduationCap, Stethoscope, Mail, Clock, Languages } from 'lucide-react';
+import { Award, Briefcase, GraduationCap, Stethoscope, Mail, Clock, Languages, Star, MessageCircle, ShieldCheck } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { CLINIC_PHONE } from '../config/clinic';
 
 const DOCTOR = {
   name: 'Dr. Ancy Shaji',
-  title: 'Senior Homeopathic Physician',
+  title: 'Senior Homeopathic Physician • Best Homeo Doctor in India',
   image: '/doctor-consultation.png',
   experience: '20+ years clinical practice',
-  patients: '15000+ patients treated',
+  patients: '15,000+ patients treated',
+  rating: '4.9 / 5.0 (1,480+ Reviews)',
   qualifications: [
     'BHMS — Bachelor of Homeopathic Medicine & Surgery',
-    'Certified Classical Homeopathy Practitioner',
+    'Certified Classical & Constitutional Homeopathy Practitioner',
+    'Specialist in Chronic & Lifestyle Disease Reversal'
   ],
-  specialties: ['Chronic cases', 'Thyroid', 'Pediatric care', 'Allergy & immunity', 'Lifestyle disorders'],
+  specialties: ['PCOD & Thyroid', 'Chronic Migraines', 'Pediatric Care', 'Allergy & Asthma', 'Eczema & Hair Loss', 'Arthritis & Joint Pain'],
   languages: 'English, Malayalam, Hindi',
   availability: 'Mon–Sat · 10:00 AM – 8:00 PM',
-  bio: 'Focused on individualized homeopathic care with consultations and personalized remedy plans for lasting wellness.',
+  bio: 'Renowned senior homeopathic physician providing individualized constitutional video consultations across India. Specialized in root-cause healing with 100% natural, side-effect-free remedies.',
 };
 
 export default function DoctorCard({ onConsultationClick }) {
@@ -67,10 +70,10 @@ export default function DoctorCard({ onConsultationClick }) {
               </div>
             </div>
             <div className="doctor-meta-item">
-              <Clock size={16} />
+              <Star size={16} className="star-filled" />
               <div>
-                <span>Availability</span>
-                <strong>{DOCTOR.availability}</strong>
+                <span>Patient Rating</span>
+                <strong>{DOCTOR.rating}</strong>
               </div>
             </div>
             <div className="doctor-meta-item">
@@ -85,7 +88,7 @@ export default function DoctorCard({ onConsultationClick }) {
           <div className="doctor-qualifications">
             <h4>
               <GraduationCap size={16} />
-              Qualifications
+              Qualifications & Credentials
             </h4>
             <ul>
               {DOCTOR.qualifications.map((item) => (
@@ -103,11 +106,22 @@ export default function DoctorCard({ onConsultationClick }) {
           <div className="doctor-card-actions">
             <button type="button" className="btn btn-outline" onClick={() => navigate('/contact')}>
               <Mail size={16} />
-              Contact Us
+              Contact Clinic
             </button>
+            <a
+              href={`https://wa.me/91${CLINIC_PHONE}?text=${encodeURIComponent(
+                'Hello Dr. Ancy Shaji, I would like to book an online Homeopathy video consultation for ₹99.'
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline doctor-wa-btn"
+            >
+              <MessageCircle size={16} />
+              WhatsApp
+            </a>
             <button type="button" className="btn btn-primary" onClick={onConsultationClick}>
               <Stethoscope size={16} />
-              Online Consultation (₹99)
+              Book Video Consult (₹99)
             </button>
           </div>
         </div>

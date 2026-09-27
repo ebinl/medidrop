@@ -4,45 +4,74 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  
+  <!-- Primary Landing Page & Best Homeo Doctor in India Consultation -->
   <url>
     <loc>https://www.medidrop.co.in/</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.medidrop.co.in/medidrop-brand-logo.png</image:loc>
+      <image:title>MEDI DROP Best Homeo Doctor in India</image:title>
+      <image:caption>Online Homeopathy Doctor Consultation in India for ₹99</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.medidrop.co.in/doctor-consultation.png</image:loc>
+      <image:title>Dr. Ancy Shaji Senior Homeopathic Physician</image:title>
+      <image:caption>Consult Dr. Ancy Shaji BHMS - 20+ Years Clinical Experience</image:caption>
+    </image:image>
   </url>
+
+  <!-- Homeopathic Remedies & Dilutions Store -->
   <url>
     <loc>https://www.medidrop.co.in/remedies</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.9</priority>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://www.medidrop.co.in/homeo-remedy.png</image:loc>
+      <image:title>Pure Certified Homeopathic Dilutions and Remedies India</image:title>
+      <image:caption>Hahnemannian Potencies with Express Pan-India Delivery</image:caption>
+    </image:image>
   </url>
+
+  <!-- Clinic Contact & WhatsApp Direct Doctor Line -->
   <url>
     <loc>https://www.medidrop.co.in/contact</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
   </url>
+
+  <!-- Pan-India Shipping & Express Delivery -->
   <url>
     <loc>https://www.medidrop.co.in/shipping-policy</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
+
+  <!-- Returns & Refund Transparency -->
   <url>
     <loc>https://www.medidrop.co.in/returns-refunds</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
+
+  <!-- Privacy Policy -->
   <url>
     <loc>https://www.medidrop.co.in/privacy-policy</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+
+  <!-- Terms of Use -->
   <url>
     <loc>https://www.medidrop.co.in/terms-of-use</loc>
-    <lastmod>2026-09-21</lastmod>
+    <lastmod>2026-09-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
